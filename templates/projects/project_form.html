@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block title %}
+    {% if project %}Edit Project{% else %}New Project{% endif %} — ProjectFlow
+{% endblock %}
+{% block page_title %}
+    {% if project %}Edit Project{% else %}Create Project{% endif %}
+{% endblock %}
+{% block page_subtitle %}
+    {% if project %}Update your project's information.{% else %}Add a new project to organize your work.{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if project %}
+        <a href="{% url 'project_detail' project.id %}" class="back-link">&#8592; Back to Project</a>
+    {% else %}
+        <a href="{% url 'project_list' %}" class="back-link">&#8592; Back to Projects</a>
+    {% endif %}
+
+    <div class="card form-card">
+        <div class="form-card__body">
+            {% if form.non_field_errors %}
+                <div class="form-alert" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="form-stack">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Project name</label>
+                    <input
+                        type="text"
+                        name="{{ form.name.html_name }}"
+                        id="{{ form.name.id_for_label }}"
+                        class="form-input {% if form.name.errors %}form-input--error{% endif %}"
+                        value="{{ form.name.value|default:'' }}"
+                        placeholder="e.g. Website Redesign"
+                        required
+                    >
+                    {% for error in form.name.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea
+                        name="{{ form.description.html_name }}"
+                        id="{{ form.description.id_for_label }}"
+                        class="form-textarea {% if form.description.errors %}form-input--error{% endif %}"
+                        placeholder="What is this project about?"
+                    >{{ form.description.value|default:'' }}</textarea>
+                    {% for error in form.description.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary">
+                        {% if request.resolver_match.url_name == 'project_update' %}Save Changes{% else %}Create Project{% endif %}
+                    </button>
+                    <a href="{% if project %}{% url 'project_detail' project.id %}{% else %}{% url 'project_list' %}{% endif %}" class="btn btn--outline">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

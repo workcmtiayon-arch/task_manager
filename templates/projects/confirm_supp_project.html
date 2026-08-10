@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block title %}Delete Project — ProjectFlow{% endblock %}
+{% block page_title %}Delete Project{% endblock %}
+{% block page_subtitle %}This action cannot be undone.{% endblock %}
+
+{% block content %}
+    <a href="{% url 'project_list'%}" class="back-link">&#8592; Back to Project</a>
+
+    <div class="card form-card">
+        <div class="form-card__body">
+            <div class="form-alert" role="alert">
+                <p>Are you sure you want to delete <strong>{{ project.name }}</strong>? This will permanently remove the project and all of its tasks.</p>
+            </div>
+
+            <form method="post" class="form-actions">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--danger">Yes, Delete</button>
+                <a href="{% url 'project_list' %}" class="btn btn--outline">Cancel</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

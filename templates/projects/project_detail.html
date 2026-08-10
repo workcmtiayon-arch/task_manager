@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block title %}{{ project.name }} — ProjectFlow{% endblock %}
+{% block page_title %}{{ project.name }}{% endblock %}
+{% block page_subtitle %}Project details and tasks.{% endblock %}
+
+{% block content %}
+    <a href="{% url 'project_list' %}" class="back-link">&#8592; Back to Projects</a>
+
+    <div class="card detail-card">
+        <div class="detail-card__header">
+            <div>
+                <h2 class="detail-card__title">{{ project.name }}</h2>
+                <p class="detail-card__description">{{ project.description }}</p>
+            </div>
+            <div class="page-header__actions">
+                <a href="{% url 'project_update' project.id %}" class="btn btn--outline">Edit</a>
+                <form method="post" action="{% url 'project_delete' project.id %}"
+                      onsubmit="return confirm('Delete this project and all of its tasks?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn--danger-outline">Delete</button>
+                </form>
+            </div>
+        </div>
+
+        {% if project.task_count %}
+        <div class="detail-card__progress">
+            <div class="progress-bar">
+                <div class="progress-bar__fill" style="width: {{ project.progress_percent }}%;"></div>
+            </div>
+            <span class="detail-card__progress-label">{{ project.done_count }}/{{ project.task_count }} tasks done</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section-row">
+        <h2 class="section-row__title">Tasks</h2>
+        <a href="{% url 'task_list' %}?project={{ project.id }}" class="btn btn--primary">
+            <span aria-hidden="true">+</span> Add Task
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in project.tasks.all %}
+                    <tr>
+                        <td><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></td>
+                        <td>
+                            {% if task.status == 'DONE' %}
+                                <span class="badge badge--success">Done</span>
+                            {% elif task.status == 'IN_PROGRESS' %}
+                                <span class="badge badge--warning">In Progress</span>
+                            {% else %}
+                                <span class="badge badge--muted">To Do</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="empty-state">No tasks in this project yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

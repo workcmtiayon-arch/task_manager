@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ProjectFlow{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="brand-name">TaskFlow</span>
+            </div>
+
+            <nav class="sidebar__nav" aria-label="Main navigation">
+                <p class="nav-section-label">Navigation</p>
+
+                <a href="{% url 'project_list' %}"
+                   class="nav-link {% if active_nav == 'projects' %}nav-link--active{% endif %}">
+                    <span class="nav-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-link__label">Projects</span>
+                    <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
+                </a>
+
+                <a href="{% url 'task_list' %}"
+                   class="nav-link {% if active_nav == 'tasks' %}nav-link--active{% endif %}">
+                    <span class="nav-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M4.5 6l1 1 2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.5 12l1 1 2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.5 18l1 1 2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-link__label">Tasks</span>
+                    <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
+                </a>
+            </nav>
+
+            <div class="sidebar__footer">
+                <a href="" class="">
+                    <span class="user-mini__avatar">
+                        {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+                    </span>
+                    <span class="user-mini__info">
+                        <span class="user-mini__name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        <span class="user-mini__role">{{ request.user.get_role_display|default:request.user.role }}</span>
+                    </span>
+                </a>
+
+                <a href="{% url 'logout' %}" class="signout-link">
+                    <span class="signout-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 15l4-3-4-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    Sign out
+                </a>
+            </div>
+        </aside>
+
+        <button class="sidebar-overlay" id="sidebarOverlay" aria-label="Close menu" tabindex="-1"></button>
+
+        <div class="app__main">
+
+            <header class="topbar">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </button>
+
+                <div class="topbar__title">
+                    <h1 class="topbar__heading">{% block page_title %}Projects{% endblock %}</h1>
+                    <p class="topbar__subtitle">{% block page_subtitle %}{% endblock %}</p>
+                </div>
+
+                <div class="topbar__user">
+                    <span class="badge badge--role">{{ request.user.get_role_display|default:request.user.role }}</span>
+                    <span class="topbar__avatar">
+                        {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+                    </span>
+                </div>
+            </header>
+
+            <main class="content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'javascript/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

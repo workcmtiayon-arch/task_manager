@@ -1,0 +1,32 @@
+.task-detail__project {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.task-detail__project a:hover {
+    text-decoration: underline;
+}
+
+.task-detail__status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.task-detail__status .form-label {
+    margin: 0;
+    color: var(--muted-color);
+    font-weight: 600;
+}
+
+@media (max-width: 680px) {
+    .detail-card__header {
+        flex-direction: column;
+    }
+}

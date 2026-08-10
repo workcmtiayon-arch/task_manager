@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager — Organize your projects, manage your tasks</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <!-- ============ HEADER / NAVBAR ============ -->
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="#" class="navbar__logo">
+                <span class="navbar__logo-mark" aria-hidden="true">TM</span>
+                <span class="navbar__logo-text">Task Manager</span>
+            </a>
+
+            <input type="checkbox" id="nav-toggle" class="navbar__toggle-input">
+            <label for="nav-toggle" class="navbar__toggle" aria-label="Open menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <nav class="navbar__menu" aria-label="Main navigation">
+                <a href="#" class="navbar__link">Home</a>
+                <a href="#what-you-can-do" class="navbar__link">Features</a>
+                <a href="#how-it-works" class="navbar__link">About</a>
+                <div class="navbar__actions">
+                    <a href="{% url 'login' %}" class="btn btn--ghost">Login</a>
+                    <a href="{% url 'registration' %}" class="btn btn--primary">Get Started</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- ============ HERO SECTION ============ -->
+        <section class="hero">
+            <div class="hero__inner">
+                <div class="hero__content">
+                    <p class="eyebrow">Project &amp; task management</p>
+                    <h1 class="hero__title">Organize your projects. Manage your tasks. Stay productive.</h1>
+                    <p class="hero__subtitle">
+                        Task Manager brings your projects and tasks together in one clear
+                        workspace, so you always know what to work on next.
+                    </p>
+                    <div class="hero__actions">
+                        <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">Get Started</a>
+                        <a href="{% url 'login' %}" class="btn btn--outline btn--lg">Login</a>
+                    </div>
+                </div>
+
+                <!-- ============ APP VISUALIZATION (mock UI, no real data) ============ -->
+                <div class="hero__visual" aria-hidden="true">
+                    <div class="mock-window">
+                        <div class="mock-window__bar">
+                            <span class="mock-dot mock-dot--red"></span>
+                            <span class="mock-dot mock-dot--yellow"></span>
+                            <span class="mock-dot mock-dot--green"></span>
+                        </div>
+
+                        <div class="mock-window__body">
+                            <div class="mock-project">
+                                <span class="mock-project__name">Website Redesign</span>
+                                <span class="badge badge--progress">In Progress</span>
+                            </div>
+
+                            <ul class="mock-tasklist">
+                                <li class="mock-task">
+                                    <span class="mock-task__checkbox mock-task__checkbox--todo"></span>
+                                    <span class="mock-task__label">Design homepage</span>
+                                    <span class="badge badge--todo">To Do</span>
+                                </li>
+                                <li class="mock-task">
+                                    <span class="mock-task__checkbox mock-task__checkbox--progress"></span>
+                                    <span class="mock-task__label">Create authentication page</span>
+                                    <span class="badge badge--progress">In Progress</span>
+                                </li>
+                                <li class="mock-task">
+                                    <span class="mock-task__checkbox mock-task__checkbox--done"></span>
+                                    <span class="mock-task__label">Test project creation</span>
+                                    <span class="badge badge--done">Done</span>
+                                </li>
+                            </ul>
+
+                            <div class="mock-project mock-project--muted">
+                                <span class="mock-project__name">Mobile Application</span>
+                                <span class="badge badge--todo">To Do</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ WHAT YOU CAN DO ============ -->
+        <section class="features" id="what-you-can-do">
+            <div class="section-inner">
+                <p class="eyebrow eyebrow--center">Features</p>
+                <h2 class="section-title">What you can do with Task Manager</h2>
+
+                <div class="features__grid">
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">&#9635;</div>
+                        <h3 class="card__title">Project Management</h3>
+                        <p class="card__text">Create and organize your projects in one place.</p>
+                    </article>
+
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">&#10003;</div>
+                        <h3 class="card__title">Task Management</h3>
+                        <p class="card__text">Create tasks and associate them with your projects.</p>
+                    </article>
+
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">&#8635;</div>
+                        <h3 class="card__title">Task Tracking</h3>
+                        <p class="card__text">Track tasks through simple statuses such as To Do, In Progress and Done.</p>
+                    </article>
+
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">&#128274;</div>
+                        <h3 class="card__title">Secure Authentication</h3>
+                        <p class="card__text">Create an account and securely access your workspace.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ HOW IT WORKS ============ -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="section-inner">
+                <p class="eyebrow eyebrow--center">Getting started</p>
+                <h2 class="section-title">How it works</h2>
+
+                <ol class="steps">
+                    <li class="step">
+                        <span class="step__number">01</span>
+                        <h3 class="step__title">Create an account</h3>
+                        <p class="step__text">Create your account and access your workspace.</p>
+                    </li>
+                    <li class="step">
+                        <span class="step__number">02</span>
+                        <h3 class="step__title">Create a project</h3>
+                        <p class="step__text">Create a project to organize your work.</p>
+                    </li>
+                    <li class="step">
+                        <span class="step__number">03</span>
+                        <h3 class="step__title">Add and track tasks</h3>
+                        <p class="step__text">Create tasks inside your projects and follow their progress.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ============ WORKSPACE PREVIEW (mock UI, no real data) ============ -->
+        <section class="workspace">
+            <div class="section-inner workspace__inner">
+                <div class="workspace__copy">
+                    <p class="eyebrow">Your workspace</p>
+                    <h2 class="section-title section-title--left">Everything in one workspace</h2>
+                    <p class="workspace__text">
+                        Once you're logged in, your workspace gives you a simple overview
+                        of your projects and the tasks inside them, organized and easy to follow.
+                    </p>
+                </div>
+
+                <div class="workspace__visual" aria-hidden="true">
+                    <div class="mock-app">
+                        <aside class="mock-sidebar">
+                            <div class="mock-sidebar__brand">Task Manager</div>
+                            <div class="mock-sidebar__item mock-sidebar__item--active">Projects</div>
+                            <div class="mock-sidebar__item">Website Redesign</div>
+                            <div class="mock-sidebar__item">Mobile Application</div>
+                            <div class="mock-sidebar__item">Marketing Campaign</div>
+                        </aside>
+
+                        <div class="mock-app__content">
+                            <div class="mock-columns">
+                                <div class="mock-column">
+                                    <h4 class="mock-column__title">To Do</h4>
+                                    <div class="mock-card">Design homepage</div>
+                                    <div class="mock-card">Plan campaign assets</div>
+                                </div>
+                                <div class="mock-column">
+                                    <h4 class="mock-column__title">In Progress</h4>
+                                    <div class="mock-card">Create authentication page</div>
+                                </div>
+                                <div class="mock-column">
+                                    <h4 class="mock-column__title">Done</h4>
+                                    <div class="mock-card">Test project creation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ FINAL CALL TO ACTION ============ -->
+        <section class="cta">
+            <div class="section-inner cta__inner">
+                <h2 class="cta__title">Ready to organize your work?</h2>
+                <p class="cta__text">Create your account and start managing your projects and tasks today.</p>
+                <div class="cta__actions">
+                    <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">Create your account</a>
+                    <a href="{% url 'login' %}" class="btn btn--outline btn--lg">Login</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+        <div class="section-inner footer__inner">
+            <div class="footer__brand">
+                <span class="navbar__logo-mark" aria-hidden="true">TM</span>
+                <span class="footer__brand-text">Task Manager</span>
+                <p class="footer__tagline">A simple way to organize projects and tasks.</p>
+            </div>
+
+            <nav class="footer__links" aria-label="Footer navigation">
+                <a href="#" class="footer__link">Home</a>
+                <a href="{% url 'login' %}" class="footer__link">Login</a>
+                <a href="{% url 'registration' %}" class="footer__link">Register</a>
+            </nav>
+        </div>
+        <p class="footer__copyright">&copy; 2026 Task Manager. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

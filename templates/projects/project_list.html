@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block title %}Projects — ProjectFlow{% endblock %}
+{% block page_title %}Projects{% endblock %}
+{% block page_subtitle %}Manage and track all your projects.{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <span></span>
+        <a href="{% url 'project_add' %}" class="btn btn--primary">
+            <span aria-hidden="true">+</span> Create Project
+        </a>
+    </div>
+
+    <div class="projects-grid">
+        {% for project in projects %}
+        <article class="card project-card">
+            <div class="project-card__top">
+                <span class="project-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+
+                <div class="project-card__actions">
+                    <a href="{% url 'project_update' project.id %}" class="btn-icon btn-icon--edit" aria-label="Edit project" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="{% url 'project_delete' project.id %}" class="btn-icon btn-icon--delete" aria-label="Delete project" title="Delete">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <h3 class="project-card__title">
+                <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
+            </h3>
+            <p class="project-card__description">{{ project.description }}</p>
+
+            {% if project.task_count %}
+            <div class="progress-bar">
+                <div class="progress-bar__fill" style="width: {{ project.progress_percent }}%;"></div>
+            </div>
+            {% endif %}
+
+            <div class="project-card__footer">
+                <span>{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
+                <a href="{% url 'project_detail' project.id %}" class="link-arrow">View Project &#8594;</a>
+            </div>
+        </article>
+        {% empty %}
+        <p class="empty-state">You don't have any projects yet. Create your first one to get started.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

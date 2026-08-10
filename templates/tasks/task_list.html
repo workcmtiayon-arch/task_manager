@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/tasks.css' %}">
+{% endblock %}
+
+{% block title %}Tasks — ProjectFlow{% endblock %}
+{% block page_title %}Tasks{% endblock %}
+{% block page_subtitle %}All your tasks across every project.{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <span></span>
+        <a href="{% url 'add_task' %}" class="btn btn--primary">
+            <span aria-hidden="true">+</span> Create Task
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Project</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></td>
+                        <td class="is-muted">
+                            <a href="{% url 'project_detail' task.project.id %}">{{ task.project.name }}</a>
+                        </td>
+                        <td>
+                            {% if task.status == 'DONE' %}
+                                <span class="badge badge--success">Done</span>
+                            {% elif task.status == 'IN_PROGRESS' %}
+                                <span class="badge badge--warning">In Progress</span>
+                            {% else %}
+                                <span class="badge badge--muted">To Do</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="empty-state">You don't have any tasks yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
