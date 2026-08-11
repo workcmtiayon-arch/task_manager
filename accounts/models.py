@@ -17,3 +17,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+[11/Aug/2026 15:58:50] "GET /favicon.ico HTTP/1.1" 404 2978
+git add .
+git commit -m "new version"
+git push
