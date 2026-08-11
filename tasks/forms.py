@@ -4,48 +4,30 @@ from django import forms
 # On importe notre modèle Task
 from .models import Task
 
-# On importe le modèle Project de l'application projects
-from projects.models import Project
 
-
-# On crée un formulaire basé sur le modèle Task
 class TaskForm(forms.ModelForm):
+    """
+    Formulaire permettant de créer ou modifier une tâche.
 
-    # Le constructeur reçoit obligatoirement l'utilisateur connecté
-    # depuis la vue : TaskForm(request.user, ...)
-    def __init__(self, user, *args, **kwargs):
+    Le projet n'est volontairement PAS présent dans ce formulaire.
+    Le projet est déterminé par la vue à partir du projet
+    dans lequel l'utilisateur se trouve.
+    """
 
-        # On initialise normalement le formulaire Django
-        # avec les données éventuelles envoyées par l'utilisateur
-        super().__init__(*args, **kwargs)
-
-        # On récupère le champ "project" du formulaire
-        # et on limite les projets proposés à ceux appartenant
-        # uniquement à l'utilisateur actuellement connecté.
-        self.fields['project'].queryset = Project.objects.filter(
-            user=user
-        )
-
-    # La classe Meta indique à Django comment construire
-    # automatiquement le formulaire à partir du modèle Task.
     class Meta:
-
-        # Le formulaire est basé sur notre modèle Task
+        # Le formulaire est basé sur le modèle Task
         model = Task
 
-        # Voici les champs du modèle que l'utilisateur
-        # pourra remplir dans le formulaire.
+        # Champs que l'utilisateur peut créer ou modifier
         fields = [
-            'project',
             'title',
             'description',
             'status',
             'due_date'
         ]
 
-        # On personnalise les labels affichés devant les champs.
+        # Libellés affichés dans le formulaire
         labels = {
-            'project': 'Project of task',
             'title': 'Task title',
             'description': 'Description',
             'status': 'Task status',

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/tasks.css' %}">
+{% endblock %}
+
+{% block title %}
+    {% if task %}Edit Task{% else %}New Task{% endif %} — ProjectFlow
+{% endblock %}
+{% block page_title %}
+    {% if task %}Edit Task{% else %}Create Task{% endif %}
+{% endblock %}
+{% block page_subtitle %}
+    {% if task %}Update this task's information.{% else %}Add a task to one of your projects.{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if task %}
+        <a href="{% url 'task_detail' task.id %}" class="back-link">&#8592; Back to Task</a>
+    {% else %}
+        <a href="{% url 'task_list' %}" class="back-link">&#8592; Back to Tasks</a>
+    {% endif %}
+
+    <div class="card form-card">
+        <div class="form-card__body">
+            {% if form.non_field_errors %}
+                <div class="form-alert" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="form-stack">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Task title</label>
+                    <input
+                        type="text"
+                        name="{{ form.title.html_name }}"
+                        id="{{ form.title.id_for_label }}"
+                        class="form-input {% if form.title.errors %}form-input--error{% endif %}"
+                        value="{{ form.title.value|default:'' }}"
+                        placeholder="e.g. Design homepage"
+                        required
+                    >
+                    {% for error in form.title.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea
+                        name="{{ form.description.html_name }}"
+                        id="{{ form.description.id_for_label }}"
+                        class="form-textarea {% if form.description.errors %}form-input--error{% endif %}"
+                        placeholder="What needs to be done?"
+                    >{{ form.description.value|default:'' }}</textarea>
+                    {% for error in form.description.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.due_date.id_for_label }}" class="form-label">Due date</label>
+                    <input
+                        type="date"
+                        name="{{ form.due_date.html_name }}"
+                        id="{{ form.due_date.id_for_label }}"
+                        class="form-input {% if form.due_date.errors %}form-input--error{% endif %}"
+                        value="{{ form.due_date.value|date:'Y-m-d'|default:'' }}"
+                    >
+                    {% for error in form.due_date.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select
+                        name="{{ form.status.html_name }}"
+                        id="{{ form.status.id_for_label }}"
+                        class="form-select {% if form.status.errors %}form-input--error{% endif %}"
+                    >
+                        {% for value, label in form.status.field.choices %}
+                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.status.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary">
+                        {% if task %}Save Changes{% else %}Create Task{% endif %}
+                    </button>
+                    <a href="{% if task %}{% url 'task_detail' task.id %}{% else %}{% url 'task_list' %}{% endif %}" class="btn btn--outline">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
