@@ -64,6 +64,23 @@
     min-height: 2.6em;
 }
 
+.project-card__date {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.project-card__date svg {
+    width: 13px;
+    height: 13px;
+}
+
+.link-arrow--center {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+}
+
 .progress-bar {
     height: 6px;
     border-radius: 999px;
@@ -73,7 +90,7 @@
 
 .progress-bar__fill {
     height: 100%;
-    background-color: var(--primary-color);
+    background-color: #22c55e;
     border-radius: 999px;
 }
 
@@ -170,7 +187,7 @@
 }
 
 .detail-card__meta-item--progress {
-    color: var(--primary-color);
+    color: #F59E0B;
 }
 
 .detail-card__progress {
@@ -670,4 +687,73 @@
         opacity: 1;
         margin-left: 36px;
     }
+}
+
+/* ---------- Segmented progress bar (project detail) ---------- */
+.progress-bar--segmented {
+    display: flex;
+    background-color: var(--background-color);
+}
+
+.progress-bar__segment {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.progress-bar__segment--done {
+    background-color: #22c55e;
+}
+
+.progress-bar__segment--progress {
+    background-color: #F59E0B;
+}
+
+.progress-bar__segment--todo {
+    background-color: #d1d5db;
+}
+
+.detail-card__progress-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--muted-color);
+}
+
+.detail-card__progress-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-card__progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+.detail-card__progress-dot--done {
+    background-color: #22c55e;
+}
+
+.detail-card__progress-dot--progress {
+    background-color: #F59E0B;
+}
+
+.detail-card__progress-dot--todo {
+    background-color: #d1d5db;
+}
+
+.project-card__progress-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+}
+
+.project-card__progress-percent {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted-color);
 }

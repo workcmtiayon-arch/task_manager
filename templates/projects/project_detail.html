@@ -73,8 +73,30 @@
             <span class="detail-card__progress-title">Progress</span>
             <span class="detail-card__progress-percent">{{ project.progress_percent }}% complete</span>
         </div>
-        <div class="progress-bar">
-            <div class="progress-bar__fill" style="width: {{ project.progress_percent }}%;"></div>
+        <div class="progress-bar progress-bar--segmented">
+            {% if project.done_percent %}
+            <div class="progress-bar__segment progress-bar__segment--done" style="width: {{ project.done_percent }}%;"></div>
+            {% endif %}
+            {% if project.in_progress_percent %}
+            <div class="progress-bar__segment progress-bar__segment--progress" style="width: {{ project.in_progress_percent }}%;"></div>
+            {% endif %}
+            {% if project.todo_percent %}
+            <div class="progress-bar__segment progress-bar__segment--todo" style="width: {{ project.todo_percent }}%;"></div>
+            {% endif %}
+        </div>
+        <div class="detail-card__progress-legend">
+            <span class="detail-card__progress-legend-item">
+                <span class="detail-card__progress-dot detail-card__progress-dot--done"></span>
+                {{ project.done_count }} done
+            </span>
+            <span class="detail-card__progress-legend-item">
+                <span class="detail-card__progress-dot detail-card__progress-dot--progress"></span>
+                {{ project.in_progress_count }} in progress
+            </span>
+            <span class="detail-card__progress-legend-item">
+                <span class="detail-card__progress-dot detail-card__progress-dot--todo"></span>
+                {{ project.todo_count }} to do
+            </span>
         </div>
     </div>
     {% endif %}

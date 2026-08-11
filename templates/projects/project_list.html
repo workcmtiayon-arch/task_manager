@@ -47,6 +47,9 @@
             <p class="project-card__description">{{ project.description }}</p>
 
             {% if project.task_count %}
+            <div class="project-card__progress-row">
+                <span class="project-card__progress-percent">{{ project.progress_percent }}% complete</span>
+            </div>
             <div class="progress-bar">
                 <div class="progress-bar__fill" style="width: {{ project.progress_percent }}%;"></div>
             </div>
@@ -54,8 +57,16 @@
 
             <div class="project-card__footer">
                 <span>{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
-                <a href="{% url 'project_detail' project.id %}" class="link-arrow">View Project &#8594;</a>
+                <span class="project-card__date">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    {{ project.update_at|date:"M j, Y" }}
+                </span>
             </div>
+
+            <a href="{% url 'project_detail' project.id %}" class="link-arrow link-arrow--center">View Project &#8594;</a>
         </article>
         {% empty %}
         <p class="empty-state">You don't have any projects yet. Create your first one to get started.</p>
@@ -156,7 +167,7 @@
             const overlay = document.getElementById('modal-overlay');
             const modalBody = document.getElementById('modal-body');
             const closeBtn = document.getElementById('modal-close');
-            let currentUrl = null; // garde en mémoire l'URL réelle du formulaire chargé
+            let currentUrl = null;
 
             function extractContent(htmlText) {
                 const parser = new DOMParser();
@@ -168,7 +179,6 @@
             function openModal(html) {
                 modalBody.innerHTML = html;
                 overlay.hidden = false;
-                // on force un reflow avant d'ajouter la classe, sinon la transition ne se joue pas
                 requestAnimationFrame(function () {
                     overlay.classList.add('is-visible');
                 });
@@ -178,15 +188,14 @@
             function closeModal() {
                 overlay.classList.remove('is-visible');
                 currentUrl = null;
-                // on attend la fin de la transition avant de vider le contenu et de re-cacher
                 setTimeout(function () {
                     overlay.hidden = true;
                     modalBody.innerHTML = '';
-                }, 250); // doit correspondre à la durée de la transition CSS
+                }, 250);
             }
 
             function loadIntoModal(url) {
-                currentUrl = url; // on retient l'URL d'origine ici
+                currentUrl = url;
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function (response) { return response.text(); })
                     .then(function (text) { openModal(extractContent(text)); })
@@ -196,12 +205,12 @@
             function bindModalContent() {
                 const form = modalBody.querySelector('form');
                 if (form && currentUrl) {
-                    form.setAttribute('action', currentUrl); // on force l'action réelle
+                    form.setAttribute('action', currentUrl);
 
                     form.addEventListener('submit', function (e) {
                         e.preventDefault();
                         const formData = new FormData(form);
-                        const submitUrl = currentUrl; // capturé avant que closeModal() le vide
+                        const submitUrl = currentUrl;
 
                         fetch(submitUrl, {
                             method: 'POST',
