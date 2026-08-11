@@ -4,7 +4,6 @@ A Django-based task management application developed as part of an internship pr
 
 The project is designed to consolidate and strengthen practical knowledge of Django, particularly **MVT architecture, relational data modeling, authentication, CRUD operations, navigation, user-specific data isolation, and access control**.
 
----
 
 ## Project Overview
 
@@ -28,7 +27,6 @@ The application also distinguishes between public content and authenticated user
 * User-specific data isolation
 * Administrative permissions
 
----
 
 ## Project Objectives
 
@@ -50,13 +48,11 @@ The main learning objectives are:
 * Improve backend security practices
 * Understand how Django handles requests, forms, sessions, authentication and database queries
 
----
 
 ## Core Architecture
 
 The project follows Django's MVT architecture:
 
-```text
 User
  │
  ▼
@@ -74,11 +70,9 @@ Template
  │
  ▼
 HTML Response
-```
 
 The project is divided into several Django applications according to their responsibilities.
 
-```text
 Task Manager
 │
 ├── accounts/
@@ -96,9 +90,7 @@ Task Manager
 │
 └── tasks/
     └── task management
-```
 
----
 
 ## Data Model
 
@@ -108,7 +100,6 @@ The application is based on related entities rather than a single-table structur
 
 A custom Django user model is used.
 
-```text
 User
 │
 ├── username
@@ -116,7 +107,6 @@ User
 ├── password
 ├── role
 └── account status
-```
 
 The custom user model is based on Django's `AbstractUser`.
 
@@ -124,19 +114,15 @@ The project uses:
 
 ```python
 AUTH_USER_MODEL = "accounts.User"
-```
 
 ### Project
 
 Each project belongs to one user.
 
-```text
 User 1 ──────────── * Project
-```
 
 Conceptually:
 
-```text
 User
  │
  ├── Project A
@@ -145,15 +131,12 @@ User
  │
  └── Project B
       └── Task 3
-```
 
 ### Task
 
 Each task belongs to one project.
 
-```text
 Project 1 ──────────── * Task
-```
 
 A task contains:
 
@@ -170,7 +153,6 @@ Task statuses currently include:
 * `IN_PROGRESS`
 * `DONE`
 
----
 
 ## Data Ownership and Security
 
@@ -178,7 +160,6 @@ One of the main objectives of the project is to ensure that users cannot access 
 
 For example:
 
-```text
 User A
 │
 ├── Project A1
@@ -194,7 +175,6 @@ User B
 └── Project B1
     ├── Task B1
     └── Task B2
-```
 
 User A must never receive User B's projects or tasks.
 
@@ -204,19 +184,16 @@ For projects:
 
 ```python
 Project.objects.filter(user=request.user)
-```
 
 For tasks:
 
 ```python
 Task.objects.filter(project__user=request.user)
-```
 
 This approach ensures that ownership is checked directly when retrieving the objects.
 
 The task creation form also restricts the `project` choices to projects belonging to the authenticated user.
 
----
 
 ## Authentication
 
@@ -224,7 +201,6 @@ The authentication system is implemented using Django's built-in authentication 
 
 Current authentication flow:
 
-```text
 Registration
      │
      ▼
@@ -238,7 +214,6 @@ Authenticated Session
      │
      ▼
 Private Workspace
-```
 
 Implemented authentication features include:
 
@@ -250,7 +225,6 @@ Implemented authentication features include:
 * Session-based authentication
 * Protected authenticated views
 
----
 
 ## CRUD Operations
 
@@ -274,7 +248,6 @@ Users can delete their own projects and tasks.
 
 The project also includes dedicated detail views for individual resources.
 
----
 
 ## Project Navigation
 
@@ -282,7 +255,6 @@ The application is designed around resource navigation.
 
 The expected navigation flow is:
 
-```text
 Public Landing Page
         │
         ▼
@@ -312,15 +284,12 @@ Private Workspace
                          ├── Update Task
                          ├── Delete Task
                          └── Task Detail
-```
 
----
 
 ## Templates Structure
 
 The template architecture follows the application's functional areas.
 
-```text
 templates/
 │
 ├── home.html
@@ -343,13 +312,11 @@ templates/
     ├── task_list.html
     ├── task_detail.html
     └── task_form.html
-```
 
 `home.html` represents the public landing page.
 
 `base.html` represents the authenticated user's private workspace.
 
----
 
 ## Forms
 
@@ -376,11 +343,9 @@ The `TaskForm` receives the authenticated user and dynamically restricts the pro
 
 ```python
 Project.objects.filter(user=user)
-```
 
 This prevents users from selecting projects that do not belong to them through the normal application interface.
 
----
 
 ## Django ORM
 
@@ -390,13 +355,11 @@ Examples include:
 
 ```python
 Project.objects.filter(user=request.user)
-```
 
 and:
 
 ```python
 Task.objects.filter(project__user=request.user)
-```
 
 The project therefore provides practical experience with:
 
@@ -409,7 +372,6 @@ The project therefore provides practical experience with:
 * Object modification
 * Object deletion
 
----
 
 ## Current Development Status
 
@@ -422,7 +384,19 @@ The project therefore provides practical experience with:
 * [x] Logout
 * [x] Authentication error handling
 * [x] Protected authenticated workspace
+* [ ] verification by e-mail
 * [ ] Complete authentication hardening
+
+### Email Verification
+
+- [ ] Email verification token generation
+- [ ] Verification email sending
+- [ ] Email verification link
+- [ ] Verification token validation
+- [ ] Token expiration
+- [ ] Prevent access to protected features before verification
+- [ ] Resend verification email
+- [ ] Handle invalid or expired verification links
 
 ### Projects
 
@@ -469,7 +443,6 @@ The project therefore provides practical experience with:
 * [ ] User data isolation tests
 * [ ] CRUD integration tests
 
----
 
 ## Security Principles
 
@@ -495,7 +468,6 @@ Future security work will include:
 * More comprehensive authorization tests
 * Authentication hardening
 
----
 
 ## Technology Stack
 
@@ -525,11 +497,9 @@ Future security work will include:
 * Linux
 * Virtual environments
 
----
 
 ## Project Structure
 
-```text
 task-manager/
 │
 ├── accounts/
@@ -576,9 +546,7 @@ task-manager/
 │
 ├── manage.py
 └── README.md
-```
 
----
 
 ## Development Philosophy
 
@@ -588,7 +556,6 @@ The goal is not simply to produce a functional application, but to understand **
 
 The development progression follows this principle:
 
-```text
 Django Fundamentals
         ↓
 MVT Architecture
@@ -612,11 +579,9 @@ Testing
 Optimization
         ↓
 Deployment
-```
 
 The project therefore serves both as an application and as a practical foundation for progressing from basic Django development toward more advanced backend engineering practices.
 
----
 
 ## Future Improvements
 
@@ -641,7 +606,6 @@ Once the core functionality is completed, the project may progressively incorpor
 
 These features are intentionally kept outside the initial scope until the fundamental Django architecture and application requirements are fully mastered.
 
----
 
 ## Project Goal
 
@@ -649,16 +613,12 @@ The ultimate goal is to transform a relatively simple task management applicatio
 
 The project emphasizes **understanding, security, maintainability, and progressive complexity** rather than simply implementing features as quickly as possible.
 
-
-<!-- PITCHER_START -->
-
 # task_manager
 
 ## Overview
 
 task_manager is a Python Application documented automatically by Pitcher.
 
----
 
 ## Project Information
 
@@ -670,7 +630,6 @@ task_manager is a Python Application documented automatically by Pitcher.
 | Total Files | 11502 |
 | Empty Folders | 3 |
 
----
 
 ## Technology Stack
 
@@ -679,3 +638,54 @@ task_manager is a Python Application documented automatically by Pitcher.
 - JavaScript
 - Python
 - Environment Variables
+
+
+### Optimization
+
+The application will progressively implement optimization techniques in order to reduce unnecessary HTTP requests, database queries, processing overhead, and duplicated work.
+
+#### Frontend / HTTP Optimization
+
+- [ ] Reduce unnecessary page reloads
+- [ ] Open edit forms directly on the current page
+- [ ] Implement inline editing or modal forms where appropriate
+- [ ] Avoid unnecessary navigation between pages
+- [ ] Load only the required content when possible
+- [ ] Reduce unnecessary requests to the server
+- [ ] Optimize static assets
+- [ ] Minimize unnecessary JavaScript and CSS requests
+
+#### Database / ORM Optimization
+
+- [ ] Avoid unnecessary database queries
+- [ ] Avoid evaluating the same QuerySet multiple times
+- [ ] Use `exists()` when only checking whether data exists
+- [ ] Use `select_related()` for appropriate ForeignKey relationships
+- [ ] Use `prefetch_related()` for appropriate reverse/many-to-many relationships
+- [ ] Use `only()` and `defer()` when appropriate
+- [ ] Use `values()` / `values_list()` when complete model instances are unnecessary
+- [ ] Use `bulk_create()` for appropriate batch insert operations
+- [ ] Use `bulk_update()` for appropriate batch update operations
+- [ ] Implement pagination for large datasets
+- [ ] Add appropriate database indexes
+- [ ] Analyze slow queries
+- [ ] Avoid N+1 query problems
+
+#### Application-Level Optimization
+
+- [ ] Implement caching where appropriate
+- [ ] Avoid duplicated computations
+- [ ] Avoid repeated QuerySet evaluation
+- [ ] Optimize expensive business logic
+- [ ] Use background tasks for appropriate long-running operations
+- [ ] Use scheduled tasks where appropriate
+- [ ] Introduce Redis where justified
+- [ ] Introduce Celery for asynchronous/background processing where justified
+
+#### Performance Testing
+
+- [ ] Measure the number of HTTP requests
+- [ ] Measure the number of database queries
+- [ ] Identify slow queries
+- [ ] Compare optimized and non-optimized implementations
+- [ ] Test application performance with larger datasets
