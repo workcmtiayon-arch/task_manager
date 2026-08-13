@@ -11,10 +11,6 @@ from .forms import TaskForm
 from projects.models import Project
 
 
-# ---------------------------------------------------------
-# LISTE DES TÂCHES
-# ---------------------------------------------------------
-
 def task_list(request):
     """
     Affiche toutes les tâches appartenant aux projets
@@ -33,11 +29,6 @@ def task_list(request):
         'tasks/task_list.html',
         {'tasks': tasks}
     )
-
-
-# ---------------------------------------------------------
-# CRÉATION D'UNE TÂCHE
-# ---------------------------------------------------------
 
 def add_task(request, project_id):
     """
@@ -85,11 +76,6 @@ def add_task(request, project_id):
         'tasks/task_form.html',
         {'form': form}
     )
-
-
-# ---------------------------------------------------------
-# MODIFICATION D'UNE TÂCHE
-# ---------------------------------------------------------
 
 def update_task(request, id):
     """
@@ -139,10 +125,6 @@ def update_task(request, id):
     )
 
 
-# ---------------------------------------------------------
-# SUPPRESSION D'UNE TÂCHE
-# ---------------------------------------------------------
-
 def delete_task(request, id):
     """
     Supprime une tâche appartenant à l'utilisateur connecté.
@@ -180,10 +162,6 @@ def delete_task(request, id):
         {'task': task}
     )
 
-
-# ---------------------------------------------------------
-# DÉTAIL D'UNE TÂCHE
-# ---------------------------------------------------------
 
 def task_detail(request, id):
     """
