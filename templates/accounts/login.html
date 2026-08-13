@@ -17,10 +17,6 @@
 </header>
 
 
-<!-- ============================================================
-     LOGIN
-     ============================================================ -->
-
 <main class="auth">
     <div class="auth__inner">
 
@@ -33,10 +29,6 @@
                 Se connecter
             </h1>
 
-            <!--
-                Les erreurs globales du formulaire sont affichées ici.
-                Exemple : identifiants incorrects.
-            -->
             {% if form.non_field_errors %}
                 <div class="form-alert" role="alert">
                     {% for error in form.non_field_errors %}
@@ -45,11 +37,6 @@
                 </div>
             {% endif %}
 
-
-            <!--
-                Le formulaire est traité par views.connection.
-                L'URL correspond au nom "login" défini dans accounts/urls.py.
-            -->
             <form
                 method="post"
                 action="{% url 'login' %}"
