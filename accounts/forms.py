@@ -9,38 +9,30 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
+        exclude.add('email')
+
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except forms.ValidationError as e:
+            self._update_errors(e)
+
+
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'autocomplete' : 'username'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'autocomplete' : 'current-password'}))
 
-# Pourquoi on a pas fait plutot de cette maniere la ? :
 
-# class CustonUserCreationForm(UserCreationForm):
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email', 'password1', 'password2', 'role']
+class OTPForm(forms.Form):
+    code = forms.CharField(min_length=6, max_length=6)
 
-
-
-
-# Ou bien de cette maniere la ? :
-
-# class CustonUserCreationForm(UserCreationForm):
-#     password1 = forms.CharField(
-#         label='Password',
-#         strip=False,
-#         widget= forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
-#         help_text='Enter a strong password.',
-#     )
-#     password2 = forms.CharField(
-#         label='Password confirmation',
-#         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
-#         strip=False,
-#         help_text='Enter the same password as before, for verification.',
-#     )
-
-#     class Meta(UserCreationForm.Meta):
-#         fields = UserCreationForm.Meta.fields + ("password1", "password2")
+    def clean_code(self):
+        code = self.cleaned_data['code']
+        if not code.isdigit():
+            raise forms.ValidationError("Le code doit etre compose de 6 chiffres")
+        return code
 
 
-# C'est quoi la meilleure facon de faire des trois ?
+class ForgotPasswordEmailForm(forms.Form):
+    email = forms.EmailField(label="Adresse email")

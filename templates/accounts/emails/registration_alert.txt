@@ -1,0 +1,11 @@
+L'équipe Task Manager
+registration_alert.txt :
+Bonjour,
+Quelqu'un a tenté de créer un compte Task Manager avec cette adresse e-
+mail,
+qui est déjà associée à un compte existant chez nous.
+Si ce n'était pas vous, aucune action n'est nécessaire. Si vous avez oublié
+vos identifiants, utilisez la fonction « mot de passe oublié » depuis la
+page de connexion.
+--
+L'équipe Task Manager

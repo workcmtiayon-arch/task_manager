@@ -43,7 +43,7 @@ def connection(request):
 
 
 # Je passe a la deconection maintenant
-def deconnection(request):
+def deconnexion(request):
     if request.method == 'POST':
         logout(request)
         return redirect('home')

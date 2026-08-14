@@ -57,14 +57,14 @@ class EmailOTP(models.Model):
 
         from django.conf import settings as dj_settings
 
-        max_attempts = getattr(dj_settings, "OPT_MAX_ATTEMPTS", 5)
+        max_attempts = getattr(dj_settings, "OTP_MAX_ATTEMPTS", 5)
         return (
             not self.is_used
             and self.attempts < max_attempts
             and timezone.now() <= self.expires_at
         )
 
-    def check(self, submitted_code):
+    def check_email(self, submitted_code):
 
         if not self.is_valid():
             return False
