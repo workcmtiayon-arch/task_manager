@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation du mot de passe — Task Manager</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body>
+<main class="auth">
+    <div class="auth__inner">
+        <section class="auth-card">
+
+            <p class="eyebrow">Réinitialisation</p>
+
+            <h1 class="auth-card__title">
+                Entrez le code reçu par e-mail
+            </h1>
+
+            <p class="auth-card__text">
+                Un code à 6 chiffres a été envoyé à votre adresse e-mail.
+                Il expire dans quelques minutes.
+            </p>
+
+            {% if error %}
+                <div class="form-alert" role="alert">
+                    <p>{{ error }}</p>
+                </div>
+            {% endif %}
+
+            <form method="post" id="otpForm" class="auth-form" novalidate>
+                {% csrf_token %}
+
+                <div class="otp-inputs" id="otpInputs">
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                        autocomplete="one-time-code"
+                        autofocus
+                    >
+
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                    >
+
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                    >
+
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                    >
+
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                    >
+
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="1"
+                        class="otp-box"
+                    >
+                </div>
+
+                <input
+                    type="hidden"
+                    name="code"
+                    id="id_code"
+                >
+
+                <button type="submit" class="btn btn--primary btn--block">
+                    Valider
+                </button>
+            </form>
+
+        </section>
+    </div>
+</main>
+
+<script>
+(function () {
+    const boxes = Array.from(document.querySelectorAll('.otp-box'));
+    const hidden = document.getElementById('id_code');
+    const form = document.getElementById('otpForm');
+
+    function updateHiddenAndMaybeSubmit() {
+        hidden.value = boxes.map(function (b) {
+            return b.value;
+        }).join('');
+
+        if (hidden.value.length === 6) {
+            form.requestSubmit();
+        }
+    }
+
+    boxes.forEach(function (box, idx) {
+
+        box.addEventListener('input', function () {
+            box.value = box.value.replace(/[^0-9]/g, '');
+
+            if (box.value && idx < boxes.length - 1) {
+                boxes[idx + 1].focus();
+            }
+
+            updateHiddenAndMaybeSubmit();
+        });
+
+        box.addEventListener('keydown', function (e) {
+            if (
+                e.key === 'Backspace' &&
+                !box.value &&
+                idx > 0
+            ) {
+                boxes[idx - 1].focus();
+            }
+        });
+
+        box.addEventListener('paste', function (e) {
+            e.preventDefault();
+
+            const digits = (
+                e.clipboardData.getData('text') || ''
+            )
+                .replace(/[^0-9]/g, '')
+                .slice(0, 6);
+
+            digits.split('').forEach(function (d, i) {
+                if (boxes[i]) {
+                    boxes[i].value = d;
+                }
+            });
+
+            if (digits.length) {
+                boxes[
+                    Math.min(digits.length, boxes.length) - 1
+                ].focus();
+            }
+
+            updateHiddenAndMaybeSubmit();
+        });
+
+    });
+})();
+</script>
+
+</body>
+</html>

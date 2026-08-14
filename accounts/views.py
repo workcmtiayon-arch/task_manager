@@ -97,7 +97,7 @@ def forgot_password(request):
             return redirect('verify-reset-otp')
     else:
         form = ForgotPasswordEmailForm()
-    return render(request, 'accounts/forgo_password.html', {'form': form})
+    return render(request, 'accounts/forgot_password.html', {'form': form})
 
 # mdp oublie : verification du code
 def verify_reset_otp(request):
