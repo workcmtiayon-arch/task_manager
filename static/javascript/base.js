@@ -30,15 +30,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     overlay.addEventListener('click', closeSidebar);
 
-    // Close the sidebar automatically if the viewport is resized
-    // back to desktop width while it was left open on mobile.
     window.addEventListener('resize', function () {
         if (window.innerWidth > 960) {
             closeSidebar();
         }
     });
-
-    // Close on Escape for keyboard users.
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeSidebar();

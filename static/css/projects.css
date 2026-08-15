@@ -105,7 +105,6 @@
     border-top: 1px solid var(--border-color);
 }
 
-/* ---------- Detail card ---------- */
 .detail-card {
     padding: 26px 30px;
     margin: 2.5rem auto 0;
@@ -213,7 +212,6 @@
     color: var(--muted-color);
 }
 
-/* ---------- Section row (shared heading + action) ---------- */
 .section-row {
     display: flex;
     align-items: center;
@@ -248,7 +246,6 @@
     text-decoration: underline;
 }
 
-/* ---------- Tasks table ---------- */
 .data-table__task {
     display: flex;
     align-items: flex-start;
@@ -323,16 +320,13 @@
     font-weight: 600;
 }
 
-/* ===================================================================
-   RESPONSIVE
-=================================================================== */
 @media (max-width: 1200px) {
     .projects-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 680px) {
+.@media (max-width: 680px) {
     .projects-grid {
         grid-template-columns: 1fr;
     }
@@ -353,12 +347,6 @@
     .page-header__actions form .btn {
         width: 100%;
     }
-}
-
-.project-card__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .project-card__actions {
@@ -440,7 +428,7 @@
     background: var(--danger-color-hover, #b91c1c);
 }
 
-/* ---------- Modal (shared: used by project_list.html and project_detail.html) ---------- */
+
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -519,7 +507,7 @@
     padding: 0;
 }
 
-/* ---------- Tasks list (project detail) ---------- */
+
 .tasks-list {
     display: flex;
     flex-direction: column;
@@ -689,7 +677,7 @@
     }
 }
 
-/* ---------- Segmented progress bar (project detail) ---------- */
+
 .progress-bar--segmented {
     display: flex;
     background-color: var(--background-color);

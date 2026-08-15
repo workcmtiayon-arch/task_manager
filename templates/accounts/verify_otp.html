@@ -13,7 +13,7 @@ initial-scale=1.0">
 <body>
     <main class="auth">
         <div class="auth__inner">
-            <section class="auth-card">
+            <section class="auth-card auth-card--compact">
                 <p class="eyebrow">Vérification</p>
                 <h1 class="auth-card__title">Entrez le code reçu par e-mail</h1>
                 <p class="auth-card__text">
@@ -37,7 +37,6 @@ initial-scale=1.0">
                         <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box">
                     </div>
                     <input type="hidden" name="code" id="id_code">
-                    <button type="submit" class="btn btn--primary btn--block">Valider</button>
                 </form>
                 <p class="auth-card__footer">
                     Vous n'avez rien reçu ?
