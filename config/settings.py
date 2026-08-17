@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from celery.schedules import crontab
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -158,6 +159,12 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
+CELERY_BEAT_SCHEDULE = {
+    "send-daily-task-reminder": {
+        "task": "tasks.tasks.send_daily_task_reminder",
+        "schedule": crontab(hour=19, minute=45),
+    },
+}
 
 
 

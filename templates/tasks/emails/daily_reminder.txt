@@ -1,0 +1,8 @@
+Bonjour {{ username }},
+
+Voici vos tâches en attente :
+
+{% for task in tasks %}- {{ task.title }} ({{ task.project.name }}){% if task.due_date %} — échéance : {{ task.due_date }}{% endif %}
+{% endfor %}
+
+Task Manager
