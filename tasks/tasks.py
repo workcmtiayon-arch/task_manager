@@ -37,10 +37,7 @@ def send_reminder_email_task(self, user_id, task_ids):
         return
 
     tasks = Task.objects.filter(id__in=task_ids).select_related("project")
-    message = render_to_string(
-        "tasks/emails/daily_reminder.txt",
-        {"username": user.username, "tasks": tasks},
-    )
+    message = render_to_string("tasks/emails/daily_reminder.txt", {"username": user.username, "tasks": tasks})
     try:
         send_mail(
             subject="Vos tâches du jour",
