@@ -20,6 +20,8 @@ The application also distinguishes between public content and authenticated user
 * Public landing page
 * User registration
 * User authentication
+* Email verification
+* Scheduled task reminders (daily email digest)
 * Private authenticated workspace
 * Project management
 * Task management
@@ -47,6 +49,8 @@ The main learning objectives are:
 * Structure a Django project using multiple applications
 * Improve backend security practices
 * Understand how Django handles requests, forms, sessions, authentication and database queries
+* Understand and implement background/asynchronous processing with Celery and Redis
+* Understand and implement scheduled/periodic tasks with Celery Beat
 
 
 ## Core Architecture
@@ -77,6 +81,7 @@ Task Manager
 │
 ├── accounts/
 │   ├── authentication
+│   ├── email verification (OTP)
 │   ├── registration
 │   ├── logout
 │   ├── user management
@@ -89,7 +94,8 @@ Task Manager
 │   └── project management
 │
 └── tasks/
-    └── task management
+    ├── task management
+    └── scheduled reminder emails
 
 
 ## Data Model
@@ -106,6 +112,7 @@ User
 ├── email
 ├── password
 ├── role
+├── is_email_verified
 └── account status
 
 The custom user model is based on Django's `AbstractUser`.
@@ -114,6 +121,7 @@ The project uses:
 
 ```python
 AUTH_USER_MODEL = "accounts.User"
+```
 
 ### Project
 
@@ -184,11 +192,13 @@ For projects:
 
 ```python
 Project.objects.filter(user=request.user)
+```
 
 For tasks:
 
 ```python
 Task.objects.filter(project__user=request.user)
+```
 
 This approach ensures that ownership is checked directly when retrieving the objects.
 
@@ -205,6 +215,9 @@ Registration
      │
      ▼
 Create User
+     │
+     ▼
+Email Verification (OTP)
      │
      ▼
 Login
@@ -224,6 +237,72 @@ Implemented authentication features include:
 * Authentication error handling
 * Session-based authentication
 * Protected authenticated views
+* Email verification via one-time password (OTP)
+
+
+## Email Verification
+
+Email verification is implemented using a one-time password (OTP) sent to the user's email address, generated and validated server-side, and delivered asynchronously through Celery.
+
+Flow:
+
+Registration
+     │
+     ▼
+Generate OTP (hashed, time-limited)
+     │
+     ▼
+Send OTP email (async, via Celery + Redis)
+     │
+     ▼
+User submits code
+     │
+     ▼
+Code validated (attempts and expiration checked)
+     │
+     ▼
+Account marked as verified
+
+Key implementation details:
+
+* The OTP is hashed before being stored (never stored in plain text)
+* Each OTP has a configurable expiration (`OTP_TTL_MINUTES`)
+* Each OTP has a configurable maximum number of attempts (`OTP_MAX_ATTEMPTS`)
+* Sending the OTP email does not block the HTTP request/response cycle, since it is delegated to a Celery task
+* Failed email sends are retried automatically (up to 3 attempts)
+
+
+## Scheduled Tasks (Celery Beat)
+
+In addition to on-demand asynchronous tasks (such as sending the OTP email), the application implements **periodic/scheduled** background processing using Celery Beat.
+
+Every day at a configured time, a scheduled task runs to:
+
+1. Collect all tasks that are not yet marked as `DONE`, grouped by the owning user
+2. Send each user a reminder email listing their pending tasks
+
+Architecture:
+
+Celery Beat (scheduler)
+     │
+     ▼
+Pushes "send_daily_task_reminder" to the queue at the scheduled time
+     │
+     ▼
+Celery Worker picks it up
+     │
+     ▼
+Groups pending tasks by user
+     │
+     ▼
+Dispatches one "send_reminder_email_task" per user (async, retryable)
+     │
+     ▼
+Email sent via SMTP
+
+This distinction matters: **Celery** executes tasks asynchronously on demand, while **Celery Beat** is a separate scheduler process responsible for triggering tasks automatically at fixed times, independent of any user action.
+
+The schedule is configured in `settings.py` via `CELERY_BEAT_SCHEDULE`, using `Africa/Douala` as the reference timezone (`TIME_ZONE` / `CELERY_TIMEZONE`), so scheduled times are expressed directly in local time.
 
 
 ## CRUD Operations
@@ -259,6 +338,9 @@ Public Landing Page
         │
         ▼
      Register
+        │
+        ▼
+  Email Verification
         │
         ▼
       Login
@@ -297,8 +379,16 @@ templates/
 ├── base.html
 │
 ├── accounts/
+│   ├── emails/
+│   │   ├── otp_register.txt
+│   │   ├── otp_reset.txt
+│   │   └── registration_alert.txt
 │   ├── register.html
-│   └── login.html
+│   ├── login.html
+│   ├── forgot_password.html
+│   ├── reset_password.html
+│   ├── verify_otp.html
+│   └── verify_reset_otp.html
 │
 ├── profile/
 │   └── profile.html
@@ -306,12 +396,16 @@ templates/
 ├── projects/
 │   ├── project_list.html
 │   ├── project_detail.html
-│   └── project_form.html
+│   ├── project_form.html
+│   └── confirm_supp_project.html
 │
 └── tasks/
+    ├── emails/
+    │   └── daily_reminder.txt
     ├── task_list.html
     ├── task_detail.html
-    └── task_form.html
+    ├── task_form.html
+    └── confirm_suppr_task.html
 
 `home.html` represents the public landing page.
 
@@ -343,6 +437,7 @@ The `TaskForm` receives the authenticated user and dynamically restricts the pro
 
 ```python
 Project.objects.filter(user=user)
+```
 
 This prevents users from selecting projects that do not belong to them through the normal application interface.
 
@@ -355,11 +450,13 @@ Examples include:
 
 ```python
 Project.objects.filter(user=request.user)
+```
 
 and:
 
 ```python
 Task.objects.filter(project__user=request.user)
+```
 
 The project therefore provides practical experience with:
 
@@ -373,6 +470,24 @@ The project therefore provides practical experience with:
 * Object deletion
 
 
+## Background Processing & Scheduling (Celery, Redis, Celery Beat)
+
+The application uses:
+
+* **Redis** as the message broker and result backend
+* **Celery** to execute asynchronous tasks (email sending, OTP delivery) without blocking HTTP requests
+* **Celery Beat** to trigger periodic tasks (the daily task reminder email)
+
+Running the application locally requires the following processes in parallel:
+
+```bash
+redis-server
+python manage.py runserver
+celery -A config worker -l info
+celery -A config beat -l info
+```
+
+
 ## Current Development Status
 
 ### Authentication
@@ -384,19 +499,27 @@ The project therefore provides practical experience with:
 * [x] Logout
 * [x] Authentication error handling
 * [x] Protected authenticated workspace
-* [ ] verification by e-mail
+* [x] Verification by e-mail
 * [ ] Complete authentication hardening
 
 ### Email Verification
 
-- [ ] Email verification token generation
-- [ ] Verification email sending
-- [ ] Email verification link
-- [ ] Verification token validation
-- [ ] Token expiration
+- [x] Email verification code generation (OTP)
+- [x] Verification email sending (async via Celery)
+- [x] Verification code validation
+- [x] Code/token expiration
 - [ ] Prevent access to protected features before verification
 - [ ] Resend verification email
 - [ ] Handle invalid or expired verification links
+
+### Scheduled Tasks
+
+- [x] Celery Beat integration
+- [x] Daily task reminder email (per user, pending tasks)
+- [x] Configurable schedule via `CELERY_BEAT_SCHEDULE`
+- [x] Timezone-aware scheduling (`Africa/Douala`)
+- [ ] Filter reminders by due date (currently all non-`DONE` tasks)
+- [ ] User-configurable reminder time/opt-out
 
 ### Projects
 
@@ -451,6 +574,7 @@ Security is progressively integrated into the project rather than added only at 
 The current implementation already considers:
 
 * Authentication
+* Email verification
 * Session management
 * Login-protected views
 * User ownership
@@ -459,6 +583,7 @@ The current implementation already considers:
 * CSRF protection
 * Restricted project selection
 * Object-level access checks
+* Hashed, time-limited, attempt-limited OTP codes
 
 Future security work will include:
 
@@ -478,6 +603,12 @@ Future security work will include:
 * Django ORM
 * Django Authentication System
 * Django Forms
+* Celery
+* Celery Beat
+
+### Infrastructure
+
+* Redis (message broker / result backend)
 
 ### Database
 
@@ -507,6 +638,7 @@ task-manager/
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
+│   ├── tasks.py
 │   └── ...
 │
 ├── core/
@@ -526,6 +658,7 @@ task-manager/
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
+│   ├── tasks.py
 │   └── ...
 │
 ├── templates/
@@ -541,10 +674,12 @@ task-manager/
 │
 ├── config/
 │   ├── settings.py
+│   ├── celery.py
 │   ├── urls.py
 │   └── ...
 │
 ├── manage.py
+├── celerybeat-schedule  (ignored via .gitignore)
 └── README.md
 
 
@@ -574,6 +709,8 @@ User Data Isolation
         ↓
 Authorization
         ↓
+Background & Scheduled Tasks
+        ↓
 Testing
         ↓
 Optimization
@@ -594,10 +731,6 @@ Once the core functionality is completed, the project may progressively incorpor
 * Caching
 * Middleware
 * Rate limiting
-* Background tasks
-* Scheduled tasks
-* Redis
-* Celery
 * Automated testing
 * API development with Django REST Framework
 * Production deployment
@@ -605,39 +738,6 @@ Once the core functionality is completed, the project may progressively incorpor
 * Logging and monitoring
 
 These features are intentionally kept outside the initial scope until the fundamental Django architecture and application requirements are fully mastered.
-
-
-## Project Goal
-
-The ultimate goal is to transform a relatively simple task management application into a solid practical exercise covering the fundamental concepts required for professional Django backend development.
-
-The project emphasizes **understanding, security, maintainability, and progressive complexity** rather than simply implementing features as quickly as possible.
-
-# task_manager
-
-## Overview
-
-task_manager is a Python Application documented automatically by Pitcher.
-
-
-## Project Information
-
-| Property | Value |
-|----------|--------|
-| Project Name | task_manager |
-| Project Type | Python Application |
-| Total Folders | 5623 |
-| Total Files | 11502 |
-| Empty Folders | 3 |
-
-
-## Technology Stack
-
-- HTML
-- CSS
-- JavaScript
-- Python
-- Environment Variables
 
 
 ### Optimization
@@ -677,10 +777,10 @@ The application will progressively implement optimization techniques in order to
 - [ ] Avoid duplicated computations
 - [ ] Avoid repeated QuerySet evaluation
 - [ ] Optimize expensive business logic
-- [ ] Use background tasks for appropriate long-running operations
-- [ ] Use scheduled tasks where appropriate
-- [ ] Introduce Redis where justified
-- [ ] Introduce Celery for asynchronous/background processing where justified
+- [x] Use background tasks for appropriate long-running operations
+- [x] Use scheduled tasks where appropriate
+- [x] Introduce Redis where justified
+- [x] Introduce Celery for asynchronous/background processing where justified
 
 #### Performance Testing
 
@@ -689,3 +789,10 @@ The application will progressively implement optimization techniques in order to
 - [ ] Identify slow queries
 - [ ] Compare optimized and non-optimized implementations
 - [ ] Test application performance with larger datasets
+
+
+## Project Goal
+
+The ultimate goal is to transform a relatively simple task management application into a solid practical exercise covering the fundamental concepts required for professional Django backend development.
+
+The project emphasizes **understanding, security, maintainability, and progressive complexity** rather than simply implementing features as quickly as possible.
