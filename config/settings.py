@@ -162,7 +162,7 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_BEAT_SCHEDULE = {
     "send-daily-task-reminder": {
         "task": "tasks.tasks.send_daily_task_reminder",
-        "schedule": crontab(hour=19, minute=45),
+        "schedule": crontab(hour=14, minute=10),
     },
 }
 
