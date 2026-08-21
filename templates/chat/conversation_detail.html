@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ conversation }}</h1>
+<div id="chat-log"></div>
+
+{{ conversation.pk|json_script:"conversation-id" }}
+<script src="{% static 'chat/chat.js' %}"></script>
+{% endblock %}

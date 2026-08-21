@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Mes conversations</h1>
+<ul>
+    {% for conversation in conversations %}
+    <li><a href="{% url 'chat:conversation_detail' conversation.pk %}">{{ conversation }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
