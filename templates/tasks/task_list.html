@@ -2,49 +2,74 @@
 {% load static %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/tasks.css' %}">
+<link rel="stylesheet" href="{% static 'css/tasks.css' %}">
 {% endblock %}
 
-{% block title %}Tasks — ProjectFlow{% endblock %}
-{% block page_title %}Tasks{% endblock %}
-{% block page_subtitle %}All your tasks across every project.{% endblock %}
+{% block title %}Mes tâches — TaskFlow{% endblock %}
+{% block page_title %}Mes tâches{% endblock %}
+{% block page_subtitle %}Toutes vos tâches, réunies dans un seul espace.{% endblock %}
 
 {% block content %}
+<section class="tasks-hero">
+    <div>
+        <p class="tasks-hero__eyebrow">Organisation personnelle</p>
+        <h2>Gardez le cap sur vos priorités.</h2>
+        <p>Suivez chaque tâche de vos projets sans changer d’espace.</p>
+    </div>
+    <div class="tasks-hero__progress" aria-label="{{ completion_percentage }} pour cent des tâches sont terminées">
+        <strong>{{ completion_percentage }}%</strong>
+        <span>terminé</span>
+        <div><i style="width: {{ completion_percentage }}%"></i></div>
+    </div>
+</section>
 
-    <div class="card">
-        <div class="table-wrap">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Task</th>
-                        <th>Project</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for task in tasks %}
-                    <tr>
-                        <td><a href="{% url 'show_details' task.id %}">{{ task.title }}</a></td>
-                        <td class="is-muted">
-                            <a href="{% url 'project_detail' task.project.id %}">{{ task.project.name }}</a>
-                        </td>
-                        <td>
-                            {% if task.status == 'DONE' %}
-                                <span class="badge badge--success">Done</span>
-                            {% elif task.status == 'IN_PROGRESS' %}
-                                <span class="badge badge--warning">In Progress</span>
-                            {% else %}
-                                <span class="badge badge--muted">To Do</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="empty-state">You don't have any tasks yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<section class="task-stats" aria-label="Résumé des tâches">
+    <article class="task-stat task-stat--all"><span>Total</span><strong>{{ total_tasks }}</strong></article>
+    <article class="task-stat task-stat--todo"><span>À faire</span><strong>{{ todo_tasks }}</strong></article>
+    <article class="task-stat task-stat--progress"><span>En cours</span><strong>{{ in_progress_tasks }}</strong></article>
+    <article class="task-stat task-stat--done"><span>Terminées</span><strong>{{ done_tasks }}</strong></article>
+</section>
+
+<section class="tasks-section">
+    <div class="tasks-section__header">
+        <div>
+            <h2>Liste des tâches</h2>
+            <p>{{ total_tasks }} tâche{{ total_tasks|pluralize }} dans vos projets.</p>
         </div>
     </div>
+
+    <div class="tasks-board">
+        {% for task in tasks %}
+        <article class="task-item task-item--{{ task.status|lower }}">
+            <div class="task-item__top">
+                {% if task.status == 'DONE' %}
+                    <span class="task-status task-status--done">Terminée</span>
+                {% elif task.status == 'IN_PROGRESS' %}
+                    <span class="task-status task-status--progress">En cours</span>
+                {% else %}
+                    <span class="task-status task-status--todo">À faire</span>
+                {% endif %}
+                <a class="task-item__open" href="{% url 'show_details' task.id %}" aria-label="Voir la tâche {{ task.title }}">↗</a>
+            </div>
+            <h3><a href="{% url 'show_details' task.id %}">{{ task.title }}</a></h3>
+            <p class="task-item__description">{{ task.description|default:"Aucune description pour cette tâche." }}</p>
+            <div class="task-item__footer">
+                <a href="{% url 'project_detail' task.project.id %}" class="task-item__project">{{ task.project.name }}</a>
+                {% if task.due_date %}
+                <span class="task-item__date">Échéance : {{ task.due_date|date:"d/m/Y" }}</span>
+                {% else %}
+                <span class="task-item__date">Sans échéance</span>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <div class="tasks-empty">
+            <span aria-hidden="true">✓</span>
+            <h3>Aucune tâche pour le moment</h3>
+            <p>Créez un projet puis ajoutez-y des tâches pour les retrouver ici.</p>
+            <a class="btn btn--primary" href="{% url 'project_list' %}">Voir mes projets</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}

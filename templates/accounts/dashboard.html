@@ -15,7 +15,7 @@
         <p class="eyebrow">Bonjour, {{ request.user.first_name|default:request.user.username }}</p>
         <h2>{% if is_dashboard_admin %}La plateforme est sous contrôle.{% else %}Voici le résumé de votre activité.{% endif %}</h2>
     </div>
-    <a class="btn btn--primary" href="{% url 'project_add' %}">+ Nouveau projet</a>
+    <button class="btn btn--primary" type="button" id="dashboard-project-trigger">+ Nouveau projet</button>
 </section>
 
 <section class="stats-grid" aria-label="Indicateurs clés">
@@ -82,4 +82,65 @@
         </div>
     </article>
 </section>
+
+<div id="dashboard-project-modal" class="dashboard-modal-overlay" hidden>
+    <section class="dashboard-modal" role="dialog" aria-modal="true" aria-labelledby="dashboard-project-title">
+        <button class="dashboard-modal__close" type="button" aria-label="Fermer">&times;</button>
+        <h2 id="dashboard-project-title">Créer un nouveau projet</h2>
+        <p>Ajoutez les premières informations de votre projet.</p>
+        <form id="dashboard-project-form" action="{% url 'project_add' %}" method="post" class="form-stack">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="{{ project_form.name.id_for_label }}">Nom du projet</label>
+                <input class="form-input" type="text" name="{{ project_form.name.html_name }}" id="{{ project_form.name.id_for_label }}" placeholder="Ex. Refonte du site" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="{{ project_form.description.id_for_label }}">Description <span class="is-muted">(facultative)</span></label>
+                <textarea class="form-textarea" name="{{ project_form.description.html_name }}" id="{{ project_form.description.id_for_label }}" placeholder="Décrivez brièvement ce projet."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn--primary" type="submit">Créer le projet</button>
+                <button class="btn btn--outline" type="button" data-dashboard-modal-close>Annuler</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const projectModal = document.getElementById('dashboard-project-modal');
+    const projectTrigger = document.getElementById('dashboard-project-trigger');
+    const projectForm = document.getElementById('dashboard-project-form');
+
+    function closeProjectModal() {
+        projectModal.classList.remove('is-visible');
+        setTimeout(() => { projectModal.hidden = true; }, 180);
+    }
+
+    projectTrigger.addEventListener('click', () => {
+        projectModal.hidden = false;
+        requestAnimationFrame(() => projectModal.classList.add('is-visible'));
+        projectForm.elements.name.focus();
+    });
+    projectModal.querySelectorAll('[data-dashboard-modal-close], .dashboard-modal__close').forEach((button) => {
+        button.addEventListener('click', closeProjectModal);
+    });
+    projectModal.addEventListener('click', (event) => {
+        if (event.target === projectModal) closeProjectModal();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !projectModal.hidden) closeProjectModal();
+    });
+
+    projectForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        fetch(projectForm.action, { method: 'POST', body: new FormData(projectForm) })
+            .then((response) => {
+                if (response.redirected) window.location.reload();
+                else projectForm.submit();
+            })
+            .catch(() => projectForm.submit());
+    });
+</script>
 {% endblock %}

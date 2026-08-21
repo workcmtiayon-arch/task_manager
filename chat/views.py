@@ -29,7 +29,10 @@ def conversation_list(request):
         .order_by("-conversation__updated_at")
     )
     conversations = [m.conversation for m in memberships]
-    return render(request, "chat/conversation_list.html", {"conversations": conversations})
+    return render(request, "chat/conversation_list.html", {
+        "conversations": conversations,
+        "active_nav": "messages",
+    })
 
 
 
@@ -47,7 +50,10 @@ def conversation_detail(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
         return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
-    return render(request, "chat/conversation_detail.html", {"conversation": conversation})
+    return render(request, "chat/conversation_detail.html", {
+        "conversation": conversation,
+        "active_nav": "messages",
+    })
 
 
 @login_required

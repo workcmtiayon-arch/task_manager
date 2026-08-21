@@ -184,6 +184,7 @@ def deconnexion(request):
 def dashboard(request):
     # Imports locaux pour garder les applications découplées et ne rien changer au chat.
     from projects.models import Project
+    from projects.forms import ProjectForm
     from tasks.models import Task
     from chat.models import Conversation, ConversationMember
 
@@ -242,6 +243,7 @@ def dashboard(request):
         "todo_task_count": todo_task_count,
         "completed_percentage": completed_percentage,
         "remaining_percentage": remaining_percentage,
+        "project_form": ProjectForm(),
     })
 
 
@@ -288,7 +290,7 @@ def profile(request):
         form.save()
         messages.success(request, "Vos informations de profil ont été mises à jour.")
         return redirect("profile")
-    return render(request, "profile/profile.html", {"form": form})
+    return render(request, "profile/profile.html", {"form": form, "active_nav": "profile"})
 
 
 @login_required

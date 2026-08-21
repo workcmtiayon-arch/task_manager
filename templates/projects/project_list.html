@@ -5,21 +5,44 @@
     <link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
-{% block title %}Projects — ProjectFlow{% endblock %}
-{% block page_title %}Projects{% endblock %}
-{% block page_subtitle %}Manage and track all your projects.{% endblock %}
+{% block title %}Mes projets — TaskFlow{% endblock %}
+{% block page_title %}Mes projets{% endblock %}
+{% block page_subtitle %}Organisez vos projets et gardez leur progression à portée de vue.{% endblock %}
 
 {% block content %}
-    <div class="page-header">
-        <span></span>
+    <section class="projects-hero">
+        <div>
+            <p class="projects-hero__eyebrow">Vue d'ensemble</p>
+            <h2>Donnez vie à vos idées, projet par projet.</h2>
+            <p>Retrouvez l’avancement et les tâches de tous vos projets.</p>
+        </div>
+        <div class="projects-hero__progress" aria-label="{{ project_completion_percentage }} pour cent des tâches de vos projets sont terminées">
+            <strong>{{ project_completion_percentage }}%</strong>
+            <span>des tâches finalisées</span>
+            <div><i style="width: {{ project_completion_percentage }}%"></i></div>
+        </div>
+    </section>
+
+    <section class="project-stats" aria-label="Résumé des projets">
+        <article class="project-stat project-stat--all"><span>Projets</span><strong>{{ project_count }}</strong></article>
+        <article class="project-stat project-stat--tasks"><span>Tâches</span><strong>{{ total_task_count }}</strong></article>
+        <article class="project-stat project-stat--done"><span>Tâches finalisées</span><strong>{{ completed_task_count }}</strong></article>
+        <article class="project-stat project-stat--complete"><span>Projets terminés</span><strong>{{ completed_project_count }}</strong></article>
+    </section>
+
+    <div class="projects-section__header">
+        <div>
+            <h2>Vos espaces de travail</h2>
+            <p>{{ project_count }} projet{{ project_count|pluralize }} à suivre.</p>
+        </div>
         <a href="{% url 'project_add' %}" class="btn btn--primary" data-modal-trigger>
-            <span aria-hidden="true">+</span> Create Project
+            <span aria-hidden="true">+</span> Nouveau projet
         </a>
     </div>
 
     <div class="projects-grid">
         {% for project in projects %}
-        <article class="card project-card">
+        <article class="project-card">
             <div class="project-card__top">
                 <span class="project-card__icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -28,12 +51,12 @@
                 </span>
 
                 <div class="project-card__actions">
-                    <a href="{% url 'project_update' project.id %}" class="btn-icon btn-icon--edit" aria-label="Edit project" title="Edit" data-modal-trigger>
+                    <a href="{% url 'project_update' project.id %}" class="btn-icon btn-icon--edit" aria-label="Modifier le projet" title="Modifier" data-modal-trigger>
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="{% url 'project_delete' project.id %}" class="btn-icon btn-icon--delete" aria-label="Delete project" title="Delete" data-modal-trigger>
+                    <a href="{% url 'project_delete' project.id %}" class="btn-icon btn-icon--delete" aria-label="Supprimer le projet" title="Supprimer" data-modal-trigger>
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -44,19 +67,22 @@
             <h3 class="project-card__title">
                 <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
             </h3>
-            <p class="project-card__description">{{ project.description }}</p>
+            <p class="project-card__description">{{ project.description|default:"Aucune description pour ce projet." }}</p>
 
             {% if project.task_count %}
             <div class="project-card__progress-row">
-                <span class="project-card__progress-percent">{{ project.progress_percent }}% complete</span>
+                <span>Avancement</span>
+                <span class="project-card__progress-percent">{{ project.progress_percent }}%</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-bar__fill" style="width: {{ project.progress_percent }}%;"></div>
             </div>
+            {% else %}
+            <div class="project-card__no-tasks">Aucune tâche ajoutée pour le moment.</div>
             {% endif %}
 
             <div class="project-card__footer">
-                <span>{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
+                <span>{{ project.task_count }} tâche{{ project.task_count|pluralize }}</span>
                 <span class="project-card__date">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/>
@@ -66,10 +92,15 @@
                 </span>
             </div>
 
-            <a href="{% url 'project_detail' project.id %}" class="link-arrow link-arrow--center">View Project &#8594;</a>
+            <a href="{% url 'project_detail' project.id %}" class="link-arrow link-arrow--center">Ouvrir le projet <span aria-hidden="true">→</span></a>
         </article>
         {% empty %}
-        <p class="empty-state">You don't have any projects yet. Create your first one to get started.</p>
+        <div class="projects-empty">
+            <span aria-hidden="true">▣</span>
+            <h3>Votre espace est prêt</h3>
+            <p>Créez votre premier projet pour commencer à organiser vos tâches.</p>
+            <a href="{% url 'project_add' %}" class="btn btn--primary" data-modal-trigger>Créer un projet</a>
+        </div>
         {% endfor %}
     </div>
 

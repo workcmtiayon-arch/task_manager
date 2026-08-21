@@ -21,13 +21,26 @@ def task_list(request):
     # appartient à l'utilisateur connecté.
     tasks = Task.objects.filter(
         project__user=request.user
-    )
+    ).select_related("project").order_by("due_date", "-created_at")
+
+    total_tasks = tasks.count()
+    done_tasks = tasks.filter(status=Task.Status.DONE).count()
+    in_progress_tasks = tasks.filter(status=Task.Status.IN_PROGRESS).count()
+    todo_tasks = tasks.filter(status=Task.Status.TODO).count()
 
     # On envoie les tâches au template.
     return render(
         request,
         'tasks/task_list.html',
-        {'tasks': tasks}
+        {
+            'tasks': tasks,
+            'active_nav': 'tasks',
+            'total_tasks': total_tasks,
+            'done_tasks': done_tasks,
+            'in_progress_tasks': in_progress_tasks,
+            'todo_tasks': todo_tasks,
+            'completion_percentage': round(done_tasks * 100 / total_tasks) if total_tasks else 0,
+        }
     )
 
 def add_task(request, project_id):
@@ -74,7 +87,7 @@ def add_task(request, project_id):
     return render(
         request,
         'tasks/task_form.html',
-        {'form': form}
+        {'form': form, 'active_nav': 'tasks'}
     )
 
 def update_task(request, id):
@@ -121,7 +134,7 @@ def update_task(request, id):
     return render(
         request,
         'tasks/task_form.html',
-        {'form': form}
+        {'form': form, 'active_nav': 'tasks'}
     )
 
 
@@ -159,7 +172,7 @@ def delete_task(request, id):
     return render(
         request,
         'tasks/confirm_suppr_task.html',
-        {'task': task}
+        {'task': task, 'active_nav': 'tasks'}
     )
 
 
@@ -182,7 +195,7 @@ def task_detail(request, id):
     return render(
         request,
         'tasks/task_detail.html',
-        {'task': task}
+        {'task': task, 'active_nav': 'tasks'}
     )
 
 

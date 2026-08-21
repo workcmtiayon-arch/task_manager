@@ -20,6 +20,7 @@ def project_list(request):
     )
 
     # Pour chaque projet, on calcule le pourcentage de tâches terminées.
+    projects = list(projects)
     for project in projects:
         project.progress_percent = (
             round((project.done_count / project.task_count) * 100)
@@ -27,10 +28,30 @@ def project_list(request):
             else 0
         )
 
+    project_count = len(projects)
+    total_task_count = sum(project.task_count for project in projects)
+    completed_task_count = sum(project.done_count for project in projects)
+    completed_project_count = sum(
+        1 for project in projects
+        if project.task_count and project.done_count == project.task_count
+    )
+    project_completion_percentage = (
+        round(completed_task_count * 100 / total_task_count)
+        if total_task_count else 0
+    )
+
     return render(
         request,
         'projects/project_list.html',
-        {'projects': projects}
+        {
+            'projects': projects,
+            'active_nav': 'projects',
+            'project_count': project_count,
+            'total_task_count': total_task_count,
+            'completed_task_count': completed_task_count,
+            'completed_project_count': completed_project_count,
+            'project_completion_percentage': project_completion_percentage,
+        }
     )
 
 
@@ -53,7 +74,7 @@ def add_project(request):
     return render(
         request,
         'projects/project_form.html',
-        {'form': form}
+        {'form': form, 'active_nav': 'projects'}
     )
 
 
@@ -82,7 +103,7 @@ def update_project(request, id):
     return render(
         request,
         'projects/project_form.html',
-        {'form': form}
+        {'form': form, 'active_nav': 'projects'}
     )
 
 
@@ -103,7 +124,7 @@ def delete_project(request, id):
     return render(
         request,
         'projects/confirm_supp_project.html',
-        {'project': project}
+        {'project': project, 'active_nav': 'projects'}
     )
 
 
@@ -155,5 +176,5 @@ def project_detail(request, id):
     return render(
         request,
         'projects/project_detail.html',
-        {'project': project}
+        {'project': project, 'active_nav': 'projects'}
     )
