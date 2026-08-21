@@ -242,3 +242,22 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             receipt.mark_as_delivered()
         return ids
 
+
+    def _set_reaction(self, message_id, reaction_value):
+        message = Message.objects.get(pk=message_id, conversation_id=self.conversation_id)
+        reaction, created = MessageReaction.objects.get_or_create(
+            message=message, user=self.user, defaults={"reaction": reaction_value},
+        )
+        if not created:
+            reaction.change(reaction_value)
+        return {
+            r: list(MessageReaction.objects.filter(message=message, reaction=r).values_list("user_id", flat=True))
+            for r in {reaction_value} | set(message.reactions.values_list("reaction", flat=True))
+        }
+    
+    
+    def _remove_reaction(self, message_id):
+        MessageReaction.objects.filter(message_id=message_id, user=self.user).delete()
+        message = Message.objects.get(pk=message_id)
+        from .utils import serialize_reactions
+        return serialize_reactions(message)
