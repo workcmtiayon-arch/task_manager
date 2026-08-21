@@ -41,3 +41,32 @@ def conversation_start(request, user_id):
     conversation = Conversation.objects.get_or_create_private(request.user, target)
     return redirect("chat:conversation_detail", pk=conversation.pk)
 
+
+@login_required
+def conversation_detail(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+    return render(request, "chat/conversation_detail.html", {"conversation": conversation})
+
+
+@login_required
+def conversation_messages_json(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+
+    limit = min(int(request.GET.get("limit", 50)), 100)
+    before_id = request.GET.get("before")
+
+    queryset = conversation.messages.select_related("sender").prefetch_related("attachments", "reactions", "receipts")
+    
+    if before_id:
+        queryset = queryset.filter(pk__lt=before_id)
+
+    messages = list(queryset.order_by("-pk")[:limit])
+    messages.reverse()
+
+    data = [serialize_message(message, for_user=request.user) for message in messages]
+    return JsonResponse({"messages": data})
+
