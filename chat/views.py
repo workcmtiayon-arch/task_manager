@@ -70,3 +70,64 @@ def conversation_messages_json(request, pk):
     data = [serialize_message(message, for_user=request.user) for message in messages]
     return JsonResponse({"messages": data})
 
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_attachment_upload(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+    uploaded_file = request.FILES.get("file")
+    if uploaded_file is None:
+        return HttpResponseBadRequest("Aucun fichier reçu.")
+    if uploaded_file.content_type not in MessageAttachment.ALLOWED_CONTENT_TYPES:
+        return HttpResponseBadRequest("Type de fichier non autorisé (images, PDF ou TXT uniquement).")
+    if uploaded_file.size > MessageAttachment.MAX_FILE_SIZE:
+        return HttpResponseBadRequest("Fichier trop volumineux (10 Mo maximum).")
+    
+    with transaction.atomic():
+        message = Message.objects.create(
+            conversation=conversation,
+            sender=request.user,
+            content="",
+            message_type=Message.MessageType.ATTACHMENT,
+        )
+        MessageAttachment.objects.create(
+            message=message,
+            file=uploaded_file,
+            file_name=uploaded_file.name,
+            file_size=uploaded_file.size,
+            content_type=uploaded_file.content_type,
+        )
+        other_members = conversation.get_members().exclude(pk=request.user.pk)
+        MessageReceipt.objects.bulk_create([
+            MessageReceipt(message=message, user=member) for member in other_members
+        ])
+        conversation.touch()
+
+    payload = serialize_message(message)
+    
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"conversation_{conversation.pk}",
+        {"type": "chat.message", "message": payload},
+    )
+    
+    return JsonResponse(payload, status=201)
+
+
+
+
+
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_leave(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+    membership = ConversationMember.objects.filter(conversation=conversation, user=request.user).first()
+    if membership is None:
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+    membership.leave()
+    return redirect("chat:conversation_list")
