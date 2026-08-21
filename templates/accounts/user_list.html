@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Utilisateurs — TaskFlow{% endblock %}
+{% block page_title %}Utilisateurs{% endblock %}
+{% block page_subtitle %}Gérez les accès des comptes de la plateforme.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="users-toolbar card">
+    <div>
+        <h2>Comptes utilisateurs</h2>
+        <p>{{ users|length }} utilisateur{{ users|length|pluralize }} répertorié{{ users|length|pluralize }}.</p>
+    </div>
+    <label class="search-field" for="user-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="user-search" type="search" placeholder="Rechercher par nom, e-mail ou rôle…" autocomplete="off">
+    </label>
+</section>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table users-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Rôle</th>
+                    <th>Inscription</th>
+                    <th>Statut</th>
+                    <th class="users-table__action">Action</th>
+                </tr>
+            </thead>
+            <tbody id="users-table-body">
+                {% for account in users %}
+                <tr data-user-row data-search="{{ account.username|lower }} {{ account.get_full_name|lower }} {{ account.email|lower }} {{ account.get_role_display|lower }}">
+                    <td>
+                        <div class="user-cell">
+                            <span class="user-cell__avatar">{{ account.get_full_name|default:account.username|slice:':2'|upper }}</span>
+                            <span><strong>{{ account.get_full_name|default:account.username }}</strong><small>{{ account.email }}</small></span>
+                        </div>
+                    </td>
+                    <td><span class="badge badge--role">{{ account.get_role_display }}</span></td>
+                    <td class="is-muted">{{ account.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if account.is_active %}<span class="badge badge--success">Actif</span>{% else %}<span class="badge badge--danger">Désactivé</span>{% endif %}
+                    </td>
+                    <td class="users-table__action">
+                        {% if account.pk == request.user.pk %}
+                            <span class="is-muted">Votre compte</span>
+                        {% elif account.is_superuser %}
+                            <span class="is-muted">Protégé</span>
+                        {% else %}
+                            <form action="{% url 'toggle_user_status' account.pk %}" method="post">
+                                {% csrf_token %}
+                                {% if account.is_active %}
+                                <button class="btn btn--danger-outline" type="submit">Désactiver</button>
+                                {% else %}
+                                <button class="btn btn--outline" type="submit">Activer</button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty-state">Aucun utilisateur à afficher.</td></tr>
+                {% endfor %}
+                <tr id="no-user-result" hidden><td colspan="5" class="empty-state">Aucun utilisateur ne correspond à votre recherche.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const searchInput = document.getElementById('user-search');
+    const rows = [...document.querySelectorAll('[data-user-row]')];
+    const noResult = document.getElementById('no-user-result');
+
+    searchInput.addEventListener('input', () => {
+        const term = searchInput.value.trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+            const matches = row.dataset.search.includes(term);
+            row.hidden = !matches;
+            if (matches) visible += 1;
+        });
+        noResult.hidden = visible !== 0;
+    });
+</script>
+{% endblock %}

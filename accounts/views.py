@@ -1,8 +1,16 @@
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, ForgotPasswordEmailForm, OTPForm
+from .forms import (
+    CustomUserCreationForm,
+    CustomAuthenticationForm,
+    ForgotPasswordEmailForm,
+    OTPForm,
+    ProfileForm,
+)
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
+from django.db.models import Count, Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
@@ -174,4 +182,117 @@ def deconnexion(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'base.html')
+    # Imports locaux pour garder les applications découplées et ne rien changer au chat.
+    from projects.models import Project
+    from tasks.models import Task
+    from chat.models import Conversation, ConversationMember
+
+    is_admin = request.user.is_superuser or request.user.role == User.Role.ADMIN
+    if is_admin:
+        projects = Project.objects.all()
+        tasks = Task.objects.all()
+        conversation_count = Conversation.objects.count()
+        user_count = User.objects.count()
+        active_user_count = User.objects.filter(is_active=True).count()
+    else:
+        projects = Project.objects.filter(user=request.user)
+        tasks = Task.objects.filter(project__user=request.user)
+        conversation_count = (
+            ConversationMember.objects.filter(user=request.user, left_at__isnull=True)
+            .values("conversation_id")
+            .distinct()
+            .count()
+        )
+        user_count = None
+        active_user_count = None
+
+    project_count = projects.count()
+    completed_project_count = (
+        projects.annotate(
+            task_count=Count("task"),
+            remaining_task_count=Count("task", filter=~Q(task__status=Task.Status.DONE)),
+        )
+        .filter(task_count__gt=0, remaining_task_count=0)
+        .count()
+    )
+    incomplete_project_count = project_count - completed_project_count
+    completed_project_percentage = (
+        round(completed_project_count * 100 / project_count) if project_count else 0
+    )
+    task_count = tasks.count()
+    completed_task_count = tasks.filter(status=Task.Status.DONE).count()
+    in_progress_task_count = tasks.filter(status=Task.Status.IN_PROGRESS).count()
+    todo_task_count = tasks.filter(status=Task.Status.TODO).count()
+    completed_percentage = round(completed_task_count * 100 / task_count) if task_count else 0
+    remaining_percentage = 100 - completed_percentage if task_count else 0
+
+    return render(request, "accounts/dashboard.html", {
+        "active_nav": "dashboard",
+        "is_dashboard_admin": is_admin,
+        "user_count": user_count,
+        "active_user_count": active_user_count,
+        "project_count": project_count,
+        "completed_project_count": completed_project_count,
+        "incomplete_project_count": incomplete_project_count,
+        "completed_project_percentage": completed_project_percentage,
+        "conversation_count": conversation_count,
+        "task_count": task_count,
+        "completed_task_count": completed_task_count,
+        "in_progress_task_count": in_progress_task_count,
+        "todo_task_count": todo_task_count,
+        "completed_percentage": completed_percentage,
+        "remaining_percentage": remaining_percentage,
+    })
+
+
+def is_platform_admin(user):
+    return user.is_authenticated and (user.is_superuser or user.role == User.Role.ADMIN)
+
+
+@login_required
+def user_list(request):
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("Cette page est réservée aux administrateurs.")
+
+    users = User.objects.all().order_by("-date_joined", "username")
+    return render(request, "accounts/user_list.html", {
+        "users": users,
+        "active_nav": "users",
+    })
+
+
+@login_required
+def toggle_user_status(request, user_id):
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("Cette action est réservée aux administrateurs.")
+    if request.method != "POST":
+        return redirect("user_list")
+
+    user = get_object_or_404(User, pk=user_id)
+    if user.pk == request.user.pk:
+        messages.error(request, "Vous ne pouvez pas désactiver votre propre compte.")
+    elif user.is_superuser:
+        messages.error(request, "Le compte super-administrateur ne peut pas être modifié ici.")
+    else:
+        user.is_active = not user.is_active
+        user.save(update_fields=["is_active"])
+        state = "activé" if user.is_active else "désactivé"
+        messages.success(request, f"Le compte de {user.username} a été {state}.")
+    return redirect("user_list")
+
+
+@login_required
+def profile(request):
+    form = ProfileForm(request.POST or None, instance=request.user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Vos informations de profil ont été mises à jour.")
+        return redirect("profile")
+    return render(request, "profile/profile.html", {"form": form})
+
+
+@login_required
+def system_settings(request):
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("Cette page est réservée aux administrateurs.")
+    return render(request, "accounts/system_settings.html", {"active_nav": "settings"})

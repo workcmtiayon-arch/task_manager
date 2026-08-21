@@ -36,3 +36,24 @@ class OTPForm(forms.Form):
 
 class ForgotPasswordEmailForm(forms.Form):
     email = forms.EmailField(label="Adresse email")
+
+
+class ProfileForm(forms.ModelForm):
+    """Formulaire limité aux informations qu'un utilisateur peut modifier lui-même."""
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email"]
+        labels = {
+            "username": "Nom d'utilisateur",
+            "first_name": "Prénom",
+            "last_name": "Nom",
+            "email": "Adresse e-mail",
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        duplicate = User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
+        if duplicate.exists():
+            raise forms.ValidationError("Cette adresse e-mail est déjà utilisée.")
+        return email

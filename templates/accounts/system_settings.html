@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Configuration — TaskFlow{% endblock %}
+{% block page_title %}Configuration du système{% endblock %}
+{% block page_subtitle %}Les réglages globaux de la plateforme.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="coming-soon card">
+    <span class="coming-soon__icon" aria-hidden="true">⚙</span>
+    <h2>Un espace de configuration est en préparation.</h2>
+    <p>Nous préparons une interface claire et fiable pour les réglages de la plateforme. Cette fonctionnalité arrivera prochainement.</p>
+    <a href="{% url 'dashboard' %}" class="btn btn--outline">Retour au tableau de bord</a>
+</section>
+{% endblock %}

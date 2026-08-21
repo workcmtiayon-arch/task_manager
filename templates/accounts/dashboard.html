@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tableau de bord — TaskFlow{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block page_subtitle %}{% if is_dashboard_admin %}Vue d'ensemble de la plateforme.{% else %}Suivez l'avancement de vos projets en un coup d'œil.{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-intro">
+    <div>
+        <p class="eyebrow">Bonjour, {{ request.user.first_name|default:request.user.username }}</p>
+        <h2>{% if is_dashboard_admin %}La plateforme est sous contrôle.{% else %}Voici le résumé de votre activité.{% endif %}</h2>
+    </div>
+    <a class="btn btn--primary" href="{% url 'project_add' %}">+ Nouveau projet</a>
+</section>
+
+<section class="stats-grid" aria-label="Indicateurs clés">
+    {% if is_dashboard_admin %}
+    <article class="stat-card stat-card--primary">
+        <span class="stat-card__label">Utilisateurs</span>
+        <strong>{{ user_count }}</strong>
+        <small>{{ active_user_count }} compte{{ active_user_count|pluralize }} actif{{ active_user_count|pluralize }}</small>
+    </article>
+    {% endif %}
+    <article class="stat-card">
+        <span class="stat-card__label">{% if is_dashboard_admin %}Projets gérés{% else %}Mes projets{% endif %}</span>
+        <strong>{{ project_count }}</strong>
+        <small>sur {% if is_dashboard_admin %}la plateforme{% else %}votre espace{% endif %}</small>
+    </article>
+    <article class="stat-card">
+        <span class="stat-card__label">{% if is_dashboard_admin %}Conversations créées{% else %}Mes conversations{% endif %}</span>
+        <strong>{{ conversation_count }}</strong>
+        <small>conversation{{ conversation_count|pluralize }}</small>
+    </article>
+    <article class="stat-card">
+        <span class="stat-card__label">{% if is_dashboard_admin %}Tâches au total{% else %}Mes tâches{% endif %}</span>
+        <strong>{{ task_count }}</strong>
+        <small>{{ completed_task_count }} terminée{{ completed_task_count|pluralize }}</small>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="card progress-card">
+        <div class="card-heading">
+            <div>
+                <h2>Avancement des tâches</h2>
+                <p>{% if is_dashboard_admin %}Répartition sur l'ensemble de la plateforme.{% else %}Répartition de vos tâches personnelles.{% endif %}</p>
+            </div>
+            <strong class="progress-card__number">{{ completed_percentage }}%</strong>
+        </div>
+        <div class="progress-track" aria-label="{{ completed_percentage }} pour cent des tâches sont terminées">
+            <span class="progress-track__done" style="width: {{ completed_percentage }}%"></span>
+        </div>
+        <div class="progress-legend">
+            <span><i class="legend-dot legend-dot--done"></i>{{ completed_task_count }} terminée{{ completed_task_count|pluralize }}</span>
+            <span><i class="legend-dot legend-dot--progress"></i>{{ in_progress_task_count }} en cours</span>
+            <span><i class="legend-dot legend-dot--todo"></i>{{ todo_task_count }} à faire</span>
+        </div>
+        <p class="progress-summary">{{ remaining_percentage }}% des tâches restent à finaliser.</p>
+        <div class="project-progress-summary">
+            <span><strong>{{ completed_project_percentage }}%</strong> des projets sont finalisés</span>
+            <span>{{ completed_project_count }} finalisé{{ completed_project_count|pluralize }} · {{ incomplete_project_count }} non finalisé{{ incomplete_project_count|pluralize }}</span>
+        </div>
+    </article>
+
+    <article class="card shortcuts-card">
+        <div class="card-heading">
+            <div>
+                <h2>Accès rapides</h2>
+                <p>Retrouvez vos espaces essentiels.</p>
+            </div>
+        </div>
+        <div class="shortcuts">
+            <a href="{% url 'project_list' %}"><span>▣</span> Projets <b>›</b></a>
+            <a href="{% url 'task_list' %}"><span>✓</span> Tâches <b>›</b></a>
+            <a href="{% url 'chat:conversation_list' %}"><span>◌</span> Messagerie <b>›</b></a>
+            {% if is_dashboard_admin %}<a href="{% url 'user_list' %}"><span>♙</span> Utilisateurs <b>›</b></a>{% endif %}
+        </div>
+    </article>
+</section>
+{% endblock %}

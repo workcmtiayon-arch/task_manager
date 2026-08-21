@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Mon profil — TaskFlow{% endblock %}
+{% block page_title %}Mon profil{% endblock %}
+{% block page_subtitle %}Mettez à jour vos informations personnelles.{% endblock %}
+
+{% block content %}
+<section class="card form-card">
+    <div class="form-card__body">
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <input class="form-input {% if field.errors %}form-input--error{% endif %}" type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}"{% if field.field.required %} required{% endif %}>
+                {% for error in field.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button class="btn btn--primary" type="submit">Enregistrer les modifications</button>
+                <a class="btn btn--outline" href="{% url 'dashboard' %}">Annuler</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

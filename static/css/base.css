@@ -337,6 +337,16 @@ button:focus-visible {
     flex-shrink: 0;
 }
 
+.topbar__profile-link {
+    color: var(--muted-color);
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.topbar__profile-link:hover {
+    color: var(--primary-color);
+}
+
 .topbar__avatar {
     display: inline-flex;
     align-items: center;
@@ -583,6 +593,24 @@ button:focus-visible {
     padding: 32px;
 }
 
+.messages {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 11px 14px;
+    border: 1px solid var(--info-color);
+    border-radius: var(--radius-sm);
+    background: var(--info-bg);
+    color: var(--info-color);
+    font-size: 0.88rem;
+}
+
+.message--success { border-color: var(--success-color); background: var(--success-bg); color: var(--success-color); }
+.message--error { border-color: var(--danger-color); background: var(--danger-bg); color: var(--danger-color); }
+
 .card {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -628,6 +656,15 @@ button:focus-visible {
 
     .badge--role {
         display: none;
+    }
+
+    .topbar__profile-link {
+        font-size: 0;
+    }
+
+    .topbar__profile-link::before {
+        content: "Profil";
+        font-size: 0.82rem;
     }
 }
 

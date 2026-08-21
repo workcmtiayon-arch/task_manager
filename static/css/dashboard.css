@@ -1,0 +1,235 @@
+.dashboard-intro,
+.card-heading,
+.users-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.dashboard-intro {
+    margin-bottom: 24px;
+}
+
+.dashboard-intro h2,
+.card-heading h2,
+.users-toolbar h2,
+.coming-soon h2 {
+    font-size: 1.12rem;
+    letter-spacing: -0.01em;
+}
+
+.eyebrow {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    min-height: 145px;
+    padding: 20px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-card--primary {
+    background: linear-gradient(135deg, var(--primary-color), #6D63EA);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.stat-card__label,
+.stat-card small,
+.card-heading p,
+.progress-summary,
+.users-toolbar p {
+    color: var(--muted-color);
+    font-size: 0.84rem;
+}
+
+.stat-card--primary small {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.stat-card strong {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+    gap: 20px;
+}
+
+.progress-card,
+.shortcuts-card {
+    padding: 24px;
+}
+
+.progress-card__number {
+    color: var(--primary-color);
+    font-size: 1.6rem;
+}
+
+.progress-track {
+    overflow: hidden;
+    height: 11px;
+    margin: 28px 0 16px;
+    border-radius: 999px;
+    background: var(--background-color);
+}
+
+.progress-track__done {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary-color), #8078F2);
+}
+
+.progress-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    font-size: 0.82rem;
+    color: var(--muted-color);
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
+
+.legend-dot--done { background: var(--primary-color); }
+.legend-dot--progress { background: var(--warning-color); }
+.legend-dot--todo { background: #9CA3AF; }
+
+.progress-summary { margin-top: 20px; }
+
+.project-progress-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+    color: var(--muted-color);
+    font-size: 0.82rem;
+}
+
+.project-progress-summary strong { color: var(--primary-color); }
+
+.shortcuts {
+    display: grid;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.shortcuts a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--muted-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.shortcuts a:hover { background: var(--primary-color-light); color: var(--primary-color); }
+.shortcuts a span { color: var(--primary-color); font-size: 1rem; }
+.shortcuts a b { margin-left: auto; font-size: 1.1rem; }
+
+.users-toolbar {
+    margin-bottom: 20px;
+    padding: 20px 24px;
+}
+
+.search-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: min(100%, 360px);
+    padding: 0 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--muted-color);
+}
+
+.search-field:focus-within { border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-color-light); }
+.search-field input { width: 100%; border: 0; outline: 0; padding: 11px 0; font: inherit; color: var(--text-color); background: transparent; }
+
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-cell > span:last-child { display: grid; gap: 1px; }
+.user-cell small { color: var(--muted-color); }
+.user-cell__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--primary-color-light);
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.users-table__action { text-align: right; white-space: nowrap; }
+.users-table .btn { padding: 7px 10px; font-size: 0.78rem; }
+
+.coming-soon {
+    max-width: 650px;
+    margin: 8vh auto 0;
+    padding: 48px;
+    text-align: center;
+}
+
+.coming-soon__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: var(--primary-color-light);
+    color: var(--primary-color);
+    font-size: 1.8rem;
+}
+
+.coming-soon p { max-width: 480px; margin: 12px auto 24px; color: var(--muted-color); }
+
+@media (max-width: 1000px) {
+    .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .dashboard-intro, .users-toolbar { align-items: flex-start; flex-direction: column; }
+    .search-field { width: 100%; }
+    .users-table__action { text-align: left; }
+    .project-progress-summary { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .progress-card, .shortcuts-card, .coming-soon { padding: 20px; }
+}
