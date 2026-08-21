@@ -47,4 +47,142 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
             
             
+    # Réception des évènements envoyés par le client
     
+    async def receive_json(self, content, **kwargs):
+        event_type = content.get("type")
+        try:
+            if event_type == "message.send":
+                await self.handle_message_send(content)
+            elif event_type == "message.edit":
+                await self.handle_message_edit(content)
+            elif event_type == "message.delete":
+                await self.handle_message_delete(content)
+            elif event_type == "message.read":
+                await self.handle_message_read(content)
+            elif event_type == "reaction.set":
+                await self.handle_reaction_set(content)
+            elif event_type == "reaction.remove":
+                await self.handle_reaction_remove(content)
+            else:
+                await self.send_json({"type": "error", "detail": f"Type d'évènement inconnu : {event_type}"})
+        except ValueError as exc:
+            await self.send_json({"type": "error", "detail": str(exc)})
+        except PermissionError:
+            await self.send_json({"type": "error", "detail": "Action non autorisée."})
+            
+            
+    # Handlers : message.send / edit / delete / read
+    
+    async def handle_message_send(self, content):
+        text = (content.get("content") or "").strip()
+        if not text:
+            raise ValueError("Le message ne peut pas être vide.")
+        if len(text) > 4000:
+            raise ValueError("Message trop long (4000 caractères maximum).")
+
+        message_data = await database_sync_to_async(self._create_text_message)(text)
+        await self.channel_layer.group_send(
+            self.group_name, {"type": "chat.message", "message": message_data},
+        )
+    
+    
+    async def handle_message_edit(self, content):
+        message_id = content.get("message_id")
+        new_text = (content.get("content") or "").strip()
+        if not message_id or not new_text:
+            raise ValueError("message_id et content sont requis.")
+        
+        message_data = await database_sync_to_async(self._edit_message)(message_id, new_text)
+        await self.channel_layer.group_send(
+            self.group_name, {"type": "chat.message_edited", "message": message_data},
+        )
+
+    
+    async def handle_message_delete(self, content):
+        message_id = content.get("message_id")
+        if not message_id:
+            raise ValueError("message_id est requis.")
+
+        message_data = await database_sync_to_async(self._delete_message)(message_id)
+        await self.channel_layer.group_send(
+            self.group_name, {"type": "chat.message_deleted", "message": message_data},
+        )
+
+
+    async def handle_message_read(self, content):
+        message_id = content.get("message_id")
+        if not message_id:
+            raise ValueError("message_id est requis.")
+
+        updated = await database_sync_to_async(self._mark_message_read)(message_id)
+        if updated:
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    "type": "chat.receipt_update",
+                    "message_ids": [message_id],
+                    "user_id": self.user.id,
+                    "status": "read",
+                },
+            )
+    
+    
+    # Handlers : reaction.set / remove
+    
+    async def handle_reaction_set(self, content):
+        message_id = content.get("message_id")
+        reaction_value = content.get("reaction")
+        valid_values = [choice[0] for choice in MessageReaction.Reaction.choices]
+
+        if not message_id or reaction_value not in valid_values:
+            raise ValueError("message_id et une reaction valide sont requis.")
+
+        summary = await database_sync_to_async(self._set_reaction)(message_id, reaction_value)
+        await self.channel_layer.group_send(
+            self.group_name,
+            {"type": "chat.reaction_update", "message_id": message_id, "reactions": summary},
+        )
+        
+    async def handle_reaction_remove(self, content):
+        message_id = content.get("message_id")
+        if not message_id:
+            raise ValueError("message_id est requis.")
+
+        summary = await database_sync_to_async(self._remove_reaction)(message_id)
+        await self.channel_layer.group_send(
+            self.group_name,
+            {"type": "chat.reaction_update", "message_id": message_id, "reactions": summary},
+        )
+        
+        
+    # Handlers de groupe : diffusion vers CE client
+    # (le nom de méthode correspond au "type" envoyé à group_send...
+    # points remplacés par des underscores)
+    
+    async def chat_message(self, event):
+        await self.send_json({**event["message"], "type": "message.new"})
+    
+    async def chat_message_edited(self, event):
+        await self.send_json({**event["message"], "type": "message.edited"})
+
+    async def chat_message_deleted(self, event):
+        await self.send_json({**event["message"], "type": "message.deleted"})
+
+    async def chat_receipt_update(self, event):
+        await self.send_json({
+            "type": "receipt.update",
+            "message_ids": event["message_ids"],
+            "user_id": event["user_id"],
+            "status": event["status"],
+        })
+
+    async def chat_reaction_update(self, event):
+        await self.send_json({
+            "type": "reaction.update",
+            "message_id": event["message_id"],
+            "reactions": event["reactions"],
+        })
+        
+    
+   
