@@ -34,6 +34,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").sp
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     'projects',
     'tasks',
     'core',
+    'channels',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -150,6 +153,21 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNELS_LAYERS = {
+    'default': {
+        "BACKEND": "channels_redis.core.RedisChannelsLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("CHANNEL_LAYER_REDIS_URL", "redis://localhost:6379/2")],
+        },
+    },
+}
 
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
