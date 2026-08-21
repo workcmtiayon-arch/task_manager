@@ -185,4 +185,60 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         })
         
     
-   
+    # Fonctions synchrones (exécutées via database_sync_to_async)
+    
+    def _create_text_message(self, text):
+        conversation = Conversation.objects.get(pk=self.conversation_id)
+        message = Message.objects.create(
+            conversation=conversation,
+            sender=self.user,
+            content=text,
+            message_type=Message.MessageType.TEXT,
+        )
+        other_members = conversation.get_members().exclude(pk=self.user.pk)
+        MessageReceipt.objects.bulk_create([
+            MessageReceipt(message=message, user=member) for member in other_members
+        ])
+        conversation.touch()
+        return serialize_message(message)
+
+    
+    def _edit_message(self, message_id, new_text):
+        message = Message.objects.select_related("sender").get(
+            pk=message_id, conversation_id=self.conversation_id,
+        )
+        if message.sender_id != self.user.id:
+            raise PermissionError("Seul l'auteur peut modifier ce message.")
+        message.edit(new_text)
+        return serialize_message(message)
+    
+    
+    def _delete_message(self, message_id):
+        message = Message.objects.select_related("sender").get(
+            pk=message_id, conversation_id=self.conversation_id,
+        )
+        if message.sender_id != self.user.id:
+            raise PermissionError("Seul l'auteur peut supprimer ce message.")
+        message.delete()
+        return serialize_message(message)
+
+    
+    def _mark_message_read(self, message_id):
+        receipt = MessageReceipt.objects.filter(message_id=message_id, user=self.user).first()
+        if receipt is None:
+            return False
+        receipt.mark_as_read()
+        return True
+
+    
+    def _mark_pending_as_delivered(self):
+        pending = MessageReceipt.objects.filter(
+            message__conversation_id=self.conversation_id,
+            user=self.user,
+            delivered_at__isnull=True,
+        )
+        ids = list(pending.values_list("message_id", flat=True))
+        for receipt in pending:
+            receipt.mark_as_delivered()
+        return ids
+
