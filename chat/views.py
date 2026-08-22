@@ -19,21 +19,52 @@ User = get_user_model()
 
 
 
-
+def _preview_text(message):
+    if message is None:
+        return ""
+    if message.is_deleted():
+        return "Message supprime"
+    if message.message_type == Message.MessageType.ATTACHMENT:
+        return "Piece jointe"
+    text = message.content or ""
+    return text if len(text) <= 60 else text[:60] + "…"
+    
+    
+def _maybe_accept_conversation(conversation, sender):
+    if conversation.accepted_at is None and sender.id != conversation.initialed_by_id:
+        conversation.accept()
+        
 
 @login_required
 def conversation_list(request):
-    memberships = (
-        ConversationMember.objects.filter(user=request.user, left_at__isnull=True)
-        .select_related("conversation")
-        .order_by("-conversation__updated_at")
-    )
-    conversations = [m.conversation for m in memberships]
+    conversations = Conversation.objects.for_user_inbox(request.user).order_by("-updated_at")
+    items = []
+    for conversation in conversations:
+        other_user = conversation.get_members().exclude(pk=request.user.pk).first()
+        items.append({
+            "conversation": conversation,
+            "other_user": other_user,
+            "preview": _preview_text(conversation.get_last_message()),
+        })
+    
+    invitations_count = Conversation.objects.invitations_for_user(request.user).count()
     return render(request, "chat/conversation_list.html", {
-        "conversations": conversations,
-        "active_nav": "messages",
+        "items" : items,
+        "invitations_count": invitations_count,
     })
 
+
+@login_required
+def user_search(request):
+    query = (request.GET.get("q") or "").strip()
+    users = []
+    if query:
+        users = list(
+            User.objects.filter(username_icontains=query)
+            .exclude(pk=request.user.pk)
+            .order_by("username")[:20]
+        )
+    return JsonResponse({"users": [{"id": u.id, "username": u.username} for u in users]})
 
 
 @login_required
@@ -49,10 +80,12 @@ def conversation_start(request, user_id):
 def conversation_detail(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
-        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+        return HttpResponseForbidden("Vous n'etes pas membre de cette conversation.")
+    other_user = conversation.get_members().exclude(pk=request.user.pk).first()
     return render(request, "chat/conversation_detail.html", {
         "conversation": conversation,
-        "active_nav": "messages",
+        "other_user": other_user,
+        "is_invitation": conversation.is_invitation_for(request.user),
     })
 
 
@@ -60,7 +93,7 @@ def conversation_detail(request, pk):
 def conversation_messages_json(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
-        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+        return HttpResponseForbidden("Vous n'etes pas membre de cette conversation.")
 
     limit = min(int(request.GET.get("limit", 50)), 100)
     before_id = request.GET.get("before")
@@ -73,7 +106,7 @@ def conversation_messages_json(request, pk):
     messages = list(queryset.order_by("-pk")[:limit])
     messages.reverse()
 
-    data = [serialize_message(message, for_user=request.user) for message in messages]
+    data = [serialize_message(message) for message in messages]
     return JsonResponse({"messages": data})
 
 
@@ -84,9 +117,11 @@ def conversation_attachment_upload(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
         return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+    
+    
     uploaded_file = request.FILES.get("file")
     if uploaded_file is None:
-        return HttpResponseBadRequest("Aucun fichier reçu.")
+        return HttpResponseBadRequest("Aucun fichier recu...")
     if uploaded_file.content_type not in MessageAttachment.ALLOWED_CONTENT_TYPES:
         return HttpResponseBadRequest("Type de fichier non autorisé (images, PDF ou TXT uniquement).")
     if uploaded_file.size > MessageAttachment.MAX_FILE_SIZE:
@@ -110,6 +145,7 @@ def conversation_attachment_upload(request, pk):
         MessageReceipt.objects.bulk_create([
             MessageReceipt(message=message, user=member) for member in other_members
         ])
+        _maybe_accept_conversation(conversation, request.user)
         conversation.touch()
 
     payload = serialize_message(message)
@@ -134,6 +170,6 @@ def conversation_leave(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk)
     membership = ConversationMember.objects.filter(conversation=conversation, user=request.user).first()
     if membership is None:
-        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+        return HttpResponseForbidden("You are not member of this conversation")
     membership.leave()
     return redirect("chat:conversation_list")
