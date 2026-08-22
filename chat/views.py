@@ -52,6 +52,19 @@ def conversation_list(request):
         "items" : items,
         "invitations_count": invitations_count,
     })
+    
+@login_required
+def invitations_list(request):
+    conversations = Conversation.objects.invitations_for_user(request.user).order_by("-updated_at")
+    items = []
+    for conversation in conversations:
+        first_message = conversation.messages.order_by("created_at").first()
+        items.append({
+            "conversation": conversation,
+            "initiator": conversation.initiated_by,
+            "preview": _preview_text(first_message),
+        })
+    return render(request, "chat/invitations_list.html", {"items": items})
 
 
 @login_required

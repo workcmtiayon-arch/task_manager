@@ -1,31 +1,28 @@
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
 from . import permissions as chat_permissions
 from .models import Conversation, Message, MessageReaction, MessageReceipt
 from .utils import serialize_message
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
-    
-    # Cycle de vie de la connexion
-    
     async def connect(self):
         self.user = self.scope["user"]
         self.conversation_id = self.scope["url_route"]["kwargs"]["conversation_id"]
         self.group_name = f"conversation_{self.conversation_id}"
-        
+
         if self.user.is_anonymous:
-            await self.close(code=4001) # non authentifié
+            await self.close(code=4001)  # non authentifié
             return
 
         is_member = await database_sync_to_async(chat_permissions.user_can_access_conversation)(
             self.user, self.conversation_id,
         )
-
         if not is_member:
-            await self.close(code=4003) # accès refusé
+            await self.close(code=4003)  # accès refusé
             return
-    
+
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
@@ -46,8 +43,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if hasattr(self, "group_name"):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
             
-            
-    # Réception des évènements envoyés par le client
     
     async def receive_json(self, content, **kwargs):
         event_type = content.get("type")
@@ -70,10 +65,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json({"type": "error", "detail": str(exc)})
         except PermissionError:
             await self.send_json({"type": "error", "detail": "Action non autorisée."})
-            
-            
-    # Handlers : message.send / edit / delete / read
-    
+
+
     async def handle_message_send(self, content):
         text = (content.get("content") or "").strip()
         if not text:
@@ -85,20 +78,18 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_send(
             self.group_name, {"type": "chat.message", "message": message_data},
         )
-    
-    
+
     async def handle_message_edit(self, content):
         message_id = content.get("message_id")
         new_text = (content.get("content") or "").strip()
         if not message_id or not new_text:
             raise ValueError("message_id et content sont requis.")
-        
+
         message_data = await database_sync_to_async(self._edit_message)(message_id, new_text)
         await self.channel_layer.group_send(
             self.group_name, {"type": "chat.message_edited", "message": message_data},
         )
 
-    
     async def handle_message_delete(self, content):
         message_id = content.get("message_id")
         if not message_id:
@@ -108,7 +99,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_send(
             self.group_name, {"type": "chat.message_deleted", "message": message_data},
         )
-
 
     async def handle_message_read(self, content):
         message_id = content.get("message_id")
@@ -126,15 +116,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "status": "read",
                 },
             )
-    
-    
-    # Handlers : reaction.set / remove
-    
+
+
     async def handle_reaction_set(self, content):
         message_id = content.get("message_id")
         reaction_value = content.get("reaction")
         valid_values = [choice[0] for choice in MessageReaction.Reaction.choices]
-
         if not message_id or reaction_value not in valid_values:
             raise ValueError("message_id et une reaction valide sont requis.")
 
@@ -143,7 +130,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             self.group_name,
             {"type": "chat.reaction_update", "message_id": message_id, "reactions": summary},
         )
-        
+
     async def handle_reaction_remove(self, content):
         message_id = content.get("message_id")
         if not message_id:
@@ -154,15 +141,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             self.group_name,
             {"type": "chat.reaction_update", "message_id": message_id, "reactions": summary},
         )
-        
-        
-    # Handlers de groupe : diffusion vers CE client
-    # (le nom de méthode correspond au "type" envoyé à group_send...
-    # points remplacés par des underscores)
-    
+
+
     async def chat_message(self, event):
         await self.send_json({**event["message"], "type": "message.new"})
-    
+
     async def chat_message_edited(self, event):
         await self.send_json({**event["message"], "type": "message.edited"})
 
@@ -183,10 +166,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "message_id": event["message_id"],
             "reactions": event["reactions"],
         })
-        
-    
-    # Fonctions synchrones (exécutées via database_sync_to_async)
-    
+
+
     def _create_text_message(self, text):
         conversation = Conversation.objects.get(pk=self.conversation_id)
         message = Message.objects.create(
@@ -199,10 +180,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         MessageReceipt.objects.bulk_create([
             MessageReceipt(message=message, user=member) for member in other_members
         ])
+        
+        if conversation.accepted_at is None and self.user.id != conversation.initiated_by_id:
+            conversation.accept()
         conversation.touch()
         return serialize_message(message)
 
-    
     def _edit_message(self, message_id, new_text):
         message = Message.objects.select_related("sender").get(
             pk=message_id, conversation_id=self.conversation_id,
@@ -211,8 +194,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             raise PermissionError("Seul l'auteur peut modifier ce message.")
         message.edit(new_text)
         return serialize_message(message)
-    
-    
+
     def _delete_message(self, message_id):
         message = Message.objects.select_related("sender").get(
             pk=message_id, conversation_id=self.conversation_id,
@@ -222,7 +204,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         message.delete()
         return serialize_message(message)
 
-    
     def _mark_message_read(self, message_id):
         receipt = MessageReceipt.objects.filter(message_id=message_id, user=self.user).first()
         if receipt is None:
@@ -230,7 +211,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         receipt.mark_as_read()
         return True
 
-    
     def _mark_pending_as_delivered(self):
         pending = MessageReceipt.objects.filter(
             message__conversation_id=self.conversation_id,
@@ -242,7 +222,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             receipt.mark_as_delivered()
         return ids
 
-
     def _set_reaction(self, message_id, reaction_value):
         message = Message.objects.get(pk=message_id, conversation_id=self.conversation_id)
         reaction, created = MessageReaction.objects.get_or_create(
@@ -250,12 +229,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
         if not created:
             reaction.change(reaction_value)
-        return {
-            r: list(MessageReaction.objects.filter(message=message, reaction=r).values_list("user_id", flat=True))
-            for r in {reaction_value} | set(message.reactions.values_list("reaction", flat=True))
-        }
-    
-    
+        from .utils import serialize_reactions
+        return serialize_reactions(message)
+
     def _remove_reaction(self, message_id):
         MessageReaction.objects.filter(message_id=message_id, user=self.user).delete()
         message = Message.objects.get(pk=message_id)
