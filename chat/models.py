@@ -1,17 +1,16 @@
-from django.db import models
+import os
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Count
+from django.db import models
+from django.db.models import Count, Q
 from django.utils import timezone
-import os
 
-# Create your models here.
+
 
 class ConversationManager(models.Manager):
     def get_or_create_private(self, user_a, user_b):
         if user_a.pk == user_b.pk:
-            raise ValueError('Un utilisateur ne peut pas demarer une conversation avec lui-meme')
-        
+            raise ValueError("Un utilisateur ne peut pas démarrer une conversation avec lui-même.")
         existing = (
             self.filter(type=Conversation.Type.PRIVATE)
             .filter(memberships__user=user_a)
@@ -20,26 +19,63 @@ class ConversationManager(models.Manager):
             .filter(member_count=2)
             .first()
         )
-
+        
         if existing is not None:
             return existing
+
+        # user_a est celui qui appelle get_or_create_private (voir conversation_start dans views.py) : c'est donc lui l'initiateur de la conversation....
         
-        conversation = self.create(type=Conversation.Type.PRIVATE)
+        conversation = self.create(type=Conversation.Type.PRIVATE, initiated_by=user_a)
         ConversationMember.objects.bulk_create([
             ConversationMember(conversation=conversation, user=user_a),
             ConversationMember(conversation=conversation, user=user_b),
         ])
         return conversation
-    
+
+    def for_user_inbox(self, user):
+        return (
+            self.filter(
+                type=Conversation.Type.PRIVATE,
+                memberships__user=user,
+                memberships__left_at__isnull=True,
+            )
+            .filter(Q(initiated_by=user) | Q(accepted_at__isnull=False))
+            .distinct()
+        )
+
+    def invitations_for_user(self, user):
+        return (
+            self.filter(
+                type=Conversation.Type.PRIVATE,
+                memberships__user=user,
+                memberships__left_at__isnull=True,
+                accepted_at__isnull=True,
+            )
+            .exclude(initiated_by=user)
+            .filter(messages__isnull=False)
+            .distinct()
+        )
+
+
 class Conversation(models.Model):
     class Type(models.TextChoices):
         PRIVATE = "PRIVATE", "Conversation privée"
+        # GROUP = "GROUP", "Groupe"... réservé à une évolution future (hors de ma Versio1)
 
     type = models.CharField(max_length=20, choices=Type.choices, default=Type.PRIVATE)
     name = models.CharField(max_length=150, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    initiated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="initiated_conversations",
+    )
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through="ConversationMember",
@@ -67,7 +103,7 @@ class Conversation(models.Model):
         return self.memberships.filter(user=user, left_at__isnull=True).exists()
 
     def get_members(self):
-        User = settings.AUTH_USER_MODEL
+        
         return self.members.filter(
             conversation_memberships__conversation=self,
             conversation_memberships__left_at__isnull=True,
@@ -78,6 +114,16 @@ class Conversation(models.Model):
     
     def touch(self):
         Conversation.objects.filter(pk=self.pk).update(updated_at=timezone.now())
+
+    def is_invitation_for(self, user):
+        if user.is_anonymous or self.initiated_by_id == user.id:
+            return False
+        return self.accepted_at is None and self.messages.exists()
+
+    def accept(self):
+        if self.accepted_at is None:
+            self.accepted_at = timezone.now()
+            self.save(update_fields=["accepted_at"])
 
     def __str__(self):
         return self.name or f"Conversation #{self.pk}"
@@ -166,7 +212,7 @@ class Message(models.Model):
         return f"Message #{self.pk} ({self.sender})"
 
 
-# MessageReceipt
+
 
 class MessageReceipt(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="receipts")
@@ -178,7 +224,7 @@ class MessageReceipt(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["message", "user"], name="unique_receipt_per_user_message"),
         ]
-    
+        
     def mark_as_delivered(self):
         if self.delivered_at is None:
             self.delivered_at = timezone.now()
@@ -205,7 +251,7 @@ class MessageReceipt(models.Model):
     def __str__(self):
         return f"Receipt msg#{self.message_id} / {self.user}"
 
-# MessageReaction
+
 
 class MessageReaction(models.Model):
     class Reaction(models.TextChoices):
@@ -235,7 +281,7 @@ class MessageReaction(models.Model):
     def __str__(self):
         return f"{self.reaction} par {self.user} sur msg#{self.message_id}"
 
-# MessageAttachment
+
 
 def attachment_upload_path(instance, filename):
     return f"chat_attachments/conversation_{instance.message.conversation_id}/{filename}"
@@ -276,6 +322,6 @@ class MessageAttachment(models.Model):
             raise ValidationError(f"Type de fichier non autorisé : {self.content_type}")
         if self.file_size > self.MAX_FILE_SIZE:
             raise ValidationError("Fichier trop volumineux (10 Mo maximum).")
-    
+        
     def __str__(self):
         return self.file_name
