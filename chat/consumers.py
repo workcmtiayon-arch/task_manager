@@ -2,6 +2,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from . import permissions as chat_permissions
+
 from .models import Conversation, Message, MessageReaction, MessageReceipt
 from .utils import serialize_message
 

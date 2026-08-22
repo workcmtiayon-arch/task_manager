@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<div class="chat-page">
+  <div class="chat-toolbar">
+    <a href="{% url 'chat:conversation_list' %}" class="chat-back-link">&larr; Conversations</a>
+  </div>
+
+  <h1 class="chat-title">Invitations de message</h1>
+
+  {% if items %}
+    <ul class="chat-list chat-invitations-list">
+      {% for item in items %}
+        <li class="chat-list-item chat-invitation-item">
+          <a href="{% url 'chat:conversation_detail' item.conversation.pk %}" class="chat-list-link">
+            <span class="chat-avatar">{{ item.initiator.username|slice:":1"|upper }}</span>
+            <span class="chat-list-body">
+              <span class="chat-list-name">{{ item.initiator.username }}</span>
+              <span class="chat-list-preview">{{ item.preview }}</span>
+            </span>
+            <span class="chat-btn chat-btn-primary chat-btn-sm">Consulter</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="chat-empty-state">
+      <p class="chat-empty-title">Aucune invitation en attente</p>
+      <p class="chat-empty-text">Les nouveaux messages de personnes avec qui vous n'avez pas encore de conversation apparaîtront ici.</p>
+      <a href="{% url 'chat:conversation_list' %}" class="chat-btn chat-btn-primary">Retour aux conversations</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

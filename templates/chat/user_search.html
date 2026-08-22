@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<div class="chat-page chat-search-page">
+  <div class="chat-toolbar">
+    <a href="{% url 'chat:conversation_list' %}" class="chat-back-link">&larr; Conversations</a>
+  </div>
+
+  <h1 class="chat-title">Rechercher un utilisateur</h1>
+
+  <input
+    type="text"
+    id="chat-search-input"
+    class="chat-search-input"
+    placeholder="Rechercher par nom d'utilisateur..."
+    autocomplete="off"
+    autofocus
+  >
+
+  <div id="chat-search-results" class="chat-search-results"
+       data-search-url="{% url 'chat:user_search' %}"
+       data-start-url-template="{% url 'chat:conversation_start' 999999999 %}">
+  </div>
+</div>
+
+<script src="{% static 'javascript/chat-search.js' %}"></script>
+{% endblock %}

@@ -1,9 +1,45 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<h1>Mes conversations</h1>
-<ul>
-    {% for conversation in conversations %}
-    <li><a href="{% url 'chat:conversation_detail' conversation.pk %}">{{ conversation }}</a></li>
-    {% endfor %}
-</ul>
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<div class="chat-page">
+  <div class="chat-toolbar">
+    <h1 class="chat-title">Messages</h1>
+    <div class="chat-toolbar-actions">
+      <a href="{% url 'chat:invitations_list' %}" class="chat-btn chat-btn-secondary chat-invitations-link">
+        Invitations
+        {% if invitations_count > 0 %}
+          <span class="chat-badge">{{ invitations_count }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">
+        + Nouvelle conversation
+      </a>
+    </div>
+  </div>
+
+  {% if items %}
+    <ul class="chat-list">
+      {% for item in items %}
+        <li class="chat-list-item">
+          <a href="{% url 'chat:conversation_detail' item.conversation.pk %}" class="chat-list-link">
+            <span class="chat-avatar">{{ item.other_user.username|slice:":1"|upper }}</span>
+            <span class="chat-list-body">
+              <span class="chat-list-name">{{ item.other_user.username }}</span>
+              <span class="chat-list-preview">{{ item.preview|default:"Aucun message pour le moment." }}</span>
+            </span>
+            <span class="chat-list-time">{{ item.conversation.updated_at|date:"d/m H:i" }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="chat-empty-state">
+      <p class="chat-empty-title">Aucune conversation pour le moment</p>
+      <p class="chat-empty-text">Démarrez-en une nouvelle pour commencer à échanger.</p>
+      <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">Rechercher un utilisateur</a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
