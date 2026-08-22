@@ -12,18 +12,22 @@
   data-other-username="{{ other_user.username }}"
   data-is-invitation="{{ is_invitation|yesno:'true,false' }}"
   data-messages-url="{% url 'chat:conversation_messages_json' conversation.pk %}"
+  data-message-send-url="{% url 'chat:conversation_message_send' conversation.pk %}"
   data-attachment-url="{% url 'chat:conversation_attachment_upload' conversation.pk %}"
   data-conversation-list-url="{% url 'chat:conversation_list' %}"
   data-invitations-url="{% url 'chat:invitations_list' %}"
-  data-login-url="{% url 'accounts:login' %}"
+  data-login-url="{% url 'login' %}"
   data-ws-scheme="{{ request.is_secure|yesno:'wss,ws' }}"
   data-ws-host="{{ request.get_host }}"
 >
   <div class="chat-conversation-header">
     <a href="{% if is_invitation %}{% url 'chat:invitations_list' %}{% else %}{% url 'chat:conversation_list' %}{% endif %}"
-       class="chat-back-link">&larr;</a>
-    <span class="chat-avatar">{{ other_user.username|slice:":1"|upper }}</span>
-    <span class="chat-conversation-name">{{ other_user.username }}</span>
+       class="chat-back-link chat-back-link--round" aria-label="Retour aux conversations">&larr;</a>
+    <span class="chat-avatar chat-avatar--conversation">{{ other_user.username|slice:":1"|upper }}</span>
+    <span class="chat-conversation-identity">
+      <span class="chat-conversation-name">{{ other_user.username }}</span>
+      <span class="chat-conversation-status" id="chat-connection-status">Connexion sécurisée</span>
+    </span>
   </div>
 
   {% if is_invitation %}
@@ -33,14 +37,20 @@
     </div>
   {% endif %}
 
-  <div id="chat-messages" class="chat-messages"></div>
+  <div id="chat-messages" class="chat-messages">
+    <div class="chat-empty-messages" id="chat-empty-messages">
+      <span aria-hidden="true">✦</span>
+      <strong>La conversation commence ici</strong>
+      <p>Envoyez un message pour démarrer l’échange avec {{ other_user.username }}.</p>
+    </div>
+  </div>
 
   <form id="chat-composer" class="chat-composer">
     {% csrf_token %}
-    <label for="chat-attachment-input" class="chat-attach-btn" title="Joindre un fichier">📎</label>
+    <label for="chat-attachment-input" class="chat-attach-btn" title="Joindre un fichier" aria-label="Joindre un fichier">📎</label>
     <input type="file" id="chat-attachment-input" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,text/plain" hidden>
     <textarea id="chat-text-input" class="chat-text-input" placeholder="Écrire un message..." rows="1"></textarea>
-    <button type="submit" id="chat-send-btn" class="chat-btn chat-btn-primary chat-send-btn">Envoyer</button>
+    <button type="submit" id="chat-send-btn" class="chat-btn chat-btn-primary chat-send-btn">Envoyer <span aria-hidden="true">↑</span></button>
   </form>
   <div id="chat-attachment-preview" class="chat-attachment-preview"></div>
 </div>

@@ -72,14 +72,16 @@
       });
   }
 
-  renderHint("Tapez un nom d'utilisateur pour commencer.");
+  // Affiche immédiatement les utilisateurs disponibles, puis affine la liste
+  // au fur et à mesure de la saisie.
+  performSearch("");
 
   input.addEventListener("input", function () {
     const query = input.value.trim();
     window.clearTimeout(debounceTimer);
 
     if (query.length === 0) {
-      renderHint("Tapez un nom d'utilisateur pour commencer.");
+      performSearch("");
       return;
     }
 

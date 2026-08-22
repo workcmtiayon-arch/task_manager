@@ -17,6 +17,7 @@
     otherUsername: app.dataset.otherUsername,
     isInvitation: app.dataset.isInvitation === "true",
     messagesUrl: app.dataset.messagesUrl,
+    messageSendUrl: app.dataset.messageSendUrl,
     attachmentUrl: app.dataset.attachmentUrl,
     conversationListUrl: app.dataset.conversationListUrl,
     invitationsUrl: app.dataset.invitationsUrl,
@@ -41,6 +42,8 @@
   const sendBtn = document.getElementById("chat-send-btn");
   const attachmentInput = document.getElementById("chat-attachment-input");
   const attachmentPreview = document.getElementById("chat-attachment-preview");
+  const emptyMessagesEl = document.getElementById("chat-empty-messages");
+  const connectionStatusEl = document.getElementById("chat-connection-status");
 
   let oldestMessageId = null;
   let hasMoreHistory = true;
@@ -84,6 +87,13 @@
 
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function updateEmptyState() {
+    if (!emptyMessagesEl) {
+      return;
+    }
+    emptyMessagesEl.hidden = Boolean(messagesEl.querySelector("[data-message-id]"));
   }
 
   // ---------------------------------------------------------------
@@ -196,6 +206,7 @@
     if (wasNearBottom) {
       scrollToBottom();
     }
+    updateEmptyState();
   }
 
   // ---------------------------------------------------------------
@@ -224,6 +235,7 @@
         const messages = data.messages;
         if (messages.length === 0) {
           hasMoreHistory = false;
+          updateEmptyState();
           return;
         }
         if (messages.length < 50) {
@@ -257,6 +269,7 @@
         }
 
         oldestMessageId = messages[0].id;
+        updateEmptyState();
       })
       .catch(function () {
         showToast("Impossible de charger les messages.");
@@ -318,6 +331,8 @@
 
     socket.addEventListener("open", function () {
       reconnectDelay = 1000;
+      app.classList.add("is-connected");
+      if (connectionStatusEl) connectionStatusEl.textContent = "En ligne";
     });
 
     socket.addEventListener("message", function (event) {
@@ -326,6 +341,8 @@
     });
 
     socket.addEventListener("close", function (event) {
+      app.classList.remove("is-connected");
+      if (connectionStatusEl) connectionStatusEl.textContent = "Connexion en cours…";
       if (event.code === 4001) {
         window.location.href = config.loginUrl;
         return;
@@ -433,10 +450,42 @@
     if (!text) {
       return;
     }
-    sendEvent({ type: "message.send", content: text });
-    textInput.value = "";
-    textInput.style.height = "auto";
+    sendTextMessage(text);
   });
+
+  function sendTextMessage(text) {
+    const formData = new FormData();
+    formData.append("content", text);
+    sendBtn.disabled = true;
+
+    fetch(config.messageSendUrl, {
+      method: "POST",
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      body: formData,
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          return response.json().catch(function () { return {}; }).then(function (data) {
+            throw new Error(data.detail || "Le message n'a pas pu être envoyé.");
+          });
+        }
+        return response.json();
+      })
+      .then(function (message) {
+        // La diffusion WebSocket peut arriver avant ou après cette réponse.
+        // upsertMessage évite le doublon dans les deux cas.
+        upsertMessage(message);
+        textInput.value = "";
+        textInput.style.height = "auto";
+      })
+      .catch(function (error) {
+        showToast(error.message || "Le message n'a pas pu être envoyé.");
+      })
+      .finally(function () {
+        sendBtn.disabled = false;
+        textInput.focus();
+      });
+  }
 
   attachmentInput.addEventListener("change", function () {
     const file = attachmentInput.files[0];

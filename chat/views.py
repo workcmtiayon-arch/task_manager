@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
 
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -31,7 +32,7 @@ def _preview_text(message):
     
     
 def _maybe_accept_conversation(conversation, sender):
-    if conversation.accepted_at is None and sender.id != conversation.initialed_by_id:
+    if conversation.accepted_at is None and sender.id != conversation.initiated_by_id:
         conversation.accept()
         
 
@@ -51,6 +52,7 @@ def conversation_list(request):
     return render(request, "chat/conversation_list.html", {
         "items" : items,
         "invitations_count": invitations_count,
+        "active_nav": "messages",
     })
     
 @login_required
@@ -64,19 +66,31 @@ def invitations_list(request):
             "initiator": conversation.initiated_by,
             "preview": _preview_text(first_message),
         })
-    return render(request, "chat/invitations_list.html", {"items": items})
+    return render(request, "chat/invitations_list.html", {
+        "items": items,
+        "active_nav": "messages",
+    })
 
 
 @login_required
 def user_search(request):
     query = (request.GET.get("q") or "").strip()
-    users = []
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+    # L'URL ouverte dans le navigateur affiche l'interface. Seules les
+    # requêtes JavaScript reçoivent la réponse JSON consommée par le script.
+    if not is_ajax:
+        return render(request, "chat/user_search.html", {"active_nav": "messages"})
+
+    users = User.objects.filter(is_active=True).exclude(pk=request.user.pk)
     if query:
-        users = list(
-            User.objects.filter(username_icontains=query)
-            .exclude(pk=request.user.pk)
-            .order_by("username")[:20]
+        users = users.filter(
+            Q(username__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(email__icontains=query)
         )
+    users = users.order_by("username")[:20]
     return JsonResponse({"users": [{"id": u.id, "username": u.username} for u in users]})
 
 
@@ -99,6 +113,7 @@ def conversation_detail(request, pk):
         "conversation": conversation,
         "other_user": other_user,
         "is_invitation": conversation.is_invitation_for(request.user),
+        "active_nav": "messages",
     })
 
 
@@ -121,6 +136,49 @@ def conversation_messages_json(request, pk):
 
     data = [serialize_message(message) for message in messages]
     return JsonResponse({"messages": data})
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_message_send(request, pk):
+    """Enregistre un message texte, même si le WebSocket est indisponible."""
+    conversation = get_object_or_404(Conversation, pk=pk)
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+
+    content = (request.POST.get("content") or "").strip()
+    if not content:
+        return JsonResponse({"detail": "Le message ne peut pas être vide."}, status=400)
+    if len(content) > 4000:
+        return JsonResponse({"detail": "Message trop long (4000 caractères maximum)."}, status=400)
+
+    with transaction.atomic():
+        message = Message.objects.create(
+            conversation=conversation,
+            sender=request.user,
+            content=content,
+            message_type=Message.MessageType.TEXT,
+        )
+        other_members = conversation.get_members().exclude(pk=request.user.pk)
+        MessageReceipt.objects.bulk_create([
+            MessageReceipt(message=message, user=member) for member in other_members
+        ])
+        _maybe_accept_conversation(conversation, request.user)
+        conversation.touch()
+
+    payload = serialize_message(message)
+    try:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"conversation_{conversation.pk}",
+            {"type": "chat.message", "message": payload},
+        )
+    except Exception:
+        # Le message est déjà enregistré : Redis ne doit pas faire échouer
+        # l'envoi ni empêcher le destinataire de le voir dans ses invitations.
+        pass
+
+    return JsonResponse(payload, status=201)
 
 
 

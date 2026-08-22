@@ -1,4 +1,4 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
@@ -46,6 +46,77 @@ class ConversationModelTests(TransactionTestCase):
         MessageReaction.objects.create(message=message, user=self.honore, reaction=MessageReaction.Reaction.LIKE)
         with self.assertRaises(Exception):
             MessageReaction.objects.create(message=message, user=self.honore, reaction=MessageReaction.Reaction.LOVE)
+
+
+class UserSearchViewTests(TestCase):
+    def setUp(self):
+        self.current_user = User.objects.create_user(
+            username="amina", email="amina@example.com", password="pass1234",
+        )
+        self.available_user = User.objects.create_user(
+            username="malik", email="malik@example.com", password="pass1234",
+        )
+
+    def test_opening_search_displays_the_search_interface(self):
+        self.client.force_login(self.current_user)
+
+        response = self.client.get("/chat/users/search/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "chat/user_search.html")
+
+    def test_ajax_search_returns_available_users(self):
+        self.client.force_login(self.current_user)
+
+        response = self.client.get(
+            "/chat/users/search/", {"q": "mal"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["users"], [{"id": self.available_user.id, "username": "malik"}])
+
+
+class ConversationDetailTemplateTests(TestCase):
+    def test_conversation_detail_uses_the_registered_login_url(self):
+        user = User.objects.create_user(
+            username="amina", email="amina@example.com", password="pass1234",
+        )
+        other_user = User.objects.create_user(
+            username="malik", email="malik@example.com", password="pass1234",
+        )
+        conversation = Conversation.objects.create(initiated_by=user)
+        conversation.add_member(user)
+        conversation.add_member(other_user)
+
+        self.client.force_login(user)
+        response = self.client.get(f"/chat/{conversation.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-login-url="/accounts/login/"')
+
+
+@override_settings(CHANNEL_LAYERS={
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+})
+class MessageSendingTests(TestCase):
+    def test_first_message_is_persisted_and_creates_an_invitation_for_the_recipient(self):
+        sender = User.objects.create_user(
+            username="amina", email="amina@example.com", password="pass1234",
+        )
+        recipient = User.objects.create_user(
+            username="malik", email="malik@example.com", password="pass1234",
+        )
+        conversation = Conversation.objects.get_or_create_private(sender, recipient)
+
+        self.client.force_login(sender)
+        response = self.client.post(
+            f"/chat/{conversation.pk}/messages/send/", {"content": "Bonjour Malik"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Message.objects.filter(conversation=conversation, content="Bonjour Malik").exists())
+        self.assertEqual(Conversation.objects.invitations_for_user(recipient).count(), 1)
 
 
 
