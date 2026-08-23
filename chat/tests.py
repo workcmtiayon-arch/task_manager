@@ -65,7 +65,7 @@ class UserSearchViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "chat/user_search.html")
 
-    def test_ajax_search_returns_available_users(self):
+    def test_ajax_search_returns_available_users(self): 
         self.client.force_login(self.current_user)
 
         response = self.client.get(
