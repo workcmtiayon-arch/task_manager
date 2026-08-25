@@ -165,6 +165,31 @@
         </div>
     </div>
 
+    <div id="logout-confirm-overlay" class="modal-overlay" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
+            <div class="modal__body">
+                <h2 id="logout-confirm-title">Confirm Sign out</h2>
+                <p>Are you sure you want to sign out? Your current session will be closed. You can cancel to remain signed in.</p>
+                <div style="display:flex; gap:12px; margin-top:18px; justify-content:flex-end">
+                    <button type="button" class="btn btn--outline logout-cancel">Cancel</button>
+                    <button type="button" class="btn btn--primary" id="confirmSignoutBtn">Sign out</button>
+                </div>
+            </div>
+            <button type="button" class="modal__close" aria-label="Close" data-logout-modal-close>&times;</button>
+        </div>
+    </div>
+
+    <style>
+        /* Minimal modal styles reused from project templates to ensure consistent appearance */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.48); display:flex; align-items:center; justify-content:center; z-index:1200; padding:16px; opacity:0; visibility:hidden; transition: opacity .18s ease, visibility .18s ease; }
+        .modal-overlay.is-visible { opacity:1; visibility:visible; }
+        .modal { background: var(--surface-color, #fff); border-radius: 12px; width:100%; max-width: 520px; box-shadow: 0 24px 60px rgba(17,24,39,.24); transform: translateY(-10px) scale(.98); opacity:0; transition: transform .18s ease, opacity .18s ease; }
+        .modal-overlay.is-visible .modal { transform: translateY(0) scale(1); opacity:1; }
+        .modal__body { padding: 20px 22px; }
+        .modal__close { position:absolute; top:10px; right:10px; width:36px; height:36px; border:none; background:transparent; font-size:1.2rem; cursor:pointer; }
+        .btn--outline { background: transparent; border:1px solid var(--border-color); color:var(--text-color); }
+    </style>
+
     <script src="{% static 'javascript/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
