@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 
 User = get_user_model()
 
+
 OTP_EMAIL_CONTEXT = {
     "REGISTER": {
         "subject": "Votre code de verification Task Manager",
