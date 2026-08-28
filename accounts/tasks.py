@@ -18,6 +18,7 @@ OTP_EMAIL_CONTEXT = {
 }
 
 
+
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def send_otp_email_task(self, user_id, code, purpose):
 
