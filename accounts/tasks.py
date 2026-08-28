@@ -37,7 +37,7 @@ def send_otp_email_task(self, user_id, code, purpose):
             fail_silently=False,
         )
     except Exception as exc:
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) 
 
 
 @shared_task
