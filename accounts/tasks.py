@@ -40,6 +40,7 @@ def send_otp_email_task(self, user_id, code, purpose):
         raise self.retry(exc=exc) 
 
 
+
 @shared_task
 def send_registration_alert_email_task(email):
     message = render_to_string("accounts/emails/registration_alert.txt", {})
