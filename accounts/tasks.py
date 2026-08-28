@@ -30,7 +30,7 @@ def send_otp_email_task(self, user_id, code, purpose):
     message = render_to_string(config["template"], {"username": user.username, "code": code})
     try:
         send_mail(
-            subject=config["subject"],
+            subject=config["subject"], 
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
