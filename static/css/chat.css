@@ -626,7 +626,8 @@
     min-height: 560px;
     width: 100%;
     max-width: none;
-    margin: 0;
+    margin: 0 -32px;
+    width: calc(100% + 64px);
     overflow: hidden;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -833,6 +834,8 @@
     .chat-conversation-page {
         height: calc(100vh - var(--topbar-height) - 40px);
         min-height: 0;
+        margin: 0 -20px;
+        width: calc(100% + 40px);
         border-right: 0;
         border-left: 0;
         border-radius: 0;
