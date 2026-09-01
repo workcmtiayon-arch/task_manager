@@ -66,6 +66,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json({"type": "error", "detail": str(exc)})
         except PermissionError:
             await self.send_json({"type": "error", "detail": "Action non autorisée."})
+        except (Conversation.DoesNotExist, Message.DoesNotExist):
+            await self.send_json({"type": "error", "detail": "La ressource demandée est introuvable."})
 
 
     async def handle_message_send(self, content):
@@ -224,7 +226,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return ids
 
     def _set_reaction(self, message_id, reaction_value):
-        message = Message.objects.get(pk=message_id, conversation_id=self.conversation_id)
+        message = Message.objects.get(
+            pk=message_id,
+            conversation_id=self.conversation_id,
+            conversation__memberships__user=self.user,
+            conversation__memberships__left_at__isnull=True,
+        )
         reaction, created = MessageReaction.objects.get_or_create(
             message=message, user=self.user, defaults={"reaction": reaction_value},
         )
@@ -234,7 +241,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return serialize_reactions(message)
 
     def _remove_reaction(self, message_id):
-        MessageReaction.objects.filter(message_id=message_id, user=self.user).delete()
-        message = Message.objects.get(pk=message_id)
+        message = Message.objects.get(
+            pk=message_id,
+            conversation_id=self.conversation_id,
+            conversation__memberships__user=self.user,
+            conversation__memberships__left_at__isnull=True,
+        )
+        MessageReaction.objects.filter(message=message, user=self.user).delete()
         from .utils import serialize_reactions
         return serialize_reactions(message)
