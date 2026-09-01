@@ -346,8 +346,9 @@
     });
 
     socket.addEventListener("close", function (event) {
+      stopTyping();
       app.classList.remove("is-connected");
-      if (connectionStatusEl) connectionStatusEl.textContent = "Connexion en cours…";
+      if (connectionStatusEl) connectionStatusEl.textContent = "Reconnexion en cours…";
       if (event.code === 4001) {
         window.location.href = config.loginUrl;
         return;
