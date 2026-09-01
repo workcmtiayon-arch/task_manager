@@ -160,7 +160,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 ASGI_APPLICATION = "config.asgi.application"
 
-CHANNELS_LAYERS = {
+CHANNEL_LAYERS = {
     'default': {
         "BACKEND": "channels_redis.core.RedisChannelsLayer",
         "CONFIG": {

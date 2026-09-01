@@ -13,9 +13,11 @@ class ConversationManager(models.Manager):
             raise ValueError("Un utilisateur ne peut pas démarrer une conversation avec lui-même.")
         existing = (
             self.filter(type=Conversation.Type.PRIVATE)
-            .filter(memberships__user=user_a)
-            .filter(memberships__user=user_b)
-            .annotate(member_count=Count("memberships"))
+            .filter(
+                memberships__user__in=[user_a, user_b],
+                memberships__left_at__isnull=True,
+            )
+            .annotate(member_count=Count("memberships__user", distinct=True))
             .filter(member_count=2)
             .first()
         )

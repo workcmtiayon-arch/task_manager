@@ -121,6 +121,9 @@ class MessageSendingTests(TestCase):
 
 
 
+@override_settings(CHANNEL_LAYERS={
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+})
 class ChatConsumerTests(TransactionTestCase):
     def setUp(self):
         self.malik = User.objects.create_user(username="malik", email="maliktiayon95@gmail.com", password="pass1234")
