@@ -150,6 +150,20 @@ class MessageSendingTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_reaction_endpoint_rejects_non_members(self):
+        owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="recipient", email="recipient@example.com", password="pass1234")
+        outsider = User.objects.create_user(username="outsider", email="outsider@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(owner, recipient)
+        message = Message.objects.create(conversation=conversation, sender=owner, content="Private")
+        self.client.force_login(outsider)
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/reactions/set/",
+            {"message_id": message.pk, "reaction": MessageReaction.Reaction.LIKE},
+        )
+        self.assertEqual(response.status_code, 403)
+
 
 
 
