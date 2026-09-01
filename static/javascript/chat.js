@@ -19,6 +19,8 @@
     messagesUrl: app.dataset.messagesUrl,
     messageSendUrl: app.dataset.messageSendUrl,
     attachmentUrl: app.dataset.attachmentUrl,
+    reactionSetUrl: app.dataset.reactionSetUrl,
+    reactionRemoveUrl: app.dataset.reactionRemoveUrl,
     conversationListUrl: app.dataset.conversationListUrl,
     invitationsUrl: app.dataset.invitationsUrl,
     loginUrl: app.dataset.loginUrl,
@@ -431,6 +433,39 @@
     }
   }
 
+  function setReaction(messageId, reaction) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      sendEvent({ type: "reaction.set", message_id: messageId, reaction: reaction });
+      return;
+    }
+    submitReaction(config.reactionSetUrl, messageId, reaction);
+  }
+
+  function removeReaction(messageId) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      sendEvent({ type: "reaction.remove", message_id: messageId });
+      return;
+    }
+    submitReaction(config.reactionRemoveUrl, messageId);
+  }
+
+  function submitReaction(url, messageId, reaction) {
+    const body = new FormData();
+    body.append("message_id", messageId);
+    if (reaction) {
+      body.append("reaction", reaction);
+    }
+    fetch(url, { method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken") }, body: body })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("La réaction n'a pas pu être enregistrée.");
+        }
+        return response.json();
+      })
+      .then(applyReactionUpdate)
+      .catch(function (error) { showToast(error.message); });
+  }
+
   // ---------------------------------------------------------------
   // Composition et envoi
   // ---------------------------------------------------------------
@@ -603,9 +638,9 @@
         `.chat-reaction-pill.mine[data-reaction="${reaction}"]`
       );
       if (alreadyMine) {
-        sendEvent({ type: "reaction.remove", message_id: messageId });
+        removeReaction(messageId);
       } else {
-        sendEvent({ type: "reaction.set", message_id: messageId, reaction: reaction });
+        setReaction(messageId, reaction);
       }
       return;
     }
@@ -613,7 +648,7 @@
     const reactionPill = event.target.closest(".chat-reaction-pill");
     if (reactionPill) {
       if (reactionPill.classList.contains("mine")) {
-        sendEvent({ type: "reaction.remove", message_id: messageId });
+        removeReaction(messageId);
       }
       return;
     }
