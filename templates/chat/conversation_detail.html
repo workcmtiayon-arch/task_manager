@@ -44,6 +44,7 @@
       <p>Envoyez un message pour démarrer l’échange avec {{ other_user.username }}.</p>
     </div>
   </div>
+  <div id="chat-typing-indicator" class="chat-typing-indicator" hidden aria-live="polite"></div>
 
   <form id="chat-composer" class="chat-composer">
     {% csrf_token %}
