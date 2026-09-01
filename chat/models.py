@@ -188,6 +188,9 @@ class Message(models.Model):
 
     class Meta:
         ordering = ["created_at"]
+        indexes = [
+            models.Index(fields=["conversation", "-created_at"]),
+        ]
 
     def edit(self, new_content):
         if self.is_deleted():
@@ -272,6 +275,7 @@ class MessageReaction(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["message", "user"], name="unique_reaction_per_user_message"),
         ]
+        indexes = [models.Index(fields=["message", "reaction"])]
 
     def change(self, new_reaction):
         self.reaction = new_reaction
