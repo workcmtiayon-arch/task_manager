@@ -135,7 +135,7 @@
 
   function buildReactionPickerHtml() {
     const options = REACTION_KEYS.map(function (key) {
-      return `<button type="button" class="chat-reaction-option" data-reaction="${key}">${REACTION_EMOJI[key]}</button>`;
+      return `<button type="button" class="chat-reaction-option" data-reaction="${key}" aria-label="Réagir avec ${key.toLowerCase()}" title="${key.toLowerCase()}">${REACTION_EMOJI[key]}</button>`;
     });
     return `<div class="chat-reaction-picker">${options.join("")}</div>`;
   }
