@@ -304,6 +304,14 @@
     background-color: var(--background-color);
 }
 
+.chat-typing-indicator {
+    min-height: 20px;
+    padding: 4px 8px;
+    color: var(--muted-color);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
 .chat-bubble-row {
     display: flex;
     flex-direction: column;
