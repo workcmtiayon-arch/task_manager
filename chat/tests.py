@@ -153,7 +153,6 @@ class ChatConsumerTests(TransactionTestCase):
     async def _connect(self, user):
         import importlib
         import config.asgi
-
         application = importlib.reload(config.asgi).application
 
         communicator = WebsocketCommunicator(application, f"/ws/chat/{self.conversation.pk}/")
