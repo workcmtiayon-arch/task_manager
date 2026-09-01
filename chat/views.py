@@ -123,7 +123,10 @@ def conversation_messages_json(request, pk):
     if not conversation.is_member(request.user):
         return HttpResponseForbidden("Vous n'etes pas membre de cette conversation.")
 
-    limit = min(int(request.GET.get("limit", 50)), 100)
+    try:
+        limit = min(max(int(request.GET.get("limit", 50)), 1), 100)
+    except (TypeError, ValueError):
+        return JsonResponse({"detail": "La limite doit être un nombre entier."}, status=400)
     before_id = request.GET.get("before")
 
     queryset = conversation.messages.select_related("sender").prefetch_related("attachments", "reactions", "receipts")
