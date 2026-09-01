@@ -2,7 +2,6 @@ from django.test import TestCase, TransactionTestCase, override_settings
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
-from config.asgi import application
 from .models import Conversation, Message, MessageReaction
 
 # Create your tests here.
@@ -132,6 +131,8 @@ class ChatConsumerTests(TransactionTestCase):
         self.conversation = Conversation.objects.get_or_create_private(self.malik, self.honore)
 
     async def _connect(self, user):
+        from config.asgi import application
+
         communicator = WebsocketCommunicator(application, f"/ws/chat/{self.conversation.pk}/")
         communicator.scope["user"] = user
         connected, _ = await communicator.connect()
