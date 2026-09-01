@@ -137,6 +137,19 @@ class MessageSendingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(MessageReaction.objects.filter(message=message, user=current_user).exists())
 
+    def test_reaction_endpoint_rejects_invalid_value(self):
+        current_user = User.objects.create_user(username="amina", email="amina@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="malik", email="malik@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(current_user, recipient)
+        message = Message.objects.create(conversation=conversation, sender=recipient, content="React to this")
+        self.client.force_login(current_user)
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/reactions/set/",
+            {"message_id": message.pk, "reaction": "INVALID"},
+        )
+        self.assertEqual(response.status_code, 400)
+
 
 
 
