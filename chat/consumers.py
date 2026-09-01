@@ -26,6 +26,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+        await self.send_json({"type": "connection.ready", "conversation_id": int(self.conversation_id)})
 
         # Rattrapage : les messages reçus pendant l'absence passent à "livré"
         delivered_ids = await database_sync_to_async(self._mark_pending_as_delivered)()

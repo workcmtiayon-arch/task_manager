@@ -392,6 +392,9 @@
           typingIndicatorEl.textContent = data.is_typing ? `${data.username} écrit…` : "";
         }
         break;
+      case "connection.ready":
+        if (connectionStatusEl) connectionStatusEl.textContent = "En ligne";
+        break;
       case "error":
         showToast(data.detail || "Une erreur est survenue.");
         break;

@@ -159,6 +159,8 @@ class ChatConsumerTests(TransactionTestCase):
         communicator = WebsocketCommunicator(application, f"/ws/chat/{self.conversation.pk}/")
         communicator.scope["user"] = user
         connected, _ = await communicator.connect()
+        if connected:
+            await communicator.receive_json_from()
         return communicator, connected
     
     async def test_member_can_connect(self):
