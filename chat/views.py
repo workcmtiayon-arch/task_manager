@@ -10,8 +10,8 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from .models import Conversation, ConversationMember, Message, MessageAttachment, MessageReceipt
-from .utils import serialize_message
+from .models import Conversation, ConversationMember, Message, MessageAttachment, MessageReaction, MessageReceipt
+from .utils import serialize_message, serialize_reactions
 
 # Create your views here.
 
@@ -244,3 +244,43 @@ def conversation_leave(request, pk):
         return HttpResponseForbidden("You are not member of this conversation")
     membership.leave()
     return redirect("chat:conversation_list")
+
+
+def _reaction_message(request, pk, remove=False):
+    conversation = get_object_or_404(Conversation, pk=pk)
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden("Vous n'êtes pas membre de cette conversation.")
+    message = get_object_or_404(Message, pk=request.POST.get("message_id"), conversation=conversation)
+    if remove:
+        MessageReaction.objects.filter(message=message, user=request.user).delete()
+    else:
+        reaction_value = request.POST.get("reaction")
+        valid_values = [choice[0] for choice in MessageReaction.Reaction.choices]
+        if reaction_value not in valid_values:
+            return JsonResponse({"detail": "Réaction invalide."}, status=400)
+        reaction, created = MessageReaction.objects.get_or_create(
+            message=message, user=request.user, defaults={"reaction": reaction_value},
+        )
+        if not created:
+            reaction.change(reaction_value)
+    reactions = serialize_reactions(message)
+    try:
+        async_to_sync(get_channel_layer().group_send)(
+            f"conversation_{conversation.pk}",
+            {"type": "chat.reaction_update", "message_id": message.pk, "reactions": reactions},
+        )
+    except Exception:
+        pass
+    return JsonResponse({"message_id": message.pk, "reactions": reactions})
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_reaction_set(request, pk):
+    return _reaction_message(request, pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_reaction_remove(request, pk):
+    return _reaction_message(request, pk, remove=True)
