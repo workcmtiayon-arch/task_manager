@@ -14,6 +14,8 @@
   data-messages-url="{% url 'chat:conversation_messages_json' conversation.pk %}"
   data-message-send-url="{% url 'chat:conversation_message_send' conversation.pk %}"
   data-attachment-url="{% url 'chat:conversation_attachment_upload' conversation.pk %}"
+  data-reaction-set-url="{% url 'chat:conversation_reaction_set' conversation.pk %}"
+  data-reaction-remove-url="{% url 'chat:conversation_reaction_remove' conversation.pk %}"
   data-conversation-list-url="{% url 'chat:conversation_list' %}"
   data-invitations-url="{% url 'chat:invitations_list' %}"
   data-login-url="{% url 'login' %}"
