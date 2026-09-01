@@ -7,10 +7,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name="message",
-            index=models.Index(fields=["conversation", "-created_at"], name="chat_messag_convers_4de8a5_idx"),
+            index=models.Index(fields=["conversation", "-created_at"], name="chat_messag_convers_d0740f_idx"),
         ),
         migrations.AddIndex(
             model_name="messagereaction",
-            index=models.Index(fields=["message", "reaction"], name="chat_messag_message_43be72_idx"),
+            index=models.Index(fields=["message", "reaction"], name="chat_messag_message_bcb033_idx"),
         ),
     ]
