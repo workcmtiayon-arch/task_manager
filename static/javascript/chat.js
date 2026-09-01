@@ -44,11 +44,14 @@
   const attachmentPreview = document.getElementById("chat-attachment-preview");
   const emptyMessagesEl = document.getElementById("chat-empty-messages");
   const connectionStatusEl = document.getElementById("chat-connection-status");
+  const typingIndicatorEl = document.getElementById("chat-typing-indicator");
 
   let oldestMessageId = null;
   let hasMoreHistory = true;
   let isLoadingHistory = false;
   let pendingAttachment = null;
+  let typingTimer = null;
+  let isTyping = false;
   const readMarked = new Set();
 
   // ---------------------------------------------------------------
@@ -381,6 +384,12 @@
       case "reaction.update":
         applyReactionUpdate(data);
         break;
+      case "typing.update":
+        if (typingIndicatorEl) {
+          typingIndicatorEl.hidden = !data.is_typing;
+          typingIndicatorEl.textContent = data.is_typing ? `${data.username} écrit…` : "";
+        }
+        break;
       case "error":
         showToast(data.detail || "Une erreur est survenue.");
         break;
@@ -429,7 +438,20 @@
   textInput.addEventListener("input", function () {
     textInput.style.height = "auto";
     textInput.style.height = `${Math.min(textInput.scrollHeight, 120)}px`;
+    if (textInput.value.trim() && !isTyping) {
+      isTyping = true;
+      sendEvent({ type: "typing.start" });
+    }
+    window.clearTimeout(typingTimer);
+    typingTimer = window.setTimeout(stopTyping, 900);
   });
+
+  function stopTyping() {
+    if (isTyping) {
+      isTyping = false;
+      sendEvent({ type: "typing.stop" });
+    }
+  }
 
   textInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -454,6 +476,14 @@
   });
 
   function sendTextMessage(text) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      sendEvent({ type: "message.send", content: text });
+      textInput.value = "";
+      textInput.style.height = "auto";
+      stopTyping();
+      textInput.focus();
+      return;
+    }
     const formData = new FormData();
     formData.append("content", text);
     sendBtn.disabled = true;
@@ -477,6 +507,7 @@
         upsertMessage(message);
         textInput.value = "";
         textInput.style.height = "auto";
+        stopTyping();
       })
       .catch(function (error) {
         showToast(error.message || "Le message n'a pas pu être envoyé.");
