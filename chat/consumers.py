@@ -60,6 +60,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.handle_reaction_set(content)
             elif event_type == "reaction.remove":
                 await self.handle_reaction_remove(content)
+            elif event_type in {"typing.start", "typing.stop"}:
+                await self.handle_typing(event_type == "typing.start")
             else:
                 await self.send_json({"type": "error", "detail": f"Type d'évènement inconnu : {event_type}"})
         except ValueError as exc:
@@ -145,6 +147,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             {"type": "chat.reaction_update", "message_id": message_id, "reactions": summary},
         )
 
+    async def handle_typing(self, is_typing):
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "chat.typing_update",
+                "user_id": self.user.id,
+                "username": self.user.username,
+                "is_typing": is_typing,
+            },
+        )
+
 
     async def chat_message(self, event):
         await self.send_json({**event["message"], "type": "message.new"})
@@ -169,6 +182,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "message_id": event["message_id"],
             "reactions": event["reactions"],
         })
+
+    async def chat_typing_update(self, event):
+        if event["user_id"] != self.user.id:
+            await self.send_json({
+                "type": "typing.update",
+                "user_id": event["user_id"],
+                "username": event["username"],
+                "is_typing": event["is_typing"],
+            })
 
 
     def _create_text_message(self, text):
