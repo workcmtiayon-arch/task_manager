@@ -117,6 +117,26 @@ class MessageSendingTests(TestCase):
         self.assertTrue(Message.objects.filter(conversation=conversation, content="Bonjour Malik").exists())
         self.assertEqual(Conversation.objects.invitations_for_user(recipient).count(), 1)
 
+    def test_reaction_http_fallback_sets_and_removes_reaction(self):
+        current_user = User.objects.create_user(username="amina", email="amina@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="malik", email="malik@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(current_user, recipient)
+        message = Message.objects.create(conversation=conversation, sender=recipient, content="React to this")
+        self.client.force_login(current_user)
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/reactions/set/",
+            {"message_id": message.pk, "reaction": MessageReaction.Reaction.LOVE},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MessageReaction.objects.get(message=message, user=current_user).reaction, "LOVE")
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/reactions/remove/", {"message_id": message.pk},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(MessageReaction.objects.filter(message=message, user=current_user).exists())
+
 
 
 
@@ -131,7 +151,10 @@ class ChatConsumerTests(TransactionTestCase):
         self.conversation = Conversation.objects.get_or_create_private(self.malik, self.honore)
 
     async def _connect(self, user):
-        from config.asgi import application
+        import importlib
+        import config.asgi
+
+        application = importlib.reload(config.asgi).application
 
         communicator = WebsocketCommunicator(application, f"/ws/chat/{self.conversation.pk}/")
         communicator.scope["user"] = user
