@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.core import mail
+from django.test import override_settings
 
 from chat.models import Conversation, ConversationMember
 from projects.models import Project
@@ -78,3 +80,53 @@ class DashboardAndAdministrationTests(TestCase):
         self.member.refresh_from_db()
         self.assertEqual(self.member.first_name, "Amina")
         self.assertEqual(self.member.email, "amina@example.com")
+
+
+class AuthenticationFlowTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="auth-user", email="auth@example.com", password="SecurePass123!",
+        )
+
+    def test_verified_reset_flow_renders_new_password_form(self):
+        session = self.client.session
+        session["reset_verified_user_id"] = self.user.pk
+        session.save()
+
+        response = self.client.get(reverse("reset-password"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="new_password1"')
+        self.assertContains(response, 'autocomplete="new-password"')
+
+    def test_valid_login_redirects_to_dashboard(self):
+        response = self.client.post(reverse("login"), {
+            "username": self.user.username,
+            "password": "SecurePass123!",
+        })
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+    def test_invalid_login_returns_form_errors(self):
+        response = self.client.post(reverse("login"), {
+            "username": self.user.username,
+            "password": "wrong-password",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please enter a correct username and password")
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class AuthenticationEmailTests(TestCase):
+    def test_otp_email_contains_html_and_plain_text_alternatives(self):
+        user = User.objects.create_user(
+            username="mail-user", email="mail@example.com", password="SecurePass123!",
+        )
+        from .tasks import send_otp_email_task
+
+        send_otp_email_task.run(user.pk, "123456", "PASSWORD_RESET")
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox[0].alternatives), 1)
+        self.assertIn("123456", mail.outbox[0].alternatives[0][0])
