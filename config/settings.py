@@ -162,7 +162,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 CHANNEL_LAYERS = {
     'default': {
-        "BACKEND": "channels_redis.core.RedisChannelsLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [os.environ.get("CHANNEL_LAYER_REDIS_URL", "redis://localhost:6379/2")],
         },
