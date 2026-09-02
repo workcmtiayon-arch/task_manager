@@ -12,6 +12,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.db.models import Count, Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
 
@@ -156,6 +157,13 @@ def reset_password(request):
     else:
         form = SetPasswordForm(user)
 
+    for field in form.fields.values():
+        field.widget.attrs.update({
+            "class": "form-input",
+            "autocomplete": "new-password",
+            "placeholder": field.label,
+        })
+
     return render(request, 'accounts/reset_password.html', {'form' : form})
 
 # connexion
@@ -165,7 +173,10 @@ def connection(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('dashboard')
+            next_url = request.POST.get("next", "")
+            if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
+                return redirect(next_url)
+            return redirect("dashboard")
     else:
         form = CustomAuthenticationForm()
 
