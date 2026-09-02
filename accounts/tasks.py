@@ -1,7 +1,7 @@
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 User = get_user_model()
@@ -10,11 +10,13 @@ User = get_user_model()
 OTP_EMAIL_CONTEXT = {
     "REGISTER": {
         "subject": "Votre code de verification Task Manager",
-        "template": "accounts/emails/otp_register.txt",
+        "text_template": "accounts/emails/otp_register.txt",
+        "html_template": "accounts/emails/otp_register.html",
     },
     "PASSWORD_RESET": {
         "subject": "Votre code de Reinitialisation Task Manager",
-        "template": "accounts/emails/otp_reset.txt",
+        "text_template": "accounts/emails/otp_reset.txt",
+        "html_template": "accounts/emails/otp_reset.html",
     },
 }
 
@@ -29,15 +31,13 @@ def send_otp_email_task(self, user_id, code, purpose):
         return
 
     config = OTP_EMAIL_CONTEXT[purpose]
-    message = render_to_string(config["template"], {"username": user.username, "code": code})
+    context = {"username": user.username, "code": code}
+    message = render_to_string(config["text_template"], context)
+    html_message = render_to_string(config["html_template"], context)
     try:
-        send_mail(
-            subject=config["subject"], 
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+        email = EmailMultiAlternatives(config["subject"], message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        email.attach_alternative(html_message, "text/html")
+        email.send(fail_silently=False)
     except Exception as exc:
         raise self.retry(exc=exc) 
 
@@ -45,11 +45,14 @@ def send_otp_email_task(self, user_id, code, purpose):
 
 @shared_task
 def send_registration_alert_email_task(email):
-    message = render_to_string("accounts/emails/registration_alert.txt", {})
-    send_mail(
+    context = {}
+    message = render_to_string("accounts/emails/registration_alert.txt", context)
+    html_message = render_to_string("accounts/emails/registration_alert.html", context)
+    email_message = EmailMultiAlternatives(
         subject="Tentative de creation de compte Task Manager",
-        message=message,
+        body=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=True,
+        to=[email],
     )
+    email_message.attach_alternative(html_message, "text/html")
+    email_message.send(fail_silently=True)
