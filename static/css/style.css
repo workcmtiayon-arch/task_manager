@@ -680,12 +680,16 @@ button:focus-visible,
 
  
 .cta {
-    padding: 88px 0;
-    background-color: var(--primary-color);
+    position: relative;
+    overflow: hidden;
+    padding: 104px 0;
+    background: linear-gradient(120deg, #3157D5, #1E327E);
     color: #FFFFFF;
 }
 
 .cta__inner {
+    position: relative;
+    z-index: 1;
     text-align: center;
 }
 
@@ -699,6 +703,28 @@ button:focus-visible,
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.85);
     margin-bottom: 32px;
+}
+
+.cta::before,
+.cta::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 50%;
+}
+
+.cta::before {
+    width: 360px;
+    height: 360px;
+    left: -170px;
+    top: -190px;
+}
+
+.cta::after {
+    width: 260px;
+    height: 260px;
+    right: -100px;
+    bottom: -150px;
 }
 
 .cta__actions {
@@ -729,9 +755,9 @@ button:focus-visible,
 
  
 .footer {
-    background-color: var(--surface-color);
+    background-color: #fff;
     border-top: 1px solid var(--border-color);
-    padding: 48px 0 24px;
+    padding: 56px 0 26px;
 }
 
 .footer__inner {
@@ -756,6 +782,10 @@ button:focus-visible,
     margin-top: 10px;
     font-size: 0.88rem;
     color: var(--muted-color);
+}
+
+.footer__brand .navbar__logo-mark {
+    vertical-align: middle;
 }
 
 .footer__links {
