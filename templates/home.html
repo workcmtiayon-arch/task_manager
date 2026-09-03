@@ -12,20 +12,20 @@
     
     <header class="navbar">
         <div class="navbar__inner">
-            <a href="#" class="navbar__logo">
+            <a href="{% url 'home' %}" class="navbar__logo" aria-label="Task Manager home">
                 <span class="navbar__logo-mark" aria-hidden="true">TM</span>
                 <span class="navbar__logo-text">Task Manager</span>
             </a>
 
-            <input type="checkbox" id="nav-toggle" class="navbar__toggle-input">
-            <label for="nav-toggle" class="navbar__toggle" aria-label="Open menu">
+            <input type="checkbox" id="nav-toggle" class="navbar__toggle-input" aria-label="Toggle navigation menu">
+            <label for="nav-toggle" class="navbar__toggle" aria-controls="main-navigation">
                 <span></span>
                 <span></span>
                 <span></span>
             </label>
 
-            <nav class="navbar__menu" aria-label="Main navigation">
-                <a href="#" class="navbar__link">Home</a>
+            <nav class="navbar__menu" id="main-navigation" aria-label="Main navigation">
+                <a href="{% url 'home' %}" class="navbar__link">Home</a>
                 <a href="#what-you-can-do" class="navbar__link">Features</a>
                 <a href="#how-it-works" class="navbar__link">About</a>
                 <div class="navbar__actions">
@@ -223,7 +223,7 @@
             </div>
 
             <nav class="footer__links" aria-label="Footer navigation">
-                <a href="#" class="footer__link">Home</a>
+                <a href="{% url 'home' %}" class="footer__link">Home</a>
                 <a href="{% url 'login' %}" class="footer__link">Login</a>
                 <a href="{% url 'registration' %}" class="footer__link">Register</a>
             </nav>
