@@ -268,7 +268,24 @@ button:focus-visible,
 
  
 .hero {
-    padding: 88px 0 96px;
+    position: relative;
+    overflow: hidden;
+    padding: 112px 0 124px;
+    background:
+        radial-gradient(circle at 78% 18%, rgba(114, 139, 255, .19), transparent 28%),
+        radial-gradient(circle at 8% 70%, rgba(242, 122, 91, .09), transparent 24%);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 60px;
+    border: 1px solid rgba(49, 87, 213, .12);
+    border-radius: 50%;
+    box-shadow: 0 0 0 28px rgba(49, 87, 213, .035), 0 0 0 56px rgba(49, 87, 213, .025);
 }
 
 .hero__inner {
@@ -282,18 +299,46 @@ button:focus-visible,
 }
 
 .hero__title {
-    font-size: clamp(2.1rem, 4vw, 2.9rem);
+    color: var(--ink-color);
+    max-width: 12ch;
+    font-size: clamp(2.5rem, 5vw, 4.35rem);
     font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
+    letter-spacing: -0.055em;
+    line-height: 1.04;
     margin-bottom: 20px;
 }
 
 .hero__subtitle {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
     color: var(--muted-color);
     max-width: 46ch;
     margin-bottom: 32px;
+}
+
+.hero__content,
+.hero__visual {
+    position: relative;
+    z-index: 1;
+}
+
+.hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid #D9E0FF;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .68);
+}
+
+.hero .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 0 4px var(--accent-color-light);
 }
 
 .hero__actions {
