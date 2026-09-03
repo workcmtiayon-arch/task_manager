@@ -470,7 +470,8 @@ button:focus-visible,
 
  
 .features {
-    padding: 88px 0;
+    padding: 112px 0;
+    background: #fff;
 }
 
 .features__grid {
@@ -482,15 +483,16 @@ button:focus-visible,
 .card {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 28px 24px;
+    border-radius: var(--radius-lg);
+    padding: 30px 26px;
     box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
 }
 
 .card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    border-color: #C9D3F6;
+    box-shadow: 0 18px 35px rgba(20, 33, 61, .1);
+    transform: translateY(-6px);
 }
 
 .card__icon {
@@ -499,11 +501,12 @@ button:focus-visible,
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--primary-color-light);
+    border-radius: 14px;
+    background: var(--accent-color-light);
+    color: var(--accent-color);
     color: var(--primary-color);
     font-size: 1.2rem;
-    margin-bottom: 18px;
+    margin-bottom: 22px;
 }
 
 .card__title {
