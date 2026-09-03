@@ -128,11 +128,11 @@ button:focus-visible,
     align-items: center;
     justify-content: center;
     padding: 11px 22px;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     font-size: 0.95rem;
     font-weight: 600;
     border: 1px solid transparent;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
     cursor: pointer;
 }
 
@@ -142,25 +142,29 @@ button:focus-visible,
 }
 
 .btn--primary {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), #5273E8);
     color: #FFFFFF;
     border-color: var(--primary-color);
+    box-shadow: 0 8px 18px rgba(49, 87, 213, .2);
 }
 
 .btn--primary:hover {
-    background-color: var(--primary-color-dark);
+    background: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color));
     border-color: var(--primary-color-dark);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(49, 87, 213, .28);
 }
 
 .btn--outline {
     background-color: transparent;
     color: var(--primary-color);
-    border-color: var(--primary-color);
+    border-color: #C9D3F6;
 }
 
 .btn--outline:hover {
     background-color: var(--primary-color-light);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
 }
 
 .btn--ghost {
@@ -172,6 +176,7 @@ button:focus-visible,
 
 .btn--ghost:hover {
     color: var(--primary-color);
+    background: var(--primary-color-light);
 }
 
  
