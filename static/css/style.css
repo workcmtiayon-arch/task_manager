@@ -114,12 +114,26 @@ button:focus-visible,
     font-weight: 700;
     letter-spacing: -0.01em;
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 52px;
+}
+
+.section-title::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: 16px auto 0;
+    border-radius: 99px;
+    background: var(--accent-color);
 }
 
 .section-title--left {
     text-align: left;
     margin-bottom: 16px;
+}
+
+.section-title--left::after {
+    margin-left: 0;
 }
 
  
@@ -522,10 +536,20 @@ button:focus-visible,
 
  
 .how-it-works {
-    padding: 88px 0;
-    background-color: var(--surface-color);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    padding: 112px 0;
+    background: var(--ink-color);
+    color: #fff;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.how-it-works .eyebrow,
+.how-it-works .step__text {
+    color: #AEBBDF;
+}
+
+.how-it-works .section-title::after {
+    background: var(--accent-color);
 }
 
 .steps {
@@ -536,15 +560,18 @@ button:focus-visible,
 
 .step {
     text-align: center;
-    padding: 0 12px;
+    padding: 24px 20px;
+    border: 1px solid rgba(174, 187, 223, .2);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, .045);
 }
 
 .step__number {
     display: inline-block;
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--primary-color);
-    background-color: var(--primary-color-light);
+    color: #fff;
+    background-color: var(--primary-color);
     padding: 4px 12px;
     border-radius: 999px;
     margin-bottom: 16px;
