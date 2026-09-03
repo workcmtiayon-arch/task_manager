@@ -484,6 +484,7 @@ button:focus-visible,
 
  
 .features {
+    scroll-margin-top: 90px;
     padding: 112px 0;
     background: #fff;
 }
@@ -517,7 +518,6 @@ button:focus-visible,
     height: 44px;
     border-radius: 14px;
     background: var(--accent-color-light);
-    color: var(--accent-color);
     color: var(--primary-color);
     font-size: 1.2rem;
     margin-bottom: 22px;
@@ -536,6 +536,7 @@ button:focus-visible,
 
  
 .how-it-works {
+    scroll-margin-top: 90px;
     padding: 112px 0;
     background: var(--ink-color);
     color: #fff;
