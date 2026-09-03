@@ -349,19 +349,27 @@ button:focus-visible,
 
  
 .mock-window {
+    position: relative;
     background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
+    border: 1px solid rgba(205, 213, 239, .9);
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
+    transform: rotate(1.5deg);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.mock-window:hover {
+    transform: rotate(0) translateY(-5px);
+    box-shadow: 0 30px 70px rgba(20, 33, 61, .18);
     overflow: hidden;
 }
 
 .mock-window__bar {
     display: flex;
     gap: 6px;
-    padding: 14px 16px;
+    padding: 16px 18px;
     border-bottom: 1px solid var(--border-color);
-    background-color: #FAFBFC;
+    background: #F8F9FE;
 }
 
 .mock-dot {
@@ -376,7 +384,7 @@ button:focus-visible,
 .mock-dot--green { background-color: #7FC29B; }
 
 .mock-window__body {
-    padding: 24px;
+    padding: 28px;
 }
 
 .mock-project {
@@ -385,7 +393,7 @@ button:focus-visible,
     justify-content: space-between;
     padding: 12px 14px;
     border-radius: var(--radius-sm);
-    background-color: var(--primary-color-light);
+    background: linear-gradient(100deg, #EEF1FF, #F7F8FF);
     margin-bottom: 16px;
 }
 
@@ -412,7 +420,9 @@ button:focus-visible,
     gap: 10px;
     padding: 10px 12px;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(20, 33, 61, .04);
 }
 
 .mock-task__checkbox {
