@@ -27,6 +27,9 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 
+# Documentation locale du système de chat
+chat/ANALYSE_SYSTEME_CHAT.md
+
 
 celerybeat-schedule
 celerybeat.pid
