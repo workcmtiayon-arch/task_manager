@@ -815,6 +815,10 @@ button:focus-visible,
 
  
 @media (max-width: 960px) {
+    .hero {
+        padding: 88px 0 96px;
+    }
+
     .hero__inner {
         grid-template-columns: 1fr;
         gap: 48px;
@@ -822,6 +826,12 @@ button:focus-visible,
 
     .hero__content {
         text-align: center;
+    }
+
+    .hero__title {
+        max-width: 16ch;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .hero__subtitle {
@@ -862,6 +872,39 @@ button:focus-visible,
 
  
 @media (max-width: 680px) {
+    .section-inner,
+    .hero__inner,
+    .navbar__inner {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .hero {
+        padding: 64px 0 76px;
+    }
+
+    .hero__title {
+        font-size: clamp(2.35rem, 12vw, 3.5rem);
+    }
+
+    .hero__subtitle {
+        font-size: 1rem;
+    }
+
+    .features,
+    .how-it-works,
+    .workspace {
+        padding: 76px 0;
+    }
+
+    .section-title {
+        margin-bottom: 38px;
+    }
+
+    .mock-window {
+        transform: none;
+    }
+
     .navbar__menu {
         position: absolute;
         top: 100%;
