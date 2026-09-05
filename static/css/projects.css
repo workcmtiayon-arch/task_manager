@@ -774,3 +774,31 @@
     font-weight: 600;
     color: var(--muted-color);
 }
+.project-card__planning {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem .7rem;
+    margin: 1rem 0 .7rem;
+    color: var(--text-muted, #667085);
+    font-size: .78rem;
+}
+
+.project-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.project-status--upcoming { background: #eef4ff; color: #3157a6; }
+.project-status--in_progress { background: #ecfdf3; color: #18794e; }
+.project-status--overdue { background: #fff4ed; color: #b54708; }
+.project-status--completed { background: #f2f4f7; color: #475467; }
+
+.project-card__alert,
+.detail-card__meta-item--overdue {
+    color: #b54708;
+    font-size: .82rem;
+}
