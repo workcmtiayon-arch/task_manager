@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -73,3 +74,7 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.planned_duration_days is not None and self.planned_duration_days < 1:
+            raise ValidationError({'planned_duration_days': 'Duration must be at least one day.'})
