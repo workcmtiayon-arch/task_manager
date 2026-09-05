@@ -124,3 +124,16 @@ class ProjectListDisplayTests(TestCase):
         response = self.client.get(reverse('project_list'))
         self.assertContains(response, '/static/css/projects.css')
         self.assertEqual(self.client.get('/static/css/projects.css').status_code, 200)
+
+    def test_completed_projects_view_only_lists_completed_projects(self):
+        user = User.objects.create_user(
+            username='completed', email='completed@example.com', password='SecurePass123!'
+        )
+        completed = Project.objects.create(user=user, name='Finished')
+        Task.objects.create(project=completed, title='Done task', status=Task.Status.DONE)
+        Project.objects.create(user=user, name='Active')
+        self.client.force_login(user)
+        response = self.client.get(reverse('completed_projects'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Finished')
+        self.assertNotContains(response, 'Active')
