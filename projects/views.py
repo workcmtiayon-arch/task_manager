@@ -1,180 +1,123 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
-from .models import Project
 from .forms import ProjectForm
+from .models import Project
 
 
-# Première fonction pour l'affichage des projets
-def project_list(request):
-    # On récupère uniquement les projets appartenant à l'utilisateur connecté.
-    # On calcule également le nombre total de tâches et le nombre de tâches terminées.
-    projects = Project.objects.filter(
-        user=request.user
-    ).annotate(
-        task_count=Count('task'),
-        done_count=Count(
+def _project_queryset(user):
+    today = timezone.localdate()
+    return Project.objects.filter(user=user).annotate(
+        task_count=Count('task', distinct=True),
+        done_count=Count('task', filter=Q(task__status='DONE'), distinct=True),
+        late_task_count=Count(
             'task',
-            filter=Q(task__status='DONE')
+            filter=Q(task__due_date__lt=today) & ~Q(task__status='DONE'),
+            distinct=True,
         ),
     )
 
-    # Pour chaque projet, on calcule le pourcentage de tâches terminées.
-    projects = list(projects)
-    for project in projects:
-        project.progress_percent = (
-            round((project.done_count / project.task_count) * 100)
-            if project.task_count
-            else 0
-        )
 
-    project_count = len(projects)
+def _status_for_counts(project):
+    if project.task_count and project.done_count == project.task_count:
+        return Project.TemporalStatus.COMPLETED
+    today = timezone.localdate()
+    if today < project.planned_start_date:
+        return Project.TemporalStatus.UPCOMING
+    if today > project.planned_end_date:
+        return Project.TemporalStatus.OVERDUE
+    return Project.TemporalStatus.IN_PROGRESS
+
+
+def _prepare_project(project):
+    project.progress_percent = round(project.done_count * 100 / project.task_count) if project.task_count else 0
+    project.display_status = _status_for_counts(project)
+    return project
+
+
+@login_required
+def project_list(request):
+    projects = [_prepare_project(project) for project in _project_queryset(request.user)]
+    grouped_projects = {
+        status: [project for project in projects if project.display_status == status]
+        for status in Project.TemporalStatus.values
+    }
     total_task_count = sum(project.task_count for project in projects)
     completed_task_count = sum(project.done_count for project in projects)
-    completed_project_count = sum(
-        1 for project in projects
-        if project.task_count and project.done_count == project.task_count
-    )
-    project_completion_percentage = (
-        round(completed_task_count * 100 / total_task_count)
-        if total_task_count else 0
-    )
-
-    return render(
-        request,
-        'projects/project_list.html',
-        {
-            'projects': projects,
-            'active_nav': 'projects',
-            'project_count': project_count,
-            'total_task_count': total_task_count,
-            'completed_task_count': completed_task_count,
-            'completed_project_count': completed_project_count,
-            'project_completion_percentage': project_completion_percentage,
-        }
-    )
+    return render(request, 'projects/project_list.html', {
+        'projects': projects,
+        'grouped_projects': grouped_projects,
+        'active_nav': 'projects',
+        'project_count': len(projects),
+        'total_task_count': total_task_count,
+        'completed_task_count': completed_task_count,
+        'completed_project_count': len(grouped_projects[Project.TemporalStatus.COMPLETED]),
+        'project_completion_percentage': round(completed_task_count * 100 / total_task_count) if total_task_count else 0,
+    })
 
 
-# Deuxième fonction permettant d'ajouter un nouveau projet
+@login_required
+def completed_project_list(request):
+    projects = [
+        project for project in (_prepare_project(p) for p in _project_queryset(request.user))
+        if project.display_status == Project.TemporalStatus.COMPLETED
+    ]
+    return render(request, 'projects/project_list.html', {
+        'projects': projects,
+        'grouped_projects': {Project.TemporalStatus.COMPLETED: projects},
+        'active_nav': 'projects',
+        'project_count': len(projects),
+        'total_task_count': sum(project.task_count for project in projects),
+        'completed_task_count': sum(project.done_count for project in projects),
+        'completed_project_count': len(projects),
+        'project_completion_percentage': 100 if projects else 0,
+        'completed_only': True,
+    })
+
+
+@login_required
 def add_project(request):
     form = ProjectForm(request.POST or None)
-
     if form.is_valid():
-        # On crée l'objet en mémoire sans encore l'enregistrer.
         project = form.save(commit=False)
-
-        # L'utilisateur connecté devient automatiquement propriétaire.
         project.user = request.user
-
-        # On enregistre le projet dans la base de données.
         project.save()
-
         return redirect('project_list')
-
-    return render(
-        request,
-        'projects/project_form.html',
-        {'form': form, 'active_nav': 'projects'}
-    )
+    return render(request, 'projects/project_form.html', {'form': form, 'active_nav': 'projects'})
 
 
-# Troisième fonction permettant de modifier un projet
+@login_required
 def update_project(request, id):
-    # On autorise uniquement la modification d'un projet appartenant
-    # à l'utilisateur actuellement connecté.
-    project = get_object_or_404(
-        Project.objects.filter(user=request.user),
-        id=id
-    )
-
-    # On initialise le formulaire avec les données existantes du projet.
-    form = ProjectForm(
-        request.POST or None,
-        instance=project
-    )
-
+    project = get_object_or_404(Project.objects.filter(user=request.user), id=id)
+    form = ProjectForm(request.POST or None, instance=project)
     if form.is_valid():
-        # On sauvegarde les modifications.
-        project = form.save(commit=False)
-        project.save()
-
+        form.save()
         return redirect('project_list')
-
-    return render(
-        request,
-        'projects/project_form.html',
-        {'form': form, 'active_nav': 'projects'}
-    )
+    return render(request, 'projects/project_form.html', {'form': form, 'project': project, 'active_nav': 'projects'})
 
 
-# Quatrième fonction permettant de supprimer un projet
+@login_required
 def delete_project(request, id):
-    # On récupère uniquement un projet appartenant à l'utilisateur connecté.
-    project = get_object_or_404(
-        Project.objects.filter(user=request.user),
-        id=id
-    )
-
+    project = get_object_or_404(Project.objects.filter(user=request.user), id=id)
     if request.method == 'POST':
-        # Suppression du projet.
         project.delete()
-
         return redirect('project_list')
-
-    return render(
-        request,
-        'projects/confirm_supp_project.html',
-        {'project': project, 'active_nav': 'projects'}
-    )
+    return render(request, 'projects/confirm_supp_project.html', {'project': project, 'active_nav': 'projects'})
 
 
-# Fonction permettant d'afficher le détail d'un projet
+@login_required
 def project_detail(request, id):
-    project = get_object_or_404(
-        Project.objects.filter(user=request.user).annotate(
-            task_count=Count('task'),
-            done_count=Count(
-                'task',
-                filter=Q(task__status='DONE')
-            ),
-            in_progress_count=Count(
-                'task',
-                filter=Q(task__status='IN_PROGRESS')
-            ),
-            todo_count=Count(
-                'task',
-                filter=Q(task__status='TODO')
-            ),
-        ),
-        id=id
-    )
-
-    # Pourcentage global de progression
-    project.progress_percent = (
-        round((project.done_count / project.task_count) * 100)
-        if project.task_count else 0
-    )
-
-    # Pourcentage de tâches terminées
-    project.done_percent = (
-        round((project.done_count / project.task_count) * 100)
-        if project.task_count else 0
-    )
-
-    # Pourcentage de tâches en cours
-    project.in_progress_percent = (
-        round((project.in_progress_count / project.task_count) * 100)
-        if project.task_count else 0
-    )
-
-    # Pourcentage de tâches à faire
-    project.todo_percent = (
-        round((project.todo_count / project.task_count) * 100)
-        if project.task_count else 0
-    )
-
-    return render(
-        request,
-        'projects/project_detail.html',
-        {'project': project, 'active_nav': 'projects'}
-    )
+    project = _prepare_project(get_object_or_404(_project_queryset(request.user), id=id))
+    tasks = list(project.task_set.all().order_by('due_date', '-created_at'))
+    today = timezone.localdate()
+    for task in tasks:
+        task.is_overdue = bool(task.due_date and task.due_date < today and task.status != 'DONE')
+    project.project_tasks = tasks
+    project.in_progress_count = sum(task.status == 'IN_PROGRESS' for task in tasks)
+    project.todo_count = sum(task.status == 'TODO' for task in tasks)
+    project.done_percent = project.progress_percent
+    project.in_progress_percent = round(project.in_progress_count * 100 / project.task_count) if project.task_count else 0
+    project.todo_percent = round(project.todo_count * 100 / project.task_count) if project.task_count else 0
+    return render(request, 'projects/project_detail.html', {'project': project, 'active_nav': 'projects'})
