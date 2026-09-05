@@ -31,6 +31,9 @@ htmlcov/
 chat/ANALYSE_SYSTEME_CHAT.md
 AI_INTEGRATION_PLAN.md
 
+# Documentation locale de l'évolution du projet
+docs/
+
 
 celerybeat-schedule
 celerybeat.pid
