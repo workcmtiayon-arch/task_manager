@@ -113,7 +113,7 @@ class ProjectListDisplayTests(TestCase):
         self.assertContains(response, 'Donnez vie à vos idées, projet par projet.')
         self.assertContains(response, 'Plateforme web')
         self.assertEqual(response.context['active_nav'], 'projects')
-        self.assertContains(response, 'Upcoming')
+        self.assertContains(response, 'In Progress')
 
     def test_project_list_includes_projects_css_and_static_accessible(self):
         user = User.objects.create_user(
