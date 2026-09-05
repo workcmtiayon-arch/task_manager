@@ -64,6 +64,24 @@
                     {% endfor %}
                 </div>
 
+                <div class="form-group">
+                    <label for="{{ form.planned_start_date.id_for_label }}" class="form-label">Planned start date</label>
+                    {{ form.planned_start_date }}
+                    {% for error in form.planned_start_date.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.planned_duration_days.id_for_label }}" class="form-label">Planned duration (days)</label>
+                    {{ form.planned_duration_days }}
+                    {% for error in form.planned_duration_days.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.complexity.id_for_label }}" class="form-label">Complexity</label>
+                    {{ form.complexity }}
+                    {% for error in form.complexity.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn--primary">
                         {% if request.resolver_match.url_name == 'project_update' %}Save Changes{% else %}Create Project{% endif %}
