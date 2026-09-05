@@ -29,6 +29,7 @@ htmlcov/
 
 # Documentation locale du système de chat
 chat/ANALYSE_SYSTEME_CHAT.md
+AI_INTEGRATION_PLAN.md
 
 
 celerybeat-schedule
