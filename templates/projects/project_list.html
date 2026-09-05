@@ -38,6 +38,7 @@
         <a href="{% url 'project_add' %}" class="btn btn--primary" data-modal-trigger>
             <span aria-hidden="true">+</span> Nouveau projet
         </a>
+        <a href="{% url 'completed_projects' %}" class="btn btn--outline">Voir les projets terminés</a>
     </div>
 
     <div class="projects-grid">
@@ -68,6 +69,18 @@
                 <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
             </h3>
             <p class="project-card__description">{{ project.description|default:"Aucune description pour ce projet." }}</p>
+
+            <div class="project-card__planning">
+                <span class="project-status project-status--{{ project.display_status|lower }}">
+                    {% if project.display_status == 'UPCOMING' %}Upcoming{% elif project.display_status == 'IN_PROGRESS' %}In Progress{% elif project.display_status == 'OVERDUE' %}Overdue{% else %}Completed{% endif %}
+                </span>
+                <span>{{ project.complexity|title }} complexity</span>
+                <span>{{ project.planned_start_date|date:"M j, Y" }} → {{ project.planned_end_date|date:"M j, Y" }}</span>
+            </div>
+
+            {% if project.late_task_count %}
+            <p class="project-card__alert" role="status">⚠️ {{ project.late_task_count }} overdue task{{ project.late_task_count|pluralize }}</p>
+            {% endif %}
 
             {% if project.task_count %}
             <div class="project-card__progress-row">
