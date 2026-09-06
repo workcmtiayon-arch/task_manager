@@ -42,8 +42,8 @@
 
     <nav class="projects-view-nav" aria-label="Filtrer les projets">
         <a href="{% url 'project_list' %}" class="{% if view_mode == 'active' %}is-active{% endif %}">Projets actifs <span>{{ status_counts.IN_PROGRESS|add:status_counts.OVERDUE }}</span></a>
-        <a href="{% url 'upcoming_projects' %}" class="{% if view_mode == 'upcoming' %}is-active{% endif %}">À venir <span>{{ status_counts.UPCOMING }}</span></a>
-        <a href="{% url 'completed_projects' %}" class="{% if view_mode == 'completed' %}is-active{% endif %}">Terminés <span>{{ status_counts.COMPLETED }}</span></a>
+        <a href="{% url 'upcoming_projects' %}" class="{% if view_mode == 'upcoming' %}is-active{% endif %}">Projets à venir <span>{{ status_counts.UPCOMING }}</span></a>
+        <a href="{% url 'completed_projects' %}" class="{% if view_mode == 'completed' %}is-active{% endif %}">Projets terminés <span>{{ status_counts.COMPLETED }}</span></a>
     </nav>
 
     <div class="projects-grid">
