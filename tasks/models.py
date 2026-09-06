@@ -55,8 +55,8 @@ class SubTask(models.Model):
             models.UniqueConstraint(fields=['task', 'position'], name='unique_subtask_position_per_task'),
         ]
         indexes = [
-            models.Index(fields=['task', 'position'], name='tasks_subtask_task_position_idx'),
-            models.Index(fields=['task', 'status'], name='tasks_subtask_task_status_idx'),
+            models.Index(fields=['task', 'position'], name='task_subtask_position_idx'),
+            models.Index(fields=['task', 'status'], name='task_subtask_status_idx'),
         ]
 
     def clean(self):
