@@ -3,9 +3,12 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
-<div class="chat-page">
+<div class="chat-page chat-list-page">
   <div class="chat-toolbar">
-    <h1 class="chat-title">Messages</h1>
+    <div>
+      <h1 class="chat-title">Conversations</h1>
+      <p class="chat-subtitle">Retrouvez vos échanges dans un espace clair et organisé.</p>
+    </div>
     <div class="chat-toolbar-actions">
       <a href="{% url 'chat:invitations_list' %}" class="chat-btn chat-btn-secondary chat-invitations-link">
         Invitations
@@ -14,11 +17,12 @@
         {% endif %}
       </a>
       <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">
-        + Nouvelle conversation
+        Nouvelle conversation
       </a>
     </div>
   </div>
 
+  <div class="chat-list-shell">
   {% if items %}
     <ul class="chat-list">
       {% for item in items %}
@@ -41,5 +45,6 @@
       <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">Rechercher un utilisateur</a>
     </div>
   {% endif %}
+  </div>
 </div>
 {% endblock %}

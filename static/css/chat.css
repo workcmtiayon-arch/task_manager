@@ -35,6 +35,12 @@
     color: var(--text-color);
 }
 
+.chat-subtitle {
+    margin: 5px 0 0;
+    color: var(--muted-color);
+    font-size: .88rem;
+}
+
 .chat-back-link {
     color: var(--muted-color);
     text-decoration: none;
@@ -588,8 +594,19 @@
 .chat-page:not(.chat-conversation-page) {
     height: auto;
     min-height: calc(100vh - var(--topbar-height) - 64px);
-    max-width: 900px;
+    width: min(100%, 1080px);
+    max-width: none;
+    margin: 0 auto;
     padding: 30px;
+    box-sizing: border-box;
+}
+
+.chat-list-shell {
+    padding: 22px;
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    background: linear-gradient(180deg, var(--surface-color), #F8FAFC);
+    box-shadow: var(--shadow-sm);
 }
 
 .chat-page:not(.chat-conversation-page) .chat-toolbar {
@@ -603,6 +620,10 @@
 
 .chat-page:not(.chat-conversation-page) .chat-list {
     gap: 10px;
+}
+
+.chat-list-page .chat-empty-state {
+    min-height: 280px;
 }
 
 .chat-page:not(.chat-conversation-page) .chat-list-item {
@@ -829,6 +850,10 @@
     .chat-page:not(.chat-conversation-page) {
         min-height: calc(100vh - var(--topbar-height) - 40px);
         padding: 18px;
+    }
+
+    .chat-list-shell {
+        padding: 14px;
     }
 
     .chat-conversation-page {
