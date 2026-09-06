@@ -137,3 +137,31 @@ class ProjectListDisplayTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Finished')
         self.assertNotContains(response, 'Active')
+
+    def test_status_views_keep_upcoming_and_completed_projects_out_of_main_list(self):
+        user = User.objects.create_user(
+            username='viewsuser', email='views@example.com', password='SecurePass123!'
+        )
+        upcoming = Project.objects.create(
+            user=user,
+            name='Upcoming project',
+            planned_start_date=date(2027, 1, 1),
+            planned_duration_days=10,
+        )
+        completed = Project.objects.create(user=user, name='Completed project')
+        Task.objects.create(project=completed, title='Finished task', status=Task.Status.DONE)
+        self.client.force_login(user)
+
+        active_response = self.client.get(reverse('project_list'))
+        self.assertNotContains(active_response, upcoming.name)
+        self.assertNotContains(active_response, completed.name)
+
+        upcoming_response = self.client.get(reverse('upcoming_projects'))
+        self.assertContains(upcoming_response, upcoming.name)
+        self.assertContains(upcoming_response, 'Projets actifs')
+        self.assertContains(upcoming_response, 'Projets terminés')
+
+        completed_response = self.client.get(reverse('completed_projects'))
+        self.assertContains(completed_response, completed.name)
+        self.assertContains(completed_response, 'Projets actifs')
+        self.assertContains(completed_response, 'Projets à venir')
