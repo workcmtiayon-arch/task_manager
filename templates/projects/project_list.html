@@ -79,7 +79,7 @@
             </div>
 
             {% if project.late_task_count %}
-            <p class="project-card__alert" role="status">⚠️ {{ project.late_task_count }} overdue task{{ project.late_task_count|pluralize }}</p>
+            <p class="project-card__alert" role="status">⚠️ {{ project.late_task_count }} tâche{{ project.late_task_count|pluralize }} en retard</p>
             {% endif %}
 
             {% if project.task_count %}
@@ -119,7 +119,7 @@
 
     <div id="modal-overlay" class="modal-overlay" hidden>
         <div class="modal" role="dialog" aria-modal="true">
-            <button type="button" class="modal__close" id="modal-close" aria-label="Close">&times;</button>
+            <button type="button" class="modal__close" id="modal-close" aria-label="Fermer">&times;</button>
                 <div class="modal__body" id="modal-body">
             </div>
         </div>
