@@ -1,227 +1,141 @@
-# On importe les fonctions nécessaires de Django
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
 
-# On importe le modèle Task
-from .models import Task
-
-# On importe le formulaire TaskForm
-from .forms import TaskForm
-
-# On importe le modèle Project
 from projects.models import Project
 
+from .forms import SubTaskForm, TaskForm
+from .models import SubTask, Task
 
+
+def _task_queryset(user):
+    return Task.objects.filter(project__user=user).select_related('project').annotate(
+        subtask_count=Count('subtasks', distinct=True),
+        done_subtask_count=Count(
+            'subtasks',
+            filter=Q(subtasks__status=SubTask.Status.DONE),
+            distinct=True,
+        ),
+    )
+
+
+def _prepare_task(task):
+    task.subtask_progress = (
+        f'{task.done_subtask_count} / {task.subtask_count}'
+        if task.subtask_count else None
+    )
+    return task
+
+
+@login_required
 def task_list(request):
-    """
-    Affiche toutes les tâches appartenant aux projets
-    de l'utilisateur actuellement connecté.
-    """
+    tasks = [_prepare_task(task) for task in _task_queryset(request.user).order_by('due_date', '-created_at')]
+    total_tasks = len(tasks)
+    done_tasks = sum(task.status == Task.Status.DONE for task in tasks)
+    in_progress_tasks = sum(task.status == Task.Status.IN_PROGRESS for task in tasks)
+    todo_tasks = sum(task.status == Task.Status.TODO for task in tasks)
+    return render(request, 'tasks/task_list.html', {
+        'tasks': tasks,
+        'active_nav': 'tasks',
+        'total_tasks': total_tasks,
+        'done_tasks': done_tasks,
+        'in_progress_tasks': in_progress_tasks,
+        'todo_tasks': todo_tasks,
+        'completion_percentage': round(done_tasks * 100 / total_tasks) if total_tasks else 0,
+    })
 
-    # On récupère uniquement les tâches dont le projet
-    # appartient à l'utilisateur connecté.
-    tasks = Task.objects.filter(
-        project__user=request.user
-    ).select_related("project").order_by("due_date", "-created_at")
 
-    total_tasks = tasks.count()
-    done_tasks = tasks.filter(status=Task.Status.DONE).count()
-    in_progress_tasks = tasks.filter(status=Task.Status.IN_PROGRESS).count()
-    todo_tasks = tasks.filter(status=Task.Status.TODO).count()
-
-    # On envoie les tâches au template.
-    return render(
-        request,
-        'tasks/task_list.html',
-        {
-            'tasks': tasks,
-            'active_nav': 'tasks',
-            'total_tasks': total_tasks,
-            'done_tasks': done_tasks,
-            'in_progress_tasks': in_progress_tasks,
-            'todo_tasks': todo_tasks,
-            'completion_percentage': round(done_tasks * 100 / total_tasks) if total_tasks else 0,
-        }
-    )
-
+@login_required
 def add_task(request, project_id):
-    """
-    Crée une nouvelle tâche dans le projet depuis lequel
-    l'utilisateur a lancé la création.
-    """
-
-    # On récupère le projet demandé uniquement s'il appartient
-    # à l'utilisateur connecté.
-    project = get_object_or_404(
-        Project.objects.filter(user=request.user),
-        id=project_id
-    )
-
-    # On crée le formulaire avec les données POST si elles existent.
-    form = TaskForm(
-        request.POST or None
-    )
-
-    # On vérifie que les données du formulaire sont valides.
+    project = get_object_or_404(Project.objects.filter(user=request.user), id=project_id)
+    form = TaskForm(request.POST or None)
     if form.is_valid():
-
-        # On crée l'objet Task en mémoire sans encore
-        # l'enregistrer dans la base de données.
         task = form.save(commit=False)
-
-        # On rattache automatiquement la tâche
-        # au projet depuis lequel elle a été créée.
         task.project = project
-
-        # On enregistre maintenant la tâche en base de données.
         task.save()
+        return redirect('project_detail', id=project.id)
+    return render(request, 'tasks/task_form.html', {'form': form, 'active_nav': 'tasks'})
 
-        # Après la création, on retourne exactement
-        # au projet depuis lequel la création a été lancée.
-        return redirect(
-            'project_detail',
-            id=project.id
-        )
 
-    # Si le formulaire n'est pas valide,
-    # on réaffiche le formulaire avec ses erreurs.
-    return render(
-        request,
-        'tasks/task_form.html',
-        {'form': form, 'active_nav': 'tasks'}
-    )
-
+@login_required
 def update_task(request, id):
-    """
-    Modifie une tâche appartenant à l'utilisateur connecté.
-
-    Le projet de la tâche ne peut pas être modifié.
-    """
-
-    # On récupère uniquement une tâche appartenant
-    # à un projet de l'utilisateur connecté.
-    task = get_object_or_404(
-        Task.objects.filter(
-            project__user=request.user
-        ),
-        id=id
-    )
-
-    # On récupère le projet auquel la tâche appartient.
-    project = task.project
-
-    # On initialise le formulaire avec les données existantes
-    # de la tâche.
-    form = TaskForm(
-        request.POST or None,
-        instance=task
-    )
-
-    # On vérifie les données envoyées.
+    task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
+    form = TaskForm(request.POST or None, instance=task)
     if form.is_valid():
-
-        # On sauvegarde les modifications.
         form.save()
-
-        # Après la modification, on retourne exactement
-        # au projet dans lequel se trouvait la tâche.
-        return redirect(
-            'project_details',
-            id=project.id
-        )
-
-    # Si le formulaire est invalide, on réaffiche
-    # le formulaire avec les erreurs.
-    return render(
-        request,
-        'tasks/task_form.html',
-        {'form': form, 'active_nav': 'tasks'}
-    )
+        return redirect('project_detail', id=task.project.id)
+    return render(request, 'tasks/task_form.html', {'form': form, 'task': task, 'active_nav': 'tasks'})
 
 
+@login_required
 def delete_task(request, id):
-    """
-    Supprime une tâche appartenant à l'utilisateur connecté.
-    """
-
-    # On récupère uniquement une tâche appartenant
-    # à un projet de l'utilisateur connecté.
-    task = get_object_or_404(
-        Task.objects.filter(
-            project__user=request.user
-        ),
-        id=id
-    )
-
-    # On mémorise le projet avant de supprimer la tâche.
+    task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     project = task.project
-
-    # La suppression est effectuée uniquement avec une requête POST.
     if request.method == 'POST':
-
-        # Suppression de la tâche.
         task.delete()
-
-        # Après suppression, retour au projet concerné.
-        return redirect(
-            'project_detail',
-            id=project.id
-        )
-
-    # Si la requête est GET, on affiche la page
-    # de confirmation de suppression.
-    return render(
-        request,
-        'tasks/confirm_suppr_task.html',
-        {'task': task, 'active_nav': 'tasks'}
-    )
+        return redirect('project_detail', id=project.id)
+    return render(request, 'tasks/confirm_suppr_task.html', {'task': task, 'active_nav': 'tasks'})
 
 
+@login_required
 def task_detail(request, id):
-    """
-    Affiche les détails d'une tâche appartenant
-    à l'utilisateur connecté.
-    """
-
-    # On empêche l'utilisateur d'accéder à une tâche
-    # appartenant à un autre utilisateur.
     task = get_object_or_404(
-        Task.objects.filter(
-            project__user=request.user
-        ),
-        id=id
+        _task_queryset(request.user).prefetch_related('subtasks'),
+        id=id,
     )
-
-    # On affiche les détails de la tâche.
-    return render(
-        request,
-        'tasks/task_detail.html',
-        {'task': task, 'active_nav': 'tasks'}
-    )
+    task = _prepare_task(task)
+    return render(request, 'tasks/task_detail.html', {'task': task, 'active_nav': 'tasks'})
 
 
+@login_required
 def task_update_status(request, id):
-    # On récupère uniquement une tâche appartenant à un projet
-    # de l'utilisateur actuellement connecté.
-    task = get_object_or_404(
-        Task.objects.filter(project__user=request.user),
-        id=id
-    )
-
-    # La modification du statut doit obligatoirement être faite en POST.
+    task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     if request.method == 'POST':
-
-        # On récupère le nouveau statut envoyé par le formulaire.
         status = request.POST.get('status')
-
-        # On vérifie que le statut envoyé fait partie des statuts autorisés.
-        if status in ['TODO', 'IN_PROGRESS', 'DONE']:
-
-            # On modifie uniquement le statut de la tâche.
+        if status in Task.Status.values:
             task.status = status
-
-            # On sauvegarde la modification en base de données.
-            task.save(update_fields=['status'])
-
-    # Après la modification, on retourne sur la page du projet
-    # dans lequel se trouvait la tâche.
+            try:
+                task.full_clean()
+            except ValidationError:
+                messages.error(request, 'La tâche ne peut pas être terminée tant que toutes ses SubTasks ne le sont pas.')
+            else:
+                task.save(update_fields=['status', 'updated_at'])
     return redirect('project_detail', id=task.project.id)
+
+
+@login_required
+def add_subtask(request, task_id):
+    task = get_object_or_404(Task.objects.filter(project__user=request.user), id=task_id)
+    form = SubTaskForm(request.POST or None, initial={'position': task.subtasks.count()})
+    if form.is_valid():
+        subtask = form.save(commit=False)
+        subtask.task = task
+        if 'position' not in form.changed_data:
+            subtask.position = task.subtasks.count()
+        subtask.save()
+        return redirect('task_detail', id=task.id)
+    return render(request, 'tasks/subtask_form.html', {'form': form, 'task': task, 'active_nav': 'tasks'})
+
+
+@login_required
+def toggle_subtask(request, id):
+    subtask = get_object_or_404(SubTask.objects.filter(task__project__user=request.user), id=id)
+    if request.method == 'POST':
+        subtask.status = (
+            SubTask.Status.NOT_DONE
+            if subtask.status == SubTask.Status.DONE
+            else SubTask.Status.DONE
+        )
+        subtask.save()
+    return redirect('task_detail', id=subtask.task.id)
+
+
+@login_required
+def delete_subtask(request, id):
+    subtask = get_object_or_404(SubTask.objects.filter(task__project__user=request.user), id=id)
+    task_id = subtask.task.id
+    if request.method == 'POST':
+        subtask.delete()
+    return redirect('task_detail', id=task_id)
