@@ -110,7 +110,7 @@
                     </span>
                     <span class="user-mini__info">
                         <span class="user-mini__name">{{ request.user.get_full_name|default:request.user.username }}</span>
-                        <span class="user-mini__role">{{ request.user.get_role_display|default:request.user.role }}</span>
+                        <span class="user-mini__role">{% if request.user.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span>
                     </span>
                 </a>
 
@@ -145,7 +145,7 @@
 
                 <div class="topbar__user">
                     <a href="{% url 'profile' %}" class="topbar__profile-link">Modifier mon profil</a>
-                    <span class="badge badge--role">{{ request.user.get_role_display|default:request.user.role }}</span>
+                    <span class="badge badge--role">{% if request.user.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span>
                     <span class="topbar__avatar">
                         {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
                     </span>

@@ -42,7 +42,7 @@
                             <span><strong>{{ account.get_full_name|default:account.username }}</strong><small>{{ account.email }}</small></span>
                         </div>
                     </td>
-                    <td><span class="badge badge--role">{{ account.get_role_display }}</span></td>
+                    <td><span class="badge badge--role">{% if account.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span></td>
                     <td class="is-muted">{{ account.date_joined|date:"d/m/Y" }}</td>
                     <td>
                         {% if account.is_active %}<span class="badge badge--success">Actif</span>{% else %}<span class="badge badge--danger">Désactivé</span>{% endif %}
