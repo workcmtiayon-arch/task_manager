@@ -22,9 +22,16 @@ class Task(models.Model):
         return self.title
 
     def clean(self):
-        if self.status == self.Status.DONE and self.pk:
-            if self.subtasks.filter(status=SubTask.Status.NOT_DONE).exists():
-                raise ValidationError({'status': 'A task with unfinished subtasks cannot be completed.'})
+        if self.pk and self.subtasks.exists():
+            expected_status = (
+                self.Status.DONE
+                if not self.subtasks.filter(status=SubTask.Status.NOT_DONE).exists()
+                else self.Status.IN_PROGRESS
+            )
+            if self.status != expected_status:
+                raise ValidationError({
+                    'status': 'Le statut est géré automatiquement par les SubTasks.'
+                })
 
     def save(self, *args, **kwargs):
         self.full_clean()

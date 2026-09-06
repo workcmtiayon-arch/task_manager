@@ -141,10 +141,18 @@ def delete_project(request, id):
 @login_required
 def project_detail(request, id):
     project = _prepare_project(get_object_or_404(_project_queryset(request.user), id=id))
-    tasks = list(project.task_set.all().order_by('due_date', '-created_at'))
+    tasks = list(
+        project.task_set.all()
+        .prefetch_related('subtasks')
+        .order_by('due_date', '-created_at')
+    )
     today = timezone.localdate()
     for task in tasks:
         task.is_overdue = bool(task.due_date and task.due_date < today and task.status != 'DONE')
+        task.subtask_count = len(task.subtasks.all())
+        task.done_subtask_count = sum(
+            subtask.status == 'DONE' for subtask in task.subtasks.all()
+        )
     project.project_tasks = tasks
     project.in_progress_count = sum(task.status == 'IN_PROGRESS' for task in tasks)
     project.todo_count = sum(task.status == 'TODO' for task in tasks)

@@ -93,6 +93,9 @@ def task_detail(request, id):
 def task_update_status(request, id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     if request.method == 'POST':
+        if task.subtasks.exists():
+            messages.info(request, 'Le statut de cette tâche est géré automatiquement par ses SubTasks.')
+            return redirect('project_detail', id=task.project.id)
         status = request.POST.get('status')
         if status in Task.Status.values:
             task.status = status

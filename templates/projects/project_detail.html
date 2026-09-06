@@ -134,9 +134,12 @@
         </span>
 
         <div class="task-row__main">
-            <h3 class="task-row__title">{{ task.title }}</h3>
+            <h3 class="task-row__title"><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></h3>
             {% if task.description %}
             <p class="task-row__description">{{ task.description }}</p>
+            {% endif %}
+            {% if task.subtask_count %}
+            <a href="{% url 'task_detail' task.id %}" class="task-row__subtasks">{{ task.done_subtask_count }} / {{ task.subtask_count }} SubTasks terminées</a>
             {% endif %}
         </div>
 
@@ -152,6 +155,9 @@
             </span>
             {% endif %}
 
+            {% if task.subtask_count %}
+            <span class="task-row__automatic-status">Statut automatique</span>
+            {% else %}
             <form method="post" action="{% url 'task_update_status' task.id %}" class="task-row__status-form">
                 {% csrf_token %}
                 <select name="status" class="task-row__status-select task-row__status-select--{{ task.status|lower }}" onchange="this.form.submit()">
@@ -160,6 +166,7 @@
                     <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>Terminé</option>
                 </select>
             </form>
+            {% endif %}
         </div>
 
         <div class="task-row__actions">
