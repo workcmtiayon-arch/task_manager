@@ -28,20 +28,25 @@ class TaskForm(forms.ModelForm):
 
         # Libellés affichés dans le formulaire
         labels = {
-            'title': 'Task title',
+            'title': 'Titre de la tâche',
             'description': 'Description',
-            'status': 'Task status',
-            'due_date': 'Task due date'
+            'status': 'Statut de la tâche',
+            'due_date': "Date d'échéance",
+        }
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
 
 class SubTaskForm(forms.ModelForm):
+    position = forms.IntegerField(min_value=0, required=False, label='Position d’affichage')
+
     class Meta:
         model = SubTask
         fields = ['title', 'position']
         labels = {
-            'title': 'Subtask title',
-            'position': 'Display position',
+            'title': 'Titre de la SubTask',
+            'position': 'Position d’affichage',
         }
         widgets = {
             'position': forms.NumberInput(attrs={'min': 0}),
