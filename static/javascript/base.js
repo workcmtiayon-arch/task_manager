@@ -41,6 +41,33 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    var aiTrigger = document.getElementById('ai-assistant-trigger');
+    var aiOverlay = document.getElementById('ai-assistant-overlay');
+    var aiClose = document.getElementById('ai-assistant-close');
+    var aiDismiss = document.getElementById('ai-assistant-dismiss');
+
+    if (aiTrigger && aiOverlay) {
+        function closeAiAssistant() {
+            aiOverlay.classList.remove('is-visible');
+            window.setTimeout(function () { aiOverlay.hidden = true; }, 180);
+            aiTrigger.focus();
+        }
+
+        aiTrigger.addEventListener('click', function () {
+            aiOverlay.hidden = false;
+            window.requestAnimationFrame(function () { aiOverlay.classList.add('is-visible'); });
+            if (aiClose) aiClose.focus();
+        });
+        if (aiClose) aiClose.addEventListener('click', closeAiAssistant);
+        if (aiDismiss) aiDismiss.addEventListener('click', closeAiAssistant);
+        aiOverlay.addEventListener('click', function (event) {
+            if (event.target === aiOverlay) closeAiAssistant();
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && !aiOverlay.hidden) closeAiAssistant();
+        });
+    }
+
     // Logout confirmation modal
     var signoutLink = document.querySelector('.signout-link');
     var logoutOverlay = document.getElementById('logout-confirm-overlay');

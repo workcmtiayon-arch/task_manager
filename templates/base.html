@@ -76,6 +76,12 @@
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
+                <button type="button" class="nav-link ai-nav-link" id="ai-assistant-trigger" aria-haspopup="dialog">
+                    <span class="nav-link__icon" aria-hidden="true">✦</span>
+                    <span class="nav-link__label">Assistant IA</span>
+                    <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
+                </button>
+
                 {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
                 <p class="nav-section-label">Administration</p>
                 <a href="{% url 'user_list' %}"
@@ -177,6 +183,21 @@
             </div>
             <button type="button" class="modal__close" aria-label="Fermer" data-logout-modal-close>&times;</button>
         </div>
+    </div>
+
+    <div id="ai-assistant-overlay" class="modal-overlay" hidden>
+        <section class="modal ai-assistant-modal" role="dialog" aria-modal="true" aria-labelledby="ai-assistant-title">
+            <button type="button" class="modal__close" id="ai-assistant-close" aria-label="Fermer">&times;</button>
+            <div class="ai-assistant-modal__icon" aria-hidden="true">✦</div>
+            <h2 id="ai-assistant-title">Assistant IA</h2>
+            <p class="ai-assistant-modal__notice">Cette fonctionnalité est encore en cours d'implémentation.</p>
+            <p class="ai-assistant-modal__text">L'espace de discussion sera bientôt disponible. Pour le moment, rien ne sera envoyé ni analysé.</p>
+            <div class="ai-assistant-composer" aria-label="Zone de discussion avec l'assistant IA">
+                <input type="text" placeholder="Écrivez votre demande..." disabled>
+                <button type="button" class="btn btn--primary" disabled>Envoyer</button>
+            </div>
+            <button type="button" class="btn btn--outline ai-assistant-modal__dismiss" id="ai-assistant-dismiss">Fermer</button>
+        </section>
     </div>
 
     <style>

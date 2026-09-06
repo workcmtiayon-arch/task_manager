@@ -685,3 +685,40 @@ button:focus-visible {
         transition: none !important;
     }
 }
+.ai-nav-link {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+}
+
+.ai-nav-link .nav-link__icon {
+    color: #A78BFA;
+    font-size: 1.1rem;
+}
+
+.ai-assistant-modal {
+    position: relative;
+    padding: 30px;
+}
+
+.ai-assistant-modal__icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, #312E81, #7C3AED);
+    font-size: 1.3rem;
+}
+
+.ai-assistant-modal h2 { margin: 0 0 8px; }
+.ai-assistant-modal__notice { margin: 0; color: #92400E; font-weight: 700; }
+.ai-assistant-modal__text { margin: 8px 0 20px; color: var(--muted-color); line-height: 1.5; }
+.ai-assistant-composer { display: flex; gap: 8px; margin-bottom: 16px; }
+.ai-assistant-composer input { min-width: 0; flex: 1; padding: 11px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--background-color); }
+.ai-assistant-composer button:disabled { cursor: not-allowed; opacity: .55; }
+.ai-assistant-modal__dismiss { width: 100%; }
