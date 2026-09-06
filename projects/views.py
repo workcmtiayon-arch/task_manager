@@ -6,6 +6,11 @@ from django.utils import timezone
 from .forms import ProjectForm
 from .models import Project
 
+ACTIVE_STATUSES = (
+    Project.TemporalStatus.IN_PROGRESS,
+    Project.TemporalStatus.OVERDUE,
+)
+
 
 def _project_queryset(user):
     today = timezone.localdate()
@@ -37,44 +42,70 @@ def _prepare_project(project):
     return project
 
 
-@login_required
-def project_list(request):
-    projects = [_prepare_project(project) for project in _project_queryset(request.user)]
-    grouped_projects = {
-        status: [project for project in projects if project.display_status == status]
-        for status in Project.TemporalStatus.values
-    }
-    total_task_count = sum(project.task_count for project in projects)
-    completed_task_count = sum(project.done_count for project in projects)
-    return render(request, 'projects/project_list.html', {
-        'projects': projects,
-        'grouped_projects': grouped_projects,
+def _project_page_context(all_projects, displayed_projects, view_mode):
+    total_task_count = sum(project.task_count for project in displayed_projects)
+    completed_task_count = sum(project.done_count for project in displayed_projects)
+    return {
+        'projects': displayed_projects,
         'active_nav': 'projects',
-        'project_count': len(projects),
+        'view_mode': view_mode,
+        'project_count': len(displayed_projects),
         'total_task_count': total_task_count,
         'completed_task_count': completed_task_count,
-        'completed_project_count': len(grouped_projects[Project.TemporalStatus.COMPLETED]),
-        'project_completion_percentage': round(completed_task_count * 100 / total_task_count) if total_task_count else 0,
-    })
+        'completed_project_count': sum(
+            project.display_status == Project.TemporalStatus.COMPLETED
+            for project in all_projects
+        ),
+        'project_completion_percentage': (
+            round(completed_task_count * 100 / total_task_count)
+            if total_task_count else 0
+        ),
+        'status_counts': {
+            status: sum(project.display_status == status for project in all_projects)
+            for status in Project.TemporalStatus.values
+        },
+    }
+
+
+@login_required
+def project_list(request):
+    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
+    displayed_projects = [
+        project for project in all_projects if project.display_status in ACTIVE_STATUSES
+    ]
+    return render(
+        request,
+        'projects/project_list.html',
+        _project_page_context(all_projects, displayed_projects, 'active'),
+    )
 
 
 @login_required
 def completed_project_list(request):
-    projects = [
-        project for project in (_prepare_project(p) for p in _project_queryset(request.user))
+    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
+    displayed_projects = [
+        project for project in all_projects
         if project.display_status == Project.TemporalStatus.COMPLETED
     ]
-    return render(request, 'projects/project_list.html', {
-        'projects': projects,
-        'grouped_projects': {Project.TemporalStatus.COMPLETED: projects},
-        'active_nav': 'projects',
-        'project_count': len(projects),
-        'total_task_count': sum(project.task_count for project in projects),
-        'completed_task_count': sum(project.done_count for project in projects),
-        'completed_project_count': len(projects),
-        'project_completion_percentage': 100 if projects else 0,
-        'completed_only': True,
-    })
+    return render(
+        request,
+        'projects/project_list.html',
+        _project_page_context(all_projects, displayed_projects, 'completed'),
+    )
+
+
+@login_required
+def upcoming_project_list(request):
+    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
+    displayed_projects = [
+        project for project in all_projects
+        if project.display_status == Project.TemporalStatus.UPCOMING
+    ]
+    return render(
+        request,
+        'projects/project_list.html',
+        _project_page_context(all_projects, displayed_projects, 'upcoming'),
+    )
 
 
 @login_required

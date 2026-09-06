@@ -5,16 +5,16 @@
     <link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
-{% block title %}Mes projets — TaskFlow{% endblock %}
-{% block page_title %}Mes projets{% endblock %}
+{% block title %}{% if view_mode == 'completed' %}Projets terminés{% elif view_mode == 'upcoming' %}Projets à venir{% else %}Mes projets actifs{% endif %} — TaskFlow{% endblock %}
+{% block page_title %}{% if view_mode == 'completed' %}Projets terminés{% elif view_mode == 'upcoming' %}Projets à venir{% else %}Mes projets actifs{% endif %}{% endblock %}
 {% block page_subtitle %}Organisez vos projets et gardez leur progression à portée de vue.{% endblock %}
 
 {% block content %}
     <section class="projects-hero">
         <div>
             <p class="projects-hero__eyebrow">Vue d'ensemble</p>
-            <h2>Donnez vie à vos idées, projet par projet.</h2>
-            <p>Retrouvez l’avancement et les tâches de tous vos projets.</p>
+            <h2>{% if view_mode == 'completed' %}Retrouvez vos projets terminés.{% elif view_mode == 'upcoming' %}Préparez vos prochains projets.{% else %}Donnez vie à vos idées, projet par projet.{% endif %}</h2>
+            <p>{% if view_mode == 'completed' %}Consultez les projets dont toutes les tâches sont terminées.{% elif view_mode == 'upcoming' %}Consultez les projets dont la période n'a pas encore commencé.{% else %}Retrouvez les projets actuellement à suivre.{% endif %}</p>
         </div>
         <div class="projects-hero__progress" aria-label="{{ project_completion_percentage }} pour cent des tâches de vos projets sont terminées">
             <strong>{{ project_completion_percentage }}%</strong>
@@ -38,8 +38,13 @@
         <a href="{% url 'project_add' %}" class="btn btn--primary" data-modal-trigger>
             <span aria-hidden="true">+</span> Nouveau projet
         </a>
-        <a href="{% url 'completed_projects' %}" class="btn btn--outline">Voir les projets terminés</a>
     </div>
+
+    <nav class="projects-view-nav" aria-label="Filtrer les projets">
+        <a href="{% url 'project_list' %}" class="{% if view_mode == 'active' %}is-active{% endif %}">Actifs <span>{{ status_counts.IN_PROGRESS|add:status_counts.OVERDUE }}</span></a>
+        <a href="{% url 'upcoming_projects' %}" class="{% if view_mode == 'upcoming' %}is-active{% endif %}">À venir <span>{{ status_counts.UPCOMING }}</span></a>
+        <a href="{% url 'completed_projects' %}" class="{% if view_mode == 'completed' %}is-active{% endif %}">Terminés <span>{{ status_counts.COMPLETED }}</span></a>
+    </nav>
 
     <div class="projects-grid">
         {% for project in projects %}
