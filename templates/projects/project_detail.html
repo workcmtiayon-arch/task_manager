@@ -35,9 +35,9 @@
     </div>
 
     <div class="detail-card__meta">
-        <span class="detail-card__meta-item">{{ project.complexity|title }} complexity</span>
-        <span class="detail-card__meta-item">{{ project.planned_start_date|date:"M j, Y" }} → {{ project.planned_end_date|date:"M j, Y" }}</span>
-        {% if project.late_task_count %}<span class="detail-card__meta-item detail-card__meta-item--overdue">⚠️ {{ project.late_task_count }} overdue task{{ project.late_task_count|pluralize }}</span>{% endif %}
+        <span class="detail-card__meta-item">{% if project.complexity == 'HIGH' %}Complexité élevée{% elif project.complexity == 'LOW' %}Faible complexité{% else %}Complexité moyenne{% endif %}</span>
+        <span class="detail-card__meta-item">{{ project.planned_start_date|date:"d/m/Y" }} → {{ project.planned_end_date|date:"d/m/Y" }}</span>
+        {% if project.late_task_count %}<span class="detail-card__meta-item detail-card__meta-item--overdue">⚠️ {{ project.late_task_count }} tâche{{ project.late_task_count|pluralize }} en retard</span>{% endif %}
         <span class="detail-card__meta-item">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/>
@@ -76,7 +76,7 @@
     {% if project.task_count %}
     <div class="detail-card__progress">
         <div class="detail-card__progress-row">
-            <span class="detail-card__progress-title">Progress</span>
+            <span class="detail-card__progress-title">Progression</span>
             <span class="detail-card__progress-percent">{{ project.progress_percent }}% terminé</span>
         </div>
         <div class="progress-bar progress-bar--segmented">
@@ -182,7 +182,7 @@
 
 <div id="modal-overlay" class="modal-overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true">
-        <button type="button" class="modal__close" id="modal-close" aria-label="Close">&times;</button>
+            <button type="button" class="modal__close" id="modal-close" aria-label="Fermer">&times;</button>
         <div class="modal__body" id="modal-body"></div>
     </div>
 </div>
