@@ -6,20 +6,20 @@
 {% endblock %}
 
 {% block title %}
-    {% if task %}Edit Task{% else %}New Task{% endif %} — ProjectFlow
+    {% if task %}Modifier la tâche{% else %}Nouvelle tâche{% endif %} — TaskFlow
 {% endblock %}
 {% block page_title %}
-    {% if task %}Edit Task{% else %}Create Task{% endif %}
+    {% if task %}Modifier la tâche{% else %}Créer une tâche{% endif %}
 {% endblock %}
 {% block page_subtitle %}
-    {% if task %}Update this task's information.{% else %}Add a task to one of your projects.{% endif %}
+    {% if task %}Mettez à jour les informations de cette tâche.{% else %}Ajoutez une tâche à l'un de vos projets.{% endif %}
 {% endblock %}
 
 {% block content %}
     {% if task %}
-        <a href="{% url 'task_detail' task.id %}" class="back-link">&#8592; Back to Task</a>
+        <a href="{% url 'task_detail' task.id %}" class="back-link">&#8592; Retour à la tâche</a>
     {% else %}
-        <a href="{% url 'task_list' %}" class="back-link">&#8592; Back to Tasks</a>
+        <a href="{% url 'task_list' %}" class="back-link">&#8592; Retour aux tâches</a>
     {% endif %}
 
     <div class="card form-card">
@@ -36,7 +36,7 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="{{ form.title.id_for_label }}" class="form-label">Task title</label>
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Titre de la tâche</label>
                     <input
                         type="text"
                         name="{{ form.title.html_name }}"
@@ -57,7 +57,7 @@
                         name="{{ form.description.html_name }}"
                         id="{{ form.description.id_for_label }}"
                         class="form-textarea {% if form.description.errors %}form-input--error{% endif %}"
-                        placeholder="What needs to be done?"
+                        placeholder="Que faut-il faire ?"
                     >{{ form.description.value|default:'' }}</textarea>
                     {% for error in form.description.errors %}
                         <p class="form-error">{{ error }}</p>
@@ -96,10 +96,10 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn--primary">
-                        {% if task %}Save Changes{% else %}Create Task{% endif %}
+                        {% if task %}Enregistrer{% else %}Créer la tâche{% endif %}
                     </button>
                     <a href="{% if task %}{% url 'task_detail' task.id %}{% else %}{% url 'task_list' %}{% endif %}" class="btn btn--outline">
-                        Cancel
+                        Annuler
                     </a>
                 </div>
             </form>

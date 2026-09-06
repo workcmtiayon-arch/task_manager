@@ -15,7 +15,7 @@
         <p class="eyebrow">Bonjour, {{ request.user.first_name|default:request.user.username }}</p>
         <h2>{% if is_dashboard_admin %}La plateforme est sous contrôle.{% else %}Voici le résumé de votre activité.{% endif %}</h2>
     </div>
-    <button class="btn btn--primary" type="button" id="dashboard-project-trigger">+ Nouveau projet</button>
+        <button class="btn btn--primary" type="button" id="dashboard-project-trigger">+ Nouveau projet</button>
 </section>
 
 <section class="stats-grid" aria-label="Indicateurs clés">
@@ -34,7 +34,7 @@
     <article class="stat-card">
         <span class="stat-card__label">{% if is_dashboard_admin %}Conversations créées{% else %}Mes conversations{% endif %}</span>
         <strong>{{ conversation_count }}</strong>
-        <small>conversation{{ conversation_count|pluralize }}</small>
+        <small>{{ conversation_count }} conversation{{ conversation_count|pluralize }}</small>
     </article>
     <article class="stat-card">
         <span class="stat-card__label">{% if is_dashboard_admin %}Tâches au total{% else %}Mes tâches{% endif %}</span>

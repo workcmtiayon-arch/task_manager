@@ -4,12 +4,12 @@
 {% block extra_css %} <link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
-{% block title %}Delete Task — ProjectFlow{% endblock %}
-{% block page_title %}Delete Task{% endblock %}
-{% block page_subtitle %}This action cannot be undone.{% endblock %}
+{% block title %}Supprimer la tâche — TaskFlow{% endblock %}
+{% block page_title %}Supprimer la tâche{% endblock %}
+{% block page_subtitle %}Cette action est irréversible.{% endblock %}
 
 {% block content %} <a href="{% url 'project_detail' task.project.id %}" class="back-link">
-← Back to Project </a>
+← Retour au projet </a>
 
 ```
 <div class="card form-card">
@@ -28,12 +28,12 @@
             {% csrf_token %}
 
             <button type="submit" class="btn btn--danger">
-                Yes, Delete
+                Oui, supprimer
             </button>
 
             <a href="{% url 'project_detail' task.project.id %}"
                class="btn btn--outline">
-                Cancel
+                Annuler
             </a>
         </form>
 

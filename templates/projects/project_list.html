@@ -72,7 +72,7 @@
 
             <div class="project-card__planning">
                 <span class="project-status project-status--{{ project.display_status|lower }}">
-                    {% if project.display_status == 'UPCOMING' %}Upcoming{% elif project.display_status == 'IN_PROGRESS' %}In Progress{% elif project.display_status == 'OVERDUE' %}Overdue{% else %}Completed{% endif %}
+                    {% if project.display_status == 'UPCOMING' %}À venir{% elif project.display_status == 'IN_PROGRESS' %}En cours{% elif project.display_status == 'OVERDUE' %}En retard{% else %}Terminé{% endif %}
                 </span>
                 <span>{{ project.complexity|title }} complexity</span>
                 <span>{{ project.planned_start_date|date:"M j, Y" }} → {{ project.planned_end_date|date:"M j, Y" }}</span>
