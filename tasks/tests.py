@@ -71,7 +71,7 @@ class SubTaskIntegrationTests(TestCase):
 
     def test_task_list_exposes_subtask_progress(self):
         SubTask.objects.create(task=self.task, title='Étape terminée', status=SubTask.Status.DONE)
-        SubTask.objects.create(task=self.task, title='Étape restante')
+        SubTask.objects.create(task=self.task, title='Étape restante', position=1)
         self.client.force_login(self.owner)
         response = self.client.get(reverse('task_list'))
         self.assertContains(response, '1 / 2 SubTasks')
@@ -105,7 +105,7 @@ class SubTaskIntegrationTests(TestCase):
         self.client.force_login(self.owner)
         self.client.post(reverse('task_update_status', args=[self.task.id]), {'status': Task.Status.DONE})
         self.task.refresh_from_db()
-        self.assertEqual(self.task.status, Task.Status.TODO)
+        self.assertEqual(self.task.status, Task.Status.IN_PROGRESS)
 
 
 class TaskListDisplayTests(TestCase):
