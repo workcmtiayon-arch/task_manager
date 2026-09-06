@@ -1,14 +1,9 @@
-from .forms import (
-    CustomUserCreationForm,
-    CustomAuthenticationForm,
-    ForgotPasswordEmailForm,
-    OTPForm,
-    ProfileForm,
-)
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, ForgotPasswordEmailForm, OTPForm, ProfileForm
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.cache import never_cache
 from django.db.models import Count, Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -167,6 +162,7 @@ def reset_password(request):
     return render(request, 'accounts/reset_password.html', {'form' : form})
 
 # connexion
+@never_cache
 def connection(request):
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)

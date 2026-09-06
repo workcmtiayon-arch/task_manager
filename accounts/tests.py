@@ -107,6 +107,20 @@ class AuthenticationFlowTests(TestCase):
 
         self.assertRedirects(response, reverse("dashboard"))
 
+    def test_login_form_can_be_submitted_with_csrf_protection_enabled(self):
+        csrf_client = self.client_class(enforce_csrf_checks=True)
+        response = csrf_client.get(reverse("login"))
+        csrf_token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(reverse("login"), {
+            "username": self.user.username,
+            "password": "SecurePass123!",
+            "csrfmiddlewaretoken": csrf_token,
+        })
+
+        self.assertRedirects(response, reverse("dashboard"))
+        self.assertIn("no-cache", response.headers.get("Cache-Control", ""))
+
     def test_invalid_login_returns_form_errors(self):
         response = self.client.post(reverse("login"), {
             "username": self.user.username,
