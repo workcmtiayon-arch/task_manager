@@ -26,6 +26,10 @@ class Task(models.Model):
             if self.subtasks.filter(status=SubTask.Status.NOT_DONE).exists():
                 raise ValidationError({'status': 'A task with unfinished subtasks cannot be completed.'})
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
     def sync_status_from_subtasks(self):
         """Keep the parent status consistent after a subtask change."""
         if not self.pk or not self.subtasks.exists():
