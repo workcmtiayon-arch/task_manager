@@ -22,7 +22,7 @@
                 <span class="brand-name">TaskFlow</span>
             </div>
 
-            <nav class="sidebar__nav" aria-label="Main navigation">
+            <nav class="sidebar__nav" aria-label="Navigation principale">
                 <p class="nav-section-label">Navigation</p>
 
                 <a href="{% url 'dashboard' %}"
@@ -46,7 +46,7 @@
                             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Projects</span>
+                    <span class="nav-link__label">Projets</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -60,7 +60,7 @@
                             <path d="M4.5 18l1 1 2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Tasks</span>
+                    <span class="nav-link__label">Tâches</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -122,17 +122,17 @@
                             <path d="M20 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                         </svg>
                     </span>
-                    Sign out
+                    Déconnexion
                 </a>
             </div>
         </aside>
 
-        <button class="sidebar-overlay" id="sidebarOverlay" aria-label="Close menu" tabindex="-1"></button>
+        <button class="sidebar-overlay" id="sidebarOverlay" aria-label="Fermer le menu" tabindex="-1"></button>
 
         <div class="app__main">
 
             <header class="topbar">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                     </svg>
@@ -168,14 +168,14 @@
     <div id="logout-confirm-overlay" class="modal-overlay" hidden>
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
             <div class="modal__body">
-                <h2 id="logout-confirm-title">Confirm Sign out</h2>
-                <p>Are you sure you want to sign out? Your current session will be closed. You can cancel to remain signed in.</p>
+                <h2 id="logout-confirm-title">Confirmer la déconnexion</h2>
+                <p>Voulez-vous vraiment vous déconnecter ? Votre session sera fermée. Vous pouvez annuler pour rester connecté.</p>
                 <div style="display:flex; gap:12px; margin-top:18px; justify-content:flex-end">
-                    <button type="button" class="btn btn--outline logout-cancel">Cancel</button>
-                    <button type="button" class="btn btn--primary" id="confirmSignoutBtn">Sign out</button>
+                    <button type="button" class="btn btn--outline logout-cancel">Annuler</button>
+                    <button type="button" class="btn btn--primary" id="confirmSignoutBtn">Déconnexion</button>
                 </div>
             </div>
-            <button type="button" class="modal__close" aria-label="Close" data-logout-modal-close>&times;</button>
+            <button type="button" class="modal__close" aria-label="Fermer" data-logout-modal-close>&times;</button>
         </div>
     </div>
 
