@@ -2,7 +2,7 @@
 from django import forms
 
 # On importe notre modèle Task
-from .models import Task
+from .models import SubTask, Task
 
 
 class TaskForm(forms.ModelForm):
@@ -32,4 +32,17 @@ class TaskForm(forms.ModelForm):
             'description': 'Description',
             'status': 'Task status',
             'due_date': 'Task due date'
+        }
+
+
+class SubTaskForm(forms.ModelForm):
+    class Meta:
+        model = SubTask
+        fields = ['title', 'position']
+        labels = {
+            'title': 'Subtask title',
+            'position': 'Display position',
+        }
+        widgets = {
+            'position': forms.NumberInput(attrs={'min': 0}),
         }
