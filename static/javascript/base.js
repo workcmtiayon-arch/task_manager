@@ -42,29 +42,39 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var aiTrigger = document.getElementById('ai-assistant-trigger');
-    var aiOverlay = document.getElementById('ai-assistant-overlay');
-    var aiClose = document.getElementById('ai-assistant-close');
-    var aiDismiss = document.getElementById('ai-assistant-dismiss');
+    var aiWorkspace = document.getElementById('ai-assistant-workspace');
+    var mainContent = document.querySelector('.content');
 
-    if (aiTrigger && aiOverlay) {
+    if (aiTrigger && aiWorkspace && mainContent) {
+        var pageContent = Array.from(mainContent.children).filter(function (child) {
+            return child !== aiWorkspace;
+        });
+
+        function openAiAssistant() {
+            pageContent.forEach(function (child) { child.hidden = true; });
+            mainContent.classList.add('content--ai-active');
+            aiWorkspace.hidden = false;
+            aiTrigger.setAttribute('aria-current', 'page');
+            aiWorkspace.querySelector('[data-ai-close]').focus();
+        }
+
         function closeAiAssistant() {
-            aiOverlay.classList.remove('is-visible');
-            window.setTimeout(function () { aiOverlay.hidden = true; }, 180);
+            aiWorkspace.hidden = true;
+            mainContent.classList.remove('content--ai-active');
+            pageContent.forEach(function (child) { child.hidden = false; });
+            aiTrigger.removeAttribute('aria-current');
             aiTrigger.focus();
         }
 
-        aiTrigger.addEventListener('click', function () {
-            aiOverlay.hidden = false;
-            window.requestAnimationFrame(function () { aiOverlay.classList.add('is-visible'); });
-            if (aiClose) aiClose.focus();
+        aiTrigger.addEventListener('click', function (event) {
+            event.preventDefault();
+            openAiAssistant();
         });
-        if (aiClose) aiClose.addEventListener('click', closeAiAssistant);
-        if (aiDismiss) aiDismiss.addEventListener('click', closeAiAssistant);
-        aiOverlay.addEventListener('click', function (event) {
-            if (event.target === aiOverlay) closeAiAssistant();
+        aiWorkspace.querySelectorAll('[data-ai-close]').forEach(function (button) {
+            button.addEventListener('click', closeAiAssistant);
         });
         document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && !aiOverlay.hidden) closeAiAssistant();
+            if (event.key === 'Escape' && !aiWorkspace.hidden) closeAiAssistant();
         });
     }
 

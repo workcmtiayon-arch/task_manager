@@ -76,11 +76,16 @@
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
-                <button type="button" class="nav-link ai-nav-link" id="ai-assistant-trigger" aria-haspopup="dialog">
-                    <span class="nav-link__icon" aria-hidden="true">✦</span>
+                <a href="#" class="nav-link" id="ai-assistant-trigger">
+                    <span class="nav-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.64 5.64l2.83 2.83M15.53 15.53l2.83 2.83M18.36 5.64l-2.83 2.83M8.47 15.53l-2.83 2.83" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M12 8.5 13.2 11l2.8 1-2.8 1.1-1.2 2.4-1.2-2.4L8 12l2.8-1L12 8.5Z" fill="currentColor"/>
+                        </svg>
+                    </span>
                     <span class="nav-link__label">Assistant IA</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
-                </button>
+                </a>
 
                 {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
                 <p class="nav-section-label">Administration</p>
@@ -166,6 +171,7 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+                {% include "ai/assistant_workspace.html" %}
                 {% block content %}{% endblock %}
             </main>
         </div>
@@ -183,21 +189,6 @@
             </div>
             <button type="button" class="modal__close" aria-label="Fermer" data-logout-modal-close>&times;</button>
         </div>
-    </div>
-
-    <div id="ai-assistant-overlay" class="modal-overlay" hidden>
-        <section class="modal ai-assistant-modal" role="dialog" aria-modal="true" aria-labelledby="ai-assistant-title">
-            <button type="button" class="modal__close" id="ai-assistant-close" aria-label="Fermer">&times;</button>
-            <div class="ai-assistant-modal__icon" aria-hidden="true">✦</div>
-            <h2 id="ai-assistant-title">Assistant IA</h2>
-            <p class="ai-assistant-modal__notice">Cette fonctionnalité est encore en cours d'implémentation.</p>
-            <p class="ai-assistant-modal__text">L'espace de discussion sera bientôt disponible. Pour le moment, rien ne sera envoyé ni analysé.</p>
-            <div class="ai-assistant-composer" aria-label="Zone de discussion avec l'assistant IA">
-                <input type="text" placeholder="Écrivez votre demande..." disabled>
-                <button type="button" class="btn btn--primary" disabled>Envoyer</button>
-            </div>
-            <button type="button" class="btn btn--outline ai-assistant-modal__dismiss" id="ai-assistant-dismiss">Fermer</button>
-        </section>
     </div>
 
     <style>
