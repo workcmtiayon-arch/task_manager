@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/tasks.css' %}">{% endblock %}
+{% block title %}{{ task.title }} — TaskFlow{% endblock %}
+{% block page_title %}{{ task.title }}{% endblock %}
+{% block page_subtitle %}Détails de la tâche et de ses SubTasks.{% endblock %}
+
+{% block content %}
+<a href="{% url 'task_list' %}" class="back-link">&#8592; Retour aux tâches</a>
+
+<section class="card task-detail-card">
+    <div class="task-detail-card__header">
+        <div>
+            <a class="task-detail__project" href="{% url 'project_detail' task.project.id %}">{{ task.project.name }}</a>
+            <h2>{{ task.title }}</h2>
+            {% if task.description %}<p class="task-detail-card__description">{{ task.description }}</p>{% endif %}
+        </div>
+        <a href="{% url 'update_task' task.id %}" class="btn btn--outline">Modifier la tâche</a>
+    </div>
+    <div class="task-detail-card__meta">
+        <span class="task-status task-status--{% if task.status == 'DONE' %}done{% elif task.status == 'IN_PROGRESS' %}progress{% else %}todo{% endif %}">
+            {% if task.status == 'DONE' %}Terminée{% elif task.status == 'IN_PROGRESS' %}En cours{% else %}À faire{% endif %}
+        </span>
+        {% if task.due_date %}<span>Échéance {{ task.due_date|date:"d/m/Y" }}</span>{% endif %}
+        {% if task.subtask_count %}<strong>{{ task.done_subtask_count }} / {{ task.subtask_count }} SubTasks terminées</strong>{% endif %}
+    </div>
+</section>
+
+<section class="subtasks-section">
+    <div class="section-row">
+        <div>
+            <h2 class="section-row__title">SubTasks <span class="section-row__count">{{ task.subtask_count }}</span></h2>
+            <p class="section-row__subtitle">Décomposez cette tâche en étapes simples.</p>
+        </div>
+        <a href="{% url 'add_subtask' task.id %}" class="btn btn--primary">+ Ajouter une SubTask</a>
+    </div>
+
+    <div class="subtasks-list">
+        {% for subtask in task.subtasks.all %}
+        <article class="subtask-row {% if subtask.status == 'DONE' %}subtask-row--done{% endif %}">
+            <form method="post" action="{% url 'toggle_subtask' subtask.id %}" class="subtask-toggle-form">
+                {% csrf_token %}
+                <button type="submit" class="subtask-checkbox" aria-label="{% if subtask.status == 'DONE' %}Dévalider{% else %}Valider{% endif %} {{ subtask.title }}">{% if subtask.status == 'DONE' %}✓{% endif %}</button>
+            </form>
+            <span class="subtask-title">{{ subtask.title }}</span>
+            <span class="subtask-position">{{ forloop.counter }}</span>
+            <form method="post" action="{% url 'delete_subtask' subtask.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-icon btn-icon--delete" aria-label="Supprimer la SubTask" title="Supprimer">×</button>
+            </form>
+        </article>
+        {% empty %}
+        <div class="subtasks-empty">
+            <p>Aucune SubTask pour le moment.</p>
+            <a href="{% url 'add_subtask' task.id %}" class="btn btn--outline">Ajouter la première SubTask</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

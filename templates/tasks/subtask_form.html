@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/tasks.css' %}">{% endblock %}
+{% block title %}Nouvelle SubTask — TaskFlow{% endblock %}
+{% block page_title %}Ajouter une SubTask{% endblock %}
+{% block page_subtitle %}Ajoutez une étape à la tâche {{ task.title }}.{% endblock %}
+
+{% block content %}
+<a href="{% url 'task_detail' task.id %}" class="back-link">&#8592; Retour à la tâche</a>
+<section class="card form-card">
+    <div class="form-card__body">
+        {% if form.non_field_errors %}<div class="form-alert" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn--primary">Créer la SubTask</button>
+                <a href="{% url 'task_detail' task.id %}" class="btn btn--outline">Annuler</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

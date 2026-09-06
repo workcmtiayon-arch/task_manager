@@ -55,6 +55,7 @@
             <p class="task-item__description">{{ task.description|default:"Aucune description pour cette tâche." }}</p>
             <div class="task-item__footer">
                 <a href="{% url 'project_detail' task.project.id %}" class="task-item__project">{{ task.project.name }}</a>
+                {% if task.subtask_progress %}<span class="task-item__subtasks">{{ task.subtask_progress }} SubTasks</span>{% endif %}
                 {% if task.due_date %}
                 <span class="task-item__date">Échéance : {{ task.due_date|date:"d/m/Y" }}</span>
                 {% else %}
