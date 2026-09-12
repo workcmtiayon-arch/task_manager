@@ -613,6 +613,14 @@ button:focus-visible {
     margin-top: 4px;
 }
 
+.form-actions .btn {
+    min-width: 138px;
+}
+
+.form-actions .btn--primary {
+    box-shadow: 0 7px 16px rgba(41, 82, 163, 0.18);
+}
+
 .table-wrap {
     overflow-x: auto;
 }
