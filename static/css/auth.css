@@ -126,6 +126,7 @@ input:focus-visible {
 
 .auth-card {
     padding: 36px 24px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FCFDFF 100%);
 }
 
 /* Compact variant used for standalone auth flows (OTP, reset) */
@@ -185,6 +186,7 @@ input:focus-visible {
     display: flex;
     flex-direction: column;
     gap: 18px;
+    margin-top: 24px;
 }
 
 .form-group {
