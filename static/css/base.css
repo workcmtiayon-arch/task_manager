@@ -621,6 +621,20 @@ button:focus-visible {
     box-shadow: 0 7px 16px rgba(41, 82, 163, 0.18);
 }
 
+@media (max-width: 560px) {
+    .form-card__body {
+        padding: 22px 18px 8px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
 .table-wrap {
     overflow-x: auto;
 }
