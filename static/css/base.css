@@ -524,9 +524,16 @@ button:focus-visible {
     font-family: inherit;
     color: var(--text-color);
     background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--form-border);
     border-radius: var(--radius-sm);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.form-input:hover,
+.form-select:hover,
+.form-textarea:hover {
+    border-color: var(--form-border-hover);
+    background-color: #FFFFFF;
 }
 
 .form-textarea {
