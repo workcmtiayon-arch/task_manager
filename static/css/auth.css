@@ -475,16 +475,18 @@ input:focus-visible {
     text-align: center;
     font-size: 1.6rem;
     font-weight: 700;
-    border: 1px solid var(--border-color, #dde3ea);
+    border: 1px solid var(--form-border, var(--border-color, #dde3ea));
     border-radius: 10px;
     background: var(--surface-color, #fff);
     box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .otp-box:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px var(--primary-color-light);
+    box-shadow: 0 0 0 4px var(--form-focus-ring, var(--primary-color-light));
+    transform: translateY(-2px);
 }
 
 .auth-card__text {
