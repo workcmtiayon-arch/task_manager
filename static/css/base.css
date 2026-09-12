@@ -502,6 +502,11 @@ button:focus-visible {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    transition: transform 0.18s ease;
+}
+
+.form-group:focus-within {
+    transform: translateX(2px);
 }
 
 .form-label {
