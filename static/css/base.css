@@ -546,7 +546,8 @@ button:focus-visible {
 .form-textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-color-light);
+    box-shadow: 0 0 0 4px var(--form-focus-ring);
+    background-color: #FFFFFF;
 }
 
 .form-input--error {
