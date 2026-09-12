@@ -206,7 +206,7 @@ input:focus-visible {
     font-family: inherit;
     color: var(--text-color);
     background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--form-border, var(--border-color));
     border-radius: var(--radius-sm);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -217,7 +217,8 @@ input:focus-visible {
 
 .form-input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-color-light);
+    box-shadow: 0 0 0 4px var(--form-focus-ring, var(--primary-color-light));
+    background-color: #FFFFFF;
 }
 
 .form-input--error {
