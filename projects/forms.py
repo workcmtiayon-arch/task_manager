@@ -21,6 +21,7 @@ class ProjectForm(forms.ModelForm):
             'complexity': 'Complexity',
         }
         widgets = {
-            'planned_start_date': forms.DateInput(attrs={'type': 'date'}),
-            'planned_duration_days': forms.NumberInput(attrs={'min': 1}),
+            'planned_start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'planned_duration_days': forms.NumberInput(attrs={'min': 1, 'class': 'form-input'}),
+            'complexity': forms.Select(attrs={'class': 'form-select'}),
         }
