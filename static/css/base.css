@@ -568,6 +568,7 @@ button:focus-visible {
 .form-hint {
     font-size: 0.8rem;
     color: var(--muted-color);
+    line-height: 1.45;
 }
 
 .form-error {
