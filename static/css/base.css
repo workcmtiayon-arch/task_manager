@@ -561,6 +561,8 @@ button:focus-visible {
 
 .form-input--error {
     border-color: var(--danger-color);
+    background-color: #FFF9F8;
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08);
 }
 
 .form-hint {
@@ -572,6 +574,24 @@ button:focus-visible {
     font-size: 0.82rem;
     color: var(--danger-color);
     font-weight: 500;
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.form-error::before {
+    content: "!";
+    display: inline-grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    margin-top: 2px;
+    border-radius: 50%;
+    color: #FFFFFF;
+    background: var(--danger-color);
+    font-size: 0.68rem;
+    font-weight: 800;
 }
 
 .form-alert {
