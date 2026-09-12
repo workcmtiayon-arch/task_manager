@@ -504,3 +504,15 @@ input:focus-visible {
 .auth-card .btn--block {
     margin-top: 8px;
 }
+
+@media (max-width: 480px) {
+    .otp-inputs {
+        gap: 6px;
+    }
+
+    .otp-box {
+        width: 44px;
+        height: 54px;
+        font-size: 1.35rem;
+    }
+}
