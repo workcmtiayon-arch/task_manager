@@ -40,7 +40,8 @@ class TaskForm(forms.ModelForm):
             'due_date': "Date d'échéance",
         }
         widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date'}),
+            'due_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
 
@@ -55,5 +56,5 @@ class SubTaskForm(forms.ModelForm):
             'position': 'Position d’affichage',
         }
         widgets = {
-            'position': forms.NumberInput(attrs={'min': 0}),
+            'position': forms.NumberInput(attrs={'min': 0, 'class': 'form-input'}),
         }
