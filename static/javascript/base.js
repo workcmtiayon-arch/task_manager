@@ -44,31 +44,50 @@ document.addEventListener('DOMContentLoaded', function () {
     var aiTrigger = document.getElementById('ai-assistant-trigger');
     var aiWorkspace = document.getElementById('ai-assistant-workspace');
     var mainContent = document.querySelector('.content');
+    var navLinks = Array.from(document.querySelectorAll('.sidebar__nav .nav-link'));
+    var previousActiveNavLinks = [];
 
     if (aiTrigger && aiWorkspace && mainContent) {
         var pageContent = Array.from(mainContent.children).filter(function (child) {
             return child !== aiWorkspace;
         });
 
-        function openAiAssistant() {
+        function GeminiAssistant(updateUrl) {
             pageContent.forEach(function (child) { child.hidden = true; });
             mainContent.classList.add('content--ai-active');
             aiWorkspace.hidden = false;
+            previousActiveNavLinks = navLinks.filter(function (link) {
+                return link !== aiTrigger && link.classList.contains('nav-link--active');
+            });
+            navLinks.forEach(function (link) {
+                link.classList.remove('nav-link--active');
+            });
+            aiTrigger.classList.add('nav-link--active');
             aiTrigger.setAttribute('aria-current', 'page');
             aiWorkspace.querySelector('[data-ai-close]').focus();
+            if (updateUrl) {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search + '#ai-assistant');
+            }
         }
 
         function closeAiAssistant() {
             aiWorkspace.hidden = true;
             mainContent.classList.remove('content--ai-active');
             pageContent.forEach(function (child) { child.hidden = false; });
+            aiTrigger.classList.remove('nav-link--active');
+            previousActiveNavLinks.forEach(function (link) {
+                link.classList.add('nav-link--active');
+            });
             aiTrigger.removeAttribute('aria-current');
+            if (window.location.hash === '#ai-assistant') {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
             aiTrigger.focus();
         }
 
         aiTrigger.addEventListener('click', function (event) {
             event.preventDefault();
-            openAiAssistant();
+            GeminiAssistant(true);
         });
         aiWorkspace.querySelectorAll('[data-ai-close]').forEach(function (button) {
             button.addEventListener('click', closeAiAssistant);
@@ -76,6 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape' && !aiWorkspace.hidden) closeAiAssistant();
         });
+
+        if (window.location.hash === '#ai-assistant') {
+            GeminiAssistant(false);
+        }
     }
 
     // Logout confirmation modal

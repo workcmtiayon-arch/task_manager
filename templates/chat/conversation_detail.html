@@ -9,6 +9,7 @@
   data-conversation-id="{{ conversation.pk }}"
   data-current-user-id="{{ request.user.id }}"
   data-current-username="{{ request.user.username }}"
+  data-other-user-id="{{ other_user.id }}"
   data-other-username="{{ other_user.username }}"
   data-is-invitation="{{ is_invitation|yesno:'true,false' }}"
   data-messages-url="{% url 'chat:conversation_messages_json' conversation.pk %}"
@@ -28,7 +29,7 @@
     <span class="chat-avatar chat-avatar--conversation">{{ other_user.username|slice:":1"|upper }}</span>
     <span class="chat-conversation-identity">
       <span class="chat-conversation-name">{{ other_user.username }}</span>
-      <span class="chat-conversation-status" id="chat-connection-status">Connexion sécurisée</span>
+      <span class="chat-conversation-status" id="chat-connection-status">Hors ligne</span>
     </span>
   </div>
 

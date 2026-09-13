@@ -1,4 +1,5 @@
 def serialize_attachment(attachment):
+    """Transforme une pièce jointe Django en objet consommable par le client."""
     return {
         "id": attachment.id,
         "file_url": attachment.file.url,
@@ -12,6 +13,7 @@ def serialize_attachment(attachment):
 
 
 def serialize_reactions(message):
+    """Regroupe les réactions d'un message par type et liste d'utilisateurs."""
     summary = {}
     for reaction in message.reactions.all():
         summary.setdefault(reaction.reaction, []).append(reaction.user_id)
@@ -19,6 +21,7 @@ def serialize_reactions(message):
 
 
 def serialize_receipt_status(message):
+    """Calcule les indicateurs livré et lu à partir des accusés destinataires."""
     receipts = list(message.receipts.all())
     if not receipts:
         return {"delivered": False, "read": False}
@@ -29,6 +32,7 @@ def serialize_receipt_status(message):
 
 
 def serialize_message(message):
+    """Sérialise un message et toutes les données nécessaires au rendu JavaScript."""
     return {
         "id": message.id,
         "conversation_id": message.conversation_id,
