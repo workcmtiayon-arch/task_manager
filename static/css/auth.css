@@ -182,6 +182,14 @@ input:focus-visible {
     margin-bottom: 14px;
 }
 
+.auth-card__lead {
+    max-width: 42ch;
+    margin-bottom: 28px;
+    color: var(--auth-muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+}
+
 .auth-card__subtitle {
     font-size: 0.95rem;
     color: var(--muted-color);
