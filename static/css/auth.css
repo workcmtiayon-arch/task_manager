@@ -132,14 +132,15 @@ input:focus-visible {
 }
 
 .auth__inner {
-    max-width: 1040px;
+    width: min(100%, 1080px);
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 0.9fr;
-    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.86);
+    border-radius: 26px;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    background-color: var(--surface-color);
+    box-shadow: 0 26px 70px rgba(35, 48, 88, 0.16), 0 4px 12px rgba(35, 48, 88, 0.05);
+    background-color: var(--auth-surface);
 }
 
 .auth-card {
