@@ -407,9 +407,16 @@ input:focus-visible {
 
 .mock-window {
     background-color: var(--surface-color);
-    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.36);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 20px 36px rgba(13, 24, 72, 0.24);
+    transform: rotate(-1.5deg);
+    transition: transform 0.25s ease;
+}
+
+.mock-window:hover {
+    transform: rotate(0) translateY(-3px);
 }
 
 .mock-window__bar {
@@ -450,11 +457,11 @@ input:focus-visible {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 10px;
+    padding: 10px 11px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-color);
-    font-size: 0.85rem;
+    font-size: 0.79rem;
 }
 
 .mock-task>span:nth-child(2) {
