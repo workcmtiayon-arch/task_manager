@@ -265,6 +265,11 @@ input:focus-visible {
     color: var(--muted-color);
 }
 
+.form-hint--action {
+    margin-top: 2px;
+    text-align: right;
+}
+
 .form-error {
     font-size: 0.82rem;
     color: var(--error-color);
