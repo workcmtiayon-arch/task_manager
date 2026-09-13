@@ -320,11 +320,37 @@ input:focus-visible {
 }
 
 .auth-side {
-    background-color: var(--primary-color);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: linear-gradient(148deg, #182B70 0%, #3155C6 54%, #5B72D6 100%);
     color: #FFFFFF;
-    padding: 48px 40px;
+    padding: 58px 46px;
     display: flex;
     align-items: center;
+}
+
+.auth-side::before,
+.auth-side::after {
+    position: absolute;
+    z-index: -1;
+    content: "";
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 50%;
+}
+
+.auth-side::before {
+    width: 420px;
+    height: 420px;
+    top: -190px;
+    right: -180px;
+}
+
+.auth-side::after {
+    width: 300px;
+    height: 300px;
+    bottom: -160px;
+    left: -150px;
 }
 
 .auth-side__inner {
