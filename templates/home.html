@@ -168,38 +168,35 @@
         <section class="workspace">
             <div class="section-inner workspace__inner">
                 <div class="workspace__copy">
-                    <p class="eyebrow">Votre espace</p>
-                    <h2 class="section-title section-title--left">Tout dans un seul espace</h2>
-                    <p class="workspace__text">
-                        Une fois connecté, votre espace vous offre une vue claire de vos projets
-                        et de leurs tâches, organisée et facile à suivre.
-                    </p>
+                    <p class="eyebrow">{% translate "Votre espace" %}</p>
+                    <h2 class="section-title section-title--left">{% translate "Tout dans un seul espace" %}</h2>
+                    <p class="workspace__text">{% blocktranslate %}Une fois connecté, votre espace vous offre une vue claire de vos projets et de leurs tâches, organisée et facile à suivre.{% endblocktranslate %}</p>
                 </div>
 
                 <div class="workspace__visual" aria-hidden="true">
                     <div class="mock-app">
                         <aside class="mock-sidebar">
                             <div class="mock-sidebar__brand">Task Manager</div>
-                            <div class="mock-sidebar__item mock-sidebar__item--active">Projets</div>
-                            <div class="mock-sidebar__item">Refonte du site</div>
-                            <div class="mock-sidebar__item">Application mobile</div>
-                            <div class="mock-sidebar__item">Campagne marketing</div>
+                            <div class="mock-sidebar__item mock-sidebar__item--active">{% translate "Projets" %}</div>
+                            <div class="mock-sidebar__item">{% translate "Refonte du site" %}</div>
+                            <div class="mock-sidebar__item">{% translate "Application mobile" %}</div>
+                            <div class="mock-sidebar__item">{% translate "Campagne marketing" %}</div>
                         </aside>
 
                         <div class="mock-app__content">
                             <div class="mock-columns">
                                 <div class="mock-column">
-                                    <h4 class="mock-column__title">À faire</h4>
-                                    <div class="mock-card">Concevoir l'accueil</div>
-                                    <div class="mock-card">Préparer la campagne</div>
+                                    <h4 class="mock-column__title">{% translate "À faire" %}</h4>
+                                    <div class="mock-card">{% translate "Concevoir l'accueil" %}</div>
+                                    <div class="mock-card">{% translate "Préparer la campagne" %}</div>
                                 </div>
                                 <div class="mock-column">
-                                    <h4 class="mock-column__title">En cours</h4>
-                                    <div class="mock-card">Créer la page de connexion</div>
+                                    <h4 class="mock-column__title">{% translate "En cours" %}</h4>
+                                    <div class="mock-card">{% translate "Créer la page de connexion" %}</div>
                                 </div>
                                 <div class="mock-column">
-                                    <h4 class="mock-column__title">Terminé</h4>
-                                    <div class="mock-card">Tester la création de projet</div>
+                                    <h4 class="mock-column__title">{% translate "Terminé" %}</h4>
+                                    <div class="mock-card">{% translate "Tester la création de projet" %}</div>
                                 </div>
                             </div>
                         </div>
@@ -211,11 +208,11 @@
         
         <section class="cta">
             <div class="section-inner cta__inner">
-                <h2 class="cta__title">Prêt à organiser votre travail ?</h2>
-                <p class="cta__text">Créez votre compte et commencez à gérer vos projets et vos tâches.</p>
+                <h2 class="cta__title">{% translate "Prêt à organiser votre travail ?" %}</h2>
+                <p class="cta__text">{% translate "Créez votre compte et commencez à gérer vos projets et vos tâches." %}</p>
                 <div class="cta__actions">
-                    <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">Créer un compte</a>
-                    <a href="{% url 'login' %}" class="btn btn--outline btn--lg">Connexion</a>
+                    <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">{% translate "Créer un compte" %}</a>
+                    <a href="{% url 'login' %}" class="btn btn--outline btn--lg">{% translate "Connexion" %}</a>
                 </div>
             </div>
         </section>
@@ -227,16 +224,16 @@
             <div class="footer__brand">
                 <span class="navbar__logo-mark" aria-hidden="true">TM</span>
                 <span class="footer__brand-text">Task Manager</span>
-                <p class="footer__tagline">Une façon simple d'organiser vos projets et vos tâches.</p>
+                <p class="footer__tagline">{% translate "Une façon simple d'organiser vos projets et vos tâches." %}</p>
             </div>
 
-            <nav class="footer__links" aria-label="Navigation du pied de page">
-                <a href="{% url 'home' %}" class="footer__link">Accueil</a>
-                <a href="{% url 'login' %}" class="footer__link">Connexion</a>
-                <a href="{% url 'registration' %}" class="footer__link">Inscription</a>
+            <nav class="footer__links" aria-label="{% translate 'Navigation du pied de page' %}">
+                <a href="{% url 'home' %}" class="footer__link">{% translate "Accueil" %}</a>
+                <a href="{% url 'login' %}" class="footer__link">{% translate "Connexion" %}</a>
+                <a href="{% url 'registration' %}" class="footer__link">{% translate "Inscription" %}</a>
             </nav>
         </div>
-    <p class="footer__copyright">&copy; 2026 Task Manager. Tous droits réservés.</p>
+    <p class="footer__copyright">&copy; 2026 Task Manager. {% translate "Tous droits réservés." %}</p>
     </footer>
 
 </body>
