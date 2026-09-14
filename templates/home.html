@@ -1,6 +1,8 @@
 {% load static i18n %}
+{% get_current_language as langue_actuelle %}
+{% get_available_languages as langues_disponibles %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="{{ langue_actuelle }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,10 +33,9 @@
                 <form method="post" action="{% url 'changer_langue' %}" class="language-form">
                     {% csrf_token %}
                     <label class="sr-only" for="language-select">{% translate "Langue" %}</label>
-                    <select id="language-select" name="langue" class="language-select" onchange="this.form.submit()">
-                        {% get_available_languages as langues_disponibles %}
+                    <select id="language-select" name="langue" class="language-select" onchange="this.form.submit()" aria-label="{% translate 'Choisir la langue' %}">
                         {% for code, nom in langues_disponibles %}
-                        <option value="{{ code }}"{% if code == LANGUAGE_CODE %} selected{% endif %}>{{ nom }}</option>
+                        <option value="{{ code }}"{% if code == langue_actuelle %} selected{% endif %}>{{ nom }}</option>
                         {% endfor %}
                     </select>
                     <input type="hidden" name="suivant" value="{{ request.path }}">

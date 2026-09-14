@@ -236,3 +236,5 @@ msgstr ""
 #: templates/home.html:236
 msgid "Tous droits réservés."
 msgstr ""
+msgid "Choisir la langue"
+msgstr "Choisir la langue"
