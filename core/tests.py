@@ -30,4 +30,15 @@ class AccueilInternationaliseTests(TestCase):
         page_anglaise = self.client.get(reverse('home'))
         self.assertContains(page_anglaise, 'Organize your projects')
 
+    def test_langue_du_compte_est_appliquee_sans_cookie(self):
+        utilisateur = User.objects.create_user(
+            username='anglais-user', email='anglais@example.com',
+            password='SecurePass123!', langue='en',
+        )
+        self.client.force_login(utilisateur)
+
+        reponse = self.client.get(reverse('home'))
+
+        self.assertContains(reponse, 'Organize your projects')
+
 # Create your tests here.
