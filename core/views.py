@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.conf.locale import LANGUAGE_SESSION_KEY
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import translation
@@ -17,7 +16,6 @@ def changer_langue(request):
 
     if request.method == 'POST' and langue in langues_disponibles:
         translation.activate(langue)
-        request.session[LANGUAGE_SESSION_KEY] = langue
         if request.user.is_authenticated and request.user.langue != langue:
             request.user.langue = langue
             request.user.save(update_fields=['langue'])
@@ -27,4 +25,11 @@ def changer_langue(request):
         destination, allowed_hosts={request.get_host()}
     ):
         destination = reverse('home')
-    return redirect(destination)
+    reponse = redirect(destination)
+    if request.method == 'POST' and langue in langues_disponibles:
+        reponse.set_cookie(
+            settings.LANGUAGE_COOKIE_NAME,
+            langue,
+            max_age=settings.LANGUAGE_COOKIE_AGE,
+        )
+    return reponse
