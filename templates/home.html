@@ -1,10 +1,10 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager — Organisez vos projets et vos tâches</title>
+    <title>{% translate "Task Manager — Organisez vos projets et vos tâches" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -12,25 +12,36 @@
     
     <header class="navbar">
         <div class="navbar__inner">
-            <a href="{% url 'home' %}" class="navbar__logo" aria-label="Accueil Task Manager">
+            <a href="{% url 'home' %}" class="navbar__logo" aria-label="{% translate 'Accueil Task Manager' %}">
                 <span class="navbar__logo-mark" aria-hidden="true">TM</span>
                 <span class="navbar__logo-text">Task Manager</span>
             </a>
 
-            <input type="checkbox" id="nav-toggle" class="navbar__toggle-input" aria-label="Ouvrir le menu de navigation">
+            <input type="checkbox" id="nav-toggle" class="navbar__toggle-input" aria-label="{% translate 'Ouvrir le menu de navigation' %}">
             <label for="nav-toggle" class="navbar__toggle" aria-controls="main-navigation">
                 <span></span>
                 <span></span>
                 <span></span>
             </label>
 
-            <nav class="navbar__menu" id="main-navigation" aria-label="Navigation principale">
-                <a href="{% url 'home' %}" class="navbar__link">Accueil</a>
-                <a href="#what-you-can-do" class="navbar__link">Fonctionnalités</a>
-                <a href="#how-it-works" class="navbar__link">Présentation</a>
+            <nav class="navbar__menu" id="main-navigation" aria-label="{% translate 'Navigation principale' %}">
+                <a href="{% url 'home' %}" class="navbar__link">{% translate "Accueil" %}</a>
+                <a href="#what-you-can-do" class="navbar__link">{% translate "Fonctionnalités" %}</a>
+                <a href="#how-it-works" class="navbar__link">{% translate "Présentation" %}</a>
+                <form method="post" action="{% url 'changer_langue' %}" class="language-form">
+                    {% csrf_token %}
+                    <label class="sr-only" for="language-select">{% translate "Langue" %}</label>
+                    <select id="language-select" name="langue" class="language-select" onchange="this.form.submit()">
+                        {% get_available_languages as langues_disponibles %}
+                        {% for code, nom in langues_disponibles %}
+                        <option value="{{ code }}"{% if code == LANGUAGE_CODE %} selected{% endif %}>{{ nom }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="suivant" value="{{ request.path }}">
+                </form>
                 <div class="navbar__actions">
-                    <a href="{% url 'login' %}" class="btn btn--ghost">Connexion</a>
-                    <a href="{% url 'registration' %}" class="btn btn--primary">Commencer</a>
+                    <a href="{% url 'login' %}" class="btn btn--ghost">{% translate "Connexion" %}</a>
+                    <a href="{% url 'registration' %}" class="btn btn--primary">{% translate "Commencer" %}</a>
                 </div>
             </nav>
         </div>
@@ -41,15 +52,12 @@
         <section class="hero">
             <div class="hero__inner">
                 <div class="hero__content">
-                    <p class="eyebrow">Gestion de projets et de tâches</p>
-                    <h1 class="hero__title">Organisez vos projets. Gérez vos tâches. Restez productif.</h1>
-                    <p class="hero__subtitle">
-                        Task Manager réunit vos projets et vos tâches dans un espace clair,
-                        pour que vous sachiez toujours quoi faire ensuite.
-                    </p>
+                    <p class="eyebrow">{% translate "Gestion de projets et de tâches" %}</p>
+                    <h1 class="hero__title">{% translate "Organisez vos projets. Gérez vos tâches. Restez productif." %}</h1>
+                    <p class="hero__subtitle">{% blocktranslate %}Task Manager réunit vos projets et vos tâches dans un espace clair, pour que vous sachiez toujours quoi faire ensuite.{% endblocktranslate %}</p>
                     <div class="hero__actions">
-                        <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">Commencer</a>
-                        <a href="{% url 'login' %}" class="btn btn--outline btn--lg">Connexion</a>
+                        <a href="{% url 'registration' %}" class="btn btn--primary btn--lg">{% translate "Commencer" %}</a>
+                        <a href="{% url 'login' %}" class="btn btn--outline btn--lg">{% translate "Connexion" %}</a>
                     </div>
                 </div>
 
