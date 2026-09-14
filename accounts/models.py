@@ -11,12 +11,17 @@ from django.utils import timezone
 
 class User(AbstractUser):
 
+    class Langue(models.TextChoices):
+        FRANCAIS = "fr", "Français"
+        ANGLAIS = "en", "English"
+
     class Role(models.TextChoices):
         MEMBER = "MEMBER", "member"
         ADMIN = "ADMIN", "admin"
     role = models.CharField(max_length=15, choices=Role.choices, default=Role.MEMBER)
     email = models.EmailField(unique=True)
     is_email_verified = models.BooleanField(default=False)
+    langue = models.CharField(max_length=5, choices=Langue.choices, default=Langue.FRANCAIS)
 
     # username = models.CharField(max_length=50)
     # password = models.CharField()
