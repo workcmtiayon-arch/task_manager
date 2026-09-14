@@ -128,7 +128,16 @@ class AuthenticationFlowTests(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Please enter a correct username and password")
+        self.assertContains(response, "Saisissez un nom d’utilisateur et un mot de passe valides")
+
+    def test_un_nouvel_utilisateur_a_le_francais_comme_langue(self):
+        utilisateur = User.objects.create_user(
+            username="utilisateur-francais",
+            email="francais@example.com",
+            password="SecurePass123!",
+        )
+
+        self.assertEqual(utilisateur.langue, User.Langue.FRANCAIS)
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
