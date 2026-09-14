@@ -1,6 +1,11 @@
-from django.urls import include, path
+from django.urls import path
 from core import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path(
+        'langue/',
+        views.changer_langue,
+        name='changer_langue',
+    ),
 ]
