@@ -41,7 +41,7 @@
                 </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'login' %}" class="auth-form" novalidate>
+                <form method="post" action="{% url 'login' %}" class="auth-form auth-form--login" novalidate>
 
                     {% csrf_token %}
 
