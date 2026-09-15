@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-14 17:46+0100\n"
+"POT-Creation-Date: 2026-09-15 23:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,223 +18,451 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
 "1000000 == 0 ? 1 : 2;\n"
-#: config/settings.py:122
-msgid "Français"
+
+#: accounts/forms.py:30 accounts/forms.py:55
+msgid "Username"
+msgstr ""
+
+#: accounts/forms.py:31
+msgid "Password"
+msgstr ""
+
+#: accounts/forms.py:35
+msgid "Verification code"
+msgstr ""
+
+#: accounts/forms.py:40
+msgid "The code must contain 6 digits."
+msgstr ""
+
+#: accounts/forms.py:45 accounts/forms.py:58
+msgid "Email address"
+msgstr ""
+
+#: accounts/forms.py:56
+msgid "First name"
+msgstr ""
+
+#: accounts/forms.py:57
+msgid "Last name"
+msgstr ""
+
+#: accounts/forms.py:65
+msgid "This email address is already in use."
 msgstr ""
 
 #: config/settings.py:123
+msgid "Français"
+msgstr ""
+
+#: config/settings.py:124
 msgid "English"
 msgstr ""
 
-#: templates/home.html:7
+#: projects/forms.py:18
+msgid "Project name"
+msgstr ""
+
+#: projects/forms.py:19 tasks/forms.py:39
+msgid "Description"
+msgstr ""
+
+#: projects/forms.py:20
+msgid "Planned start date"
+msgstr ""
+
+#: projects/forms.py:21
+msgid "Planned duration (days)"
+msgstr ""
+
+#: projects/forms.py:22
+msgid "Complexity"
+msgstr ""
+
+#: tasks/forms.py:38
+msgid "Task title"
+msgstr ""
+
+#: tasks/forms.py:40
+msgid "Task status"
+msgstr ""
+
+#: tasks/forms.py:41
+msgid "Due date"
+msgstr ""
+
+#: tasks/forms.py:50 tasks/forms.py:57
+msgid "Display position"
+msgstr ""
+
+#: tasks/forms.py:56
+msgid "Subtask title"
+msgstr ""
+
+#: templates/accounts/forgot_password.html:8
+#: templates/accounts/forgot_password.html:26
+msgid "Forgot password"
+msgstr ""
+
+#: templates/accounts/forgot_password.html:29
+msgid "Reset your password"
+msgstr ""
+
+#: templates/accounts/forgot_password.html:68
+msgid "Send code"
+msgstr ""
+
+#: templates/accounts/forgot_password.html:75
+msgid "Back to login"
+msgstr ""
+
+#: templates/accounts/login.html:8 templates/accounts/login.html:28
+#: templates/accounts/login.html:31 templates/accounts/register.html:149
+msgid "Log in"
+msgstr ""
+
+#: templates/accounts/login.html:92
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/accounts/login.html:113
+msgid "Don't have an account yet?"
+msgstr ""
+
+#: templates/accounts/login.html:115 templates/accounts/register.html:26
+msgid "Sign up"
+msgstr ""
+
+#: templates/accounts/register.html:8 templates/accounts/register.html:29
+msgid "Create an account"
+msgstr ""
+
+#: templates/accounts/register.html:139
+msgid "Create account"
+msgstr ""
+
+#: templates/accounts/register.html:147
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/home.html:9
 msgid "Task Manager — Organisez vos projets et vos tâches"
 msgstr ""
 
-#: templates/home.html:15
+#: templates/home.html:17
 msgid "Accueil Task Manager"
 msgstr ""
 
-#: templates/home.html:20
+#: templates/home.html:22
 msgid "Ouvrir le menu de navigation"
 msgstr ""
 
-#: templates/home.html:27
+#: templates/home.html:29
 msgid "Navigation principale"
 msgstr ""
 
-#: templates/home.html:28 templates/home.html:231
+#: templates/home.html:30 templates/home.html:232
 msgid "Accueil"
 msgstr ""
 
-#: templates/home.html:29 templates/home.html:110
+#: templates/home.html:31 templates/home.html:111
 msgid "Fonctionnalités"
 msgstr ""
 
-#: templates/home.html:30
+#: templates/home.html:32
 msgid "Présentation"
 msgstr ""
 
-#: templates/home.html:33
+#: templates/home.html:35
 msgid "Langue"
 msgstr ""
 
-#: templates/home.html:43 templates/home.html:60 templates/home.html:215
-#: templates/home.html:232
+#: templates/home.html:36
+msgid "Choisir la langue"
+msgstr "Choisir la langue"
+
+#: templates/home.html:44 templates/home.html:61 templates/home.html:216
+#: templates/home.html:233
 msgid "Connexion"
 msgstr ""
 
-#: templates/home.html:44 templates/home.html:59
+#: templates/home.html:45 templates/home.html:60
 msgid "Commencer"
 msgstr ""
 
-#: templates/home.html:55
+#: templates/home.html:56
 msgid "Gestion de projets et de tâches"
 msgstr ""
 
-#: templates/home.html:56
+#: templates/home.html:57
 msgid "Organisez vos projets. Gérez vos tâches. Restez productif."
 msgstr ""
 
-#: templates/home.html:57
+#: templates/home.html:58
 msgid ""
 "Task Manager réunit vos projets et vos tâches dans un espace clair, pour que "
 "vous sachiez toujours quoi faire ensuite."
 msgstr ""
 
-#: templates/home.html:75 templates/home.html:181
+#: templates/home.html:76 templates/home.html:182
 msgid "Refonte du site"
 msgstr ""
 
-#: templates/home.html:76 templates/home.html:88 templates/home.html:194
+#: templates/home.html:77 templates/home.html:89 templates/home.html:195
 msgid "En cours"
 msgstr ""
 
-#: templates/home.html:82 templates/home.html:190
+#: templates/home.html:83 templates/home.html:191
 msgid "Concevoir l'accueil"
 msgstr ""
 
-#: templates/home.html:83 templates/home.html:99 templates/home.html:189
+#: templates/home.html:84 templates/home.html:100 templates/home.html:190
 msgid "À faire"
 msgstr ""
 
-#: templates/home.html:87 templates/home.html:195
+#: templates/home.html:88 templates/home.html:196
 msgid "Créer la page de connexion"
 msgstr ""
 
-#: templates/home.html:92 templates/home.html:199
+#: templates/home.html:93 templates/home.html:200
 msgid "Tester la création de projet"
 msgstr ""
 
-#: templates/home.html:93 templates/home.html:198
+#: templates/home.html:94 templates/home.html:199
 msgid "Terminé"
 msgstr ""
 
-#: templates/home.html:98 templates/home.html:182
+#: templates/home.html:99 templates/home.html:183
 msgid "Application mobile"
 msgstr ""
 
-#: templates/home.html:111
+#: templates/home.html:112
 msgid "Ce que vous pouvez faire avec Task Manager"
 msgstr ""
 
-#: templates/home.html:116
+#: templates/home.html:117
 msgid "Gestion de projets"
 msgstr ""
 
-#: templates/home.html:117
+#: templates/home.html:118
 msgid "Créez et organisez vos projets au même endroit."
 msgstr ""
 
-#: templates/home.html:122
+#: templates/home.html:123
 msgid "Gestion des tâches"
 msgstr ""
 
-#: templates/home.html:123
+#: templates/home.html:124
 msgid "Créez des tâches et associez-les à vos projets."
 msgstr ""
 
-#: templates/home.html:128
+#: templates/home.html:129
 msgid "Suivi des tâches"
 msgstr ""
 
-#: templates/home.html:129
+#: templates/home.html:130
 msgid ""
 "Suivez vos tâches avec des statuts simples comme à faire, en cours et "
 "terminé."
 msgstr ""
 
-#: templates/home.html:134
+#: templates/home.html:135
 msgid "Accès sécurisé"
 msgstr ""
 
-#: templates/home.html:135
+#: templates/home.html:136
 msgid "Créez un compte et accédez à votre espace en toute sécurité."
 msgstr ""
 
-#: templates/home.html:144
+#: templates/home.html:145
 msgid "Premiers pas"
 msgstr ""
 
-#: templates/home.html:145
+#: templates/home.html:146
 msgid "Comment ça marche"
 msgstr ""
 
-#: templates/home.html:150
+#: templates/home.html:151
 msgid "Créez un compte"
 msgstr ""
 
-#: templates/home.html:151
+#: templates/home.html:152
 msgid "Créez votre compte et accédez à votre espace."
 msgstr ""
 
-#: templates/home.html:155
+#: templates/home.html:156
 msgid "Créez un projet"
 msgstr ""
 
-#: templates/home.html:156
+#: templates/home.html:157
 msgid "Créez un projet pour organiser votre travail."
 msgstr ""
 
-#: templates/home.html:160
+#: templates/home.html:161
 msgid "Ajoutez et suivez vos tâches"
 msgstr ""
 
-#: templates/home.html:161
+#: templates/home.html:162
 msgid "Créez des tâches dans vos projets et suivez leur progression."
 msgstr ""
 
-#: templates/home.html:171
+#: templates/home.html:172
 msgid "Votre espace"
 msgstr ""
 
-#: templates/home.html:172
+#: templates/home.html:173
 msgid "Tout dans un seul espace"
 msgstr ""
 
-#: templates/home.html:173
+#: templates/home.html:174
 msgid ""
 "Une fois connecté, votre espace vous offre une vue claire de vos projets et "
 "de leurs tâches, organisée et facile à suivre."
 msgstr ""
 
-#: templates/home.html:180
+#: templates/home.html:181
 msgid "Projets"
 msgstr ""
 
-#: templates/home.html:183
+#: templates/home.html:184
 msgid "Campagne marketing"
 msgstr ""
 
-#: templates/home.html:191
+#: templates/home.html:192
 msgid "Préparer la campagne"
 msgstr ""
 
-#: templates/home.html:211
+#: templates/home.html:212
 msgid "Prêt à organiser votre travail ?"
 msgstr ""
 
-#: templates/home.html:212
+#: templates/home.html:213
 msgid "Créez votre compte et commencez à gérer vos projets et vos tâches."
 msgstr ""
 
-#: templates/home.html:214
+#: templates/home.html:215
 msgid "Créer un compte"
 msgstr ""
 
-#: templates/home.html:227
+#: templates/home.html:228
 msgid "Une façon simple d'organiser vos projets et vos tâches."
 msgstr ""
 
-#: templates/home.html:230
+#: templates/home.html:231
 msgid "Navigation du pied de page"
 msgstr ""
 
-#: templates/home.html:233
+#: templates/home.html:234
 msgid "Inscription"
 msgstr ""
 
-#: templates/home.html:236
+#: templates/home.html:237
 msgid "Tous droits réservés."
 msgstr ""
-msgid "Choisir la langue"
-msgstr "Choisir la langue"
+
+#: templates/projects/project_form.html:9
+#: templates/projects/project_form.html:12
+msgid "Edit project"
+msgstr ""
+
+#: templates/projects/project_form.html:9
+msgid "New project"
+msgstr ""
+
+#: templates/projects/project_form.html:12
+msgid "Create a project"
+msgstr ""
+
+#: templates/projects/project_form.html:15
+msgid "Update your project information."
+msgstr ""
+
+#: templates/projects/project_form.html:15
+msgid "Add a project to organize your work."
+msgstr ""
+
+#: templates/projects/project_form.html:20
+msgid "Back to project"
+msgstr ""
+
+#: templates/projects/project_form.html:22
+msgid "Back to projects"
+msgstr ""
+
+#: templates/projects/project_form.html:46
+msgid "E.g. Website redesign"
+msgstr ""
+
+#: templates/projects/project_form.html:60
+msgid "What is it about?"
+msgstr ""
+
+#: templates/projects/project_form.html:87 templates/tasks/task_form.html:99
+msgid "Save"
+msgstr ""
+
+#: templates/projects/project_form.html:87
+msgid "Create project"
+msgstr ""
+
+#: templates/projects/project_form.html:90 templates/tasks/subtask_form.html:25
+#: templates/tasks/task_form.html:102
+msgid "Cancel"
+msgstr ""
+
+#: templates/tasks/subtask_form.html:5
+msgid "New subtask"
+msgstr ""
+
+#: templates/tasks/subtask_form.html:6
+msgid "Add a subtask"
+msgstr ""
+
+#: templates/tasks/subtask_form.html:7
+#, python-format
+msgid "Add a step to the task %(title)s."
+msgstr ""
+
+#: templates/tasks/subtask_form.html:10 templates/tasks/task_form.html:20
+msgid "Back to task"
+msgstr ""
+
+#: templates/tasks/subtask_form.html:24
+msgid "Create subtask"
+msgstr ""
+
+#: templates/tasks/task_form.html:9 templates/tasks/task_form.html:12
+msgid "Edit task"
+msgstr ""
+
+#: templates/tasks/task_form.html:9
+msgid "New task"
+msgstr ""
+
+#: templates/tasks/task_form.html:12
+msgid "Create a task"
+msgstr ""
+
+#: templates/tasks/task_form.html:15
+msgid "Update this task's information."
+msgstr ""
+
+#: templates/tasks/task_form.html:15
+msgid "Add a task to one of your projects."
+msgstr ""
+
+#: templates/tasks/task_form.html:22
+msgid "Back to tasks"
+msgstr ""
+
+#: templates/tasks/task_form.html:46
+msgid "E.g. Design homepage"
+msgstr ""
+
+#: templates/tasks/task_form.html:60
+msgid "What needs to be done?"
+msgstr ""
+
+#: templates/tasks/task_form.html:99
+msgid "Create task"
+msgstr ""
