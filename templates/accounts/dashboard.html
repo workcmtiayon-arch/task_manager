@@ -62,7 +62,7 @@
         </div>
         <p class="progress-summary">{{ remaining_percentage }}% des tâches restent à finaliser.</p>
         <div class="project-progress-summary">
-            <span><strong>{{ completed_project_percentage }}%</strong> des projets sont finalisés</span>
+            <span><strong>{{ completed_project_percentage }}%</strong> {% translate "of projects completed" %}</span>
             <span>{{ completed_project_count }} finalisé{{ completed_project_count|pluralize }} · {{ incomplete_project_count }} non finalisé{{ incomplete_project_count|pluralize }}</span>
         </div>
     </article>

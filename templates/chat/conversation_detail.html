@@ -35,26 +35,26 @@
 
   {% if is_invitation %}
     <div class="chat-invitation-banner">
-      Nouvelle invitation de <strong>{{ other_user.username }}</strong> —
-      répondez pour l'accepter et démarrer la conversation.
+      {% translate "New invitation from" %} <strong>{{ other_user.username }}</strong> —
+      {% translate "respond to accept and start the conversation." %}
     </div>
   {% endif %}
 
   <div id="chat-messages" class="chat-messages">
     <div class="chat-empty-messages" id="chat-empty-messages">
       <span aria-hidden="true">✦</span>
-      <strong>La conversation commence ici</strong>
-      <p>Envoyez un message pour démarrer l’échange avec {{ other_user.username }}.</p>
+      <strong>{% translate "The conversation starts here" %}</strong>
+      <p>{% translate "Send a message to start chatting with" %} {{ other_user.username }}.</p>
     </div>
   </div>
   <div id="chat-typing-indicator" class="chat-typing-indicator" hidden aria-live="polite"></div>
 
   <form id="chat-composer" class="chat-composer">
     {% csrf_token %}
-    <label for="chat-attachment-input" class="chat-attach-btn" title="Joindre un fichier" aria-label="Joindre un fichier">📎</label>
+    <label for="chat-attachment-input" class="chat-attach-btn" title="{% translate 'Attach a file' %}" aria-label="{% translate 'Attach a file' %}">📎</label>
     <input type="file" id="chat-attachment-input" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,text/plain" hidden>
-    <textarea id="chat-text-input" class="chat-text-input" placeholder="Écrire un message..." rows="1"></textarea>
-    <button type="submit" id="chat-send-btn" class="chat-btn chat-btn-primary chat-send-btn">Envoyer <span aria-hidden="true">↑</span></button>
+    <textarea id="chat-text-input" class="chat-text-input" placeholder="{% translate 'Write a message...' %}" rows="1"></textarea>
+    <button type="submit" id="chat-send-btn" class="chat-btn chat-btn-primary chat-send-btn">{% translate "Send" %} <span aria-hidden="true">↑</span></button>
   </form>
   <div id="chat-attachment-preview" class="chat-attachment-preview"></div>
 </div>
