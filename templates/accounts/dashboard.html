@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}Tableau de bord — TaskFlow{% endblock %}
 {% block page_title %}Tableau de bord{% endblock %}
@@ -12,32 +12,32 @@
 {% block content %}
 <section class="dashboard-intro">
     <div>
-        <p class="eyebrow">Bonjour, {{ request.user.first_name|default:request.user.username }}</p>
+        <p class="eyebrow">{% translate "Hello" %}, {{ request.user.first_name|default:request.user.username }}</p>
         <h2>{% if is_dashboard_admin %}La plateforme est sous contrôle.{% else %}Voici le résumé de votre activité.{% endif %}</h2>
     </div>
-        <button class="btn btn--primary" type="button" id="dashboard-project-trigger">+ Nouveau projet</button>
+        <button class="btn btn--primary" type="button" id="dashboard-project-trigger">+ {% translate "New project" %}</button>
 </section>
 
-<section class="stats-grid" aria-label="Indicateurs clés">
+<section class="stats-grid" aria-label="{% translate 'Key metrics' %}">
     {% if is_dashboard_admin %}
     <article class="stat-card stat-card--primary">
-        <span class="stat-card__label">Utilisateurs</span>
+        <span class="stat-card__label">{% translate "Users" %}</span>
         <strong>{{ user_count }}</strong>
         <small>{{ active_user_count }} compte{{ active_user_count|pluralize }} actif{{ active_user_count|pluralize }}</small>
     </article>
     {% endif %}
     <article class="stat-card">
-        <span class="stat-card__label">{% if is_dashboard_admin %}Projets gérés{% else %}Mes projets{% endif %}</span>
+        <span class="stat-card__label">{% if is_dashboard_admin %}{% translate "Managed projects" %}{% else %}{% translate "My projects" %}{% endif %}</span>
         <strong>{{ project_count }}</strong>
         <small>sur {% if is_dashboard_admin %}la plateforme{% else %}votre espace{% endif %}</small>
     </article>
     <article class="stat-card">
-        <span class="stat-card__label">{% if is_dashboard_admin %}Conversations créées{% else %}Mes conversations{% endif %}</span>
+        <span class="stat-card__label">{% if is_dashboard_admin %}{% translate "Created conversations" %}{% else %}{% translate "My conversations" %}{% endif %}</span>
         <strong>{{ conversation_count }}</strong>
         <small>{{ conversation_count }} conversation{{ conversation_count|pluralize }}</small>
     </article>
     <article class="stat-card">
-        <span class="stat-card__label">{% if is_dashboard_admin %}Tâches au total{% else %}Mes tâches{% endif %}</span>
+        <span class="stat-card__label">{% if is_dashboard_admin %}{% translate "Total tasks" %}{% else %}{% translate "My tasks" %}{% endif %}</span>
         <strong>{{ task_count }}</strong>
         <small>{{ completed_task_count }} terminée{{ completed_task_count|pluralize }}</small>
     </article>
@@ -47,7 +47,7 @@
     <article class="card progress-card">
         <div class="card-heading">
             <div>
-                <h2>Avancement des tâches</h2>
+                <h2>{% translate "Task progress" %}</h2>
                 <p>{% if is_dashboard_admin %}Répartition sur l'ensemble de la plateforme.{% else %}Répartition de vos tâches personnelles.{% endif %}</p>
             </div>
             <strong class="progress-card__number">{{ completed_percentage }}%</strong>
@@ -70,37 +70,37 @@
     <article class="card shortcuts-card">
         <div class="card-heading">
             <div>
-                <h2>Accès rapides</h2>
-                <p>Retrouvez vos espaces essentiels.</p>
+                <h2>{% translate "Quick access" %}</h2>
+                <p>{% translate "Find your essential workspaces." %}</p>
             </div>
         </div>
         <div class="shortcuts">
-            <a href="{% url 'project_list' %}"><span>▣</span> Projets <b>›</b></a>
-            <a href="{% url 'task_list' %}"><span>✓</span> Tâches <b>›</b></a>
-            <a href="{% url 'chat:conversation_list' %}"><span>◌</span> Messagerie <b>›</b></a>
-            {% if is_dashboard_admin %}<a href="{% url 'user_list' %}"><span>♙</span> Utilisateurs <b>›</b></a>{% endif %}
+            <a href="{% url 'project_list' %}"><span>▣</span> {% translate "Projects" %} <b>›</b></a>
+            <a href="{% url 'task_list' %}"><span>✓</span> {% translate "Tasks" %} <b>›</b></a>
+            <a href="{% url 'chat:conversation_list' %}"><span>◌</span> {% translate "Messages" %} <b>›</b></a>
+            {% if is_dashboard_admin %}<a href="{% url 'user_list' %}"><span>♙</span> {% translate "Users" %} <b>›</b></a>{% endif %}
         </div>
     </article>
 </section>
 
 <div id="dashboard-project-modal" class="dashboard-modal-overlay" hidden>
     <section class="dashboard-modal" role="dialog" aria-modal="true" aria-labelledby="dashboard-project-title">
-        <button class="dashboard-modal__close" type="button" aria-label="Fermer">&times;</button>
-        <h2 id="dashboard-project-title">Créer un nouveau projet</h2>
-        <p>Ajoutez les premières informations de votre projet.</p>
+        <button class="dashboard-modal__close" type="button" aria-label="{% translate 'Close' %}">&times;</button>
+        <h2 id="dashboard-project-title">{% translate "Create a new project" %}</h2>
+        <p>{% translate "Add the initial details of your project." %}</p>
         <form id="dashboard-project-form" action="{% url 'project_add' %}" method="post" class="form-stack">
             {% csrf_token %}
             <div class="form-group">
-                <label class="form-label" for="{{ project_form.name.id_for_label }}">Nom du projet</label>
-                <input class="form-input" type="text" name="{{ project_form.name.html_name }}" id="{{ project_form.name.id_for_label }}" placeholder="Ex. Refonte du site" required>
+                <label class="form-label" for="{{ project_form.name.id_for_label }}">{{ project_form.name.label }}</label>
+                <input class="form-input" type="text" name="{{ project_form.name.html_name }}" id="{{ project_form.name.id_for_label }}" placeholder="{% translate 'E.g. Website redesign' %}" required>
             </div>
             <div class="form-group">
-                <label class="form-label" for="{{ project_form.description.id_for_label }}">Description <span class="is-muted">(facultative)</span></label>
-                <textarea class="form-textarea" name="{{ project_form.description.html_name }}" id="{{ project_form.description.id_for_label }}" placeholder="Décrivez brièvement ce projet."></textarea>
+                <label class="form-label" for="{{ project_form.description.id_for_label }}">{{ project_form.description.label }} <span class="is-muted">({% translate "optional" %})</span></label>
+                <textarea class="form-textarea" name="{{ project_form.description.html_name }}" id="{{ project_form.description.id_for_label }}" placeholder="{% translate 'Briefly describe this project.' %}"></textarea>
             </div>
             <div class="form-actions">
-                <button class="btn btn--primary" type="submit">Créer le projet</button>
-                <button class="btn btn--outline" type="button" data-dashboard-modal-close>Annuler</button>
+                <button class="btn btn--primary" type="submit">{% translate "Create project" %}</button>
+                <button class="btn btn--outline" type="button" data-dashboard-modal-close>{% translate "Cancel" %}</button>
             </div>
         </form>
     </section>
