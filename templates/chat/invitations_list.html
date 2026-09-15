@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 <div class="chat-page chat-list-page">
   <div class="chat-toolbar">
-    <a href="{% url 'chat:conversation_list' %}" class="chat-back-link">&larr; Conversations</a>
+    <a href="{% url 'chat:conversation_list' %}" class="chat-back-link">&larr; {% translate "Conversations" %}</a>
   </div>
 
-  <h1 class="chat-title">Invitations de message</h1>
+  <h1 class="chat-title">{% translate "Message invitations" %}</h1>
 
   {% if items %}
     <ul class="chat-list chat-invitations-list">
@@ -20,16 +20,16 @@
               <span class="chat-list-name">{{ item.initiator.username }}</span>
               <span class="chat-list-preview">{{ item.preview }}</span>
             </span>
-            <span class="chat-btn chat-btn-primary chat-btn-sm">Consulter</span>
+            <span class="chat-btn chat-btn-primary chat-btn-sm">{% translate "View" %}</span>
           </a>
         </li>
       {% endfor %}
     </ul>
   {% else %}
     <div class="chat-empty-state">
-      <p class="chat-empty-title">Aucune invitation en attente</p>
-      <p class="chat-empty-text">Les nouveaux messages de personnes avec qui vous n'avez pas encore de conversation apparaîtront ici.</p>
-      <a href="{% url 'chat:conversation_list' %}" class="chat-btn chat-btn-primary">Retour aux conversations</a>
+      <p class="chat-empty-title">{% translate "No pending invitations" %}</p>
+      <p class="chat-empty-text">{% translate "New messages from people you do not have a conversation with yet will appear here." %}</p>
+      <a href="{% url 'chat:conversation_list' %}" class="chat-btn chat-btn-primary">{% translate "Back to conversations" %}</a>
     </div>
   {% endif %}
 </div>

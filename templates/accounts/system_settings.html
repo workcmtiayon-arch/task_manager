@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Configuration — TaskFlow{% endblock %}
-{% block page_title %}Configuration du système{% endblock %}
-{% block page_subtitle %}Les réglages globaux de la plateforme.{% endblock %}
+{% block title %}{% translate "Settings" %} — TaskFlow{% endblock %}
+{% block page_title %}{% translate "System settings" %}{% endblock %}
+{% block page_subtitle %}{% translate "Global platform settings." %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -12,8 +12,8 @@
 {% block content %}
 <section class="coming-soon card">
     <span class="coming-soon__icon" aria-hidden="true">⚙</span>
-    <h2>Un espace de configuration est en préparation.</h2>
-    <p>Nous préparons une interface claire et fiable pour les réglages de la plateforme. Cette fonctionnalité arrivera prochainement.</p>
-    <a href="{% url 'dashboard' %}" class="btn btn--outline">Retour au tableau de bord</a>
+    <h2>{% translate "A settings area is being prepared." %}</h2>
+    <p>{% translate "We are preparing a clear and reliable interface for platform settings. This feature will be available soon." %}</p>
+    <a href="{% url 'dashboard' %}" class="btn btn--outline">{% translate "Back to dashboard" %}</a>
 </section>
 {% endblock %}

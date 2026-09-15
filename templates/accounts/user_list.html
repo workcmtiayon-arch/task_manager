@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Utilisateurs — TaskFlow{% endblock %}
-{% block page_title %}Utilisateurs{% endblock %}
-{% block page_subtitle %}Gérez les accès des comptes de la plateforme.{% endblock %}
+{% block title %}{% translate "Users" %} — TaskFlow{% endblock %}
+{% block page_title %}{% translate "Users" %}{% endblock %}
+{% block page_subtitle %}{% translate "Manage access to platform accounts." %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -12,12 +12,12 @@
 {% block content %}
 <section class="users-toolbar card">
     <div>
-        <h2>Comptes utilisateurs</h2>
-        <p>{{ users|length }} utilisateur{{ users|length|pluralize }} répertorié{{ users|length|pluralize }}.</p>
+        <h2>{% translate "User accounts" %}</h2>
+        <p>{% blocktranslate count count=users|length %}{{ count }} user listed.{% plural %}{{ count }} users listed.{% endblocktranslate %}</p>
     </div>
     <label class="search-field" for="user-search">
         <span aria-hidden="true">⌕</span>
-        <input id="user-search" type="search" placeholder="Rechercher par nom, e-mail ou rôle…" autocomplete="off">
+        <input id="user-search" type="search" placeholder="{% translate 'Search by name, email or role…' %}" autocomplete="off">
     </label>
 </section>
 
@@ -26,11 +26,11 @@
         <table class="data-table users-table">
             <thead>
                 <tr>
-                    <th>Utilisateur</th>
-                    <th>Rôle</th>
-                    <th>Inscription</th>
-                    <th>Statut</th>
-                    <th class="users-table__action">Action</th>
+                    <th>{% translate "User" %}</th>
+                    <th>{% translate "Role" %}</th>
+                    <th>{% translate "Joined" %}</th>
+                    <th>{% translate "Status" %}</th>
+                    <th class="users-table__action">{% translate "Action" %}</th>
                 </tr>
             </thead>
             <tbody id="users-table-body">
@@ -42,32 +42,32 @@
                             <span><strong>{{ account.get_full_name|default:account.username }}</strong><small>{{ account.email }}</small></span>
                         </div>
                     </td>
-                    <td><span class="badge badge--role">{% if account.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span></td>
+                    <td><span class="badge badge--role">{% if account.role == 'ADMIN' %}{% translate "Administrator" %}{% else %}{% translate "Member" %}{% endif %}</span></td>
                     <td class="is-muted">{{ account.date_joined|date:"d/m/Y" }}</td>
                     <td>
-                        {% if account.is_active %}<span class="badge badge--success">Actif</span>{% else %}<span class="badge badge--danger">Désactivé</span>{% endif %}
+                        {% if account.is_active %}<span class="badge badge--success">{% translate "Active" %}</span>{% else %}<span class="badge badge--danger">{% translate "Disabled" %}</span>{% endif %}
                     </td>
                     <td class="users-table__action">
                         {% if account.pk == request.user.pk %}
-                            <span class="is-muted">Votre compte</span>
+                            <span class="is-muted">{% translate "Your account" %}</span>
                         {% elif account.is_superuser %}
-                            <span class="is-muted">Protégé</span>
+                            <span class="is-muted">{% translate "Protected" %}</span>
                         {% else %}
                             <form action="{% url 'toggle_user_status' account.pk %}" method="post">
                                 {% csrf_token %}
                                 {% if account.is_active %}
-                                <button class="btn btn--danger-outline" type="submit">Désactiver</button>
+                                <button class="btn btn--danger-outline" type="submit">{% translate "Disable" %}</button>
                                 {% else %}
-                                <button class="btn btn--outline" type="submit">Activer</button>
+                                <button class="btn btn--outline" type="submit">{% translate "Enable" %}</button>
                                 {% endif %}
                             </form>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="empty-state">Aucun utilisateur à afficher.</td></tr>
+                <tr><td colspan="5" class="empty-state">{% translate "No users to display." %}</td></tr>
                 {% endfor %}
-                <tr id="no-user-result" hidden><td colspan="5" class="empty-state">Aucun utilisateur ne correspond à votre recherche.</td></tr>
+                <tr id="no-user-result" hidden><td colspan="5" class="empty-state">{% translate "No users match your search." %}</td></tr>
             </tbody>
         </table>
     </div>
