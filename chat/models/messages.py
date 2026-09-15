@@ -15,8 +15,8 @@ class Message(models.Model):
     class MessageType(models.TextChoices):
         """Décrit les deux formes de contenu actuellement supportées."""
 
-        TEXT = "TEXT", "Texte"
-        ATTACHMENT = "ATTACHMENT", "Pièce jointe"
+        TEXT = "TEXT", _("Text")
+        ATTACHMENT = "ATTACHMENT", _("Attachment")
 
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sent_messages")
@@ -115,12 +115,12 @@ class MessageReaction(models.Model):
     class Reaction(models.TextChoices):
         """Liste les réactions exposées par l'interface du chat."""
 
-        LIKE = "LIKE", "like"
-        LOVE = "LOVE", "love"
-        LAUGH = "LAUGH", "laugh"
-        WOW = "WOW", "wow"
-        SAD = "SAD", "sad"
-        ANGRY = "ANGRY", "angry"
+        LIKE = "LIKE", _("like")
+        LOVE = "LOVE", _("love")
+        LAUGH = "LAUGH", _("laugh")
+        WOW = "WOW", _("wow")
+        SAD = "SAD", _("sad")
+        ANGRY = "ANGRY", _("angry")
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="reactions")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="message_reactions")

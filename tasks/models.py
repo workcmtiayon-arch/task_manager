@@ -11,9 +11,9 @@ class Task(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     class Status(models.TextChoices):
-        TODO = "TODO", "À faire"
-        IN_PROGRESS = "IN_PROGRESS", "En cours"
-        DONE = "DONE", "Terminée"
+        TODO = "TODO", _("To do")
+        IN_PROGRESS = "IN_PROGRESS", _("In progress")
+        DONE = "DONE", _("Completed")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.TODO)
     due_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,8 +51,8 @@ class Task(models.Model):
 
 class SubTask(models.Model):
     class Status(models.TextChoices):
-        NOT_DONE = 'NOT_DONE', 'Non terminée'
-        DONE = 'DONE', 'Terminée'
+        NOT_DONE = 'NOT_DONE', _('Not completed')
+        DONE = 'DONE', _('Completed')
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtasks')
     title = models.CharField(max_length=150)

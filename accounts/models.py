@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -12,12 +13,12 @@ from django.utils import timezone
 class User(AbstractUser):
 
     class Langue(models.TextChoices):
-        FRANCAIS = "fr", "Français"
-        ANGLAIS = "en", "English"
+        FRANCAIS = "fr", _("French")
+        ANGLAIS = "en", _("English")
 
     class Role(models.TextChoices):
-        MEMBER = "MEMBER", "member"
-        ADMIN = "ADMIN", "admin"
+        MEMBER = "MEMBER", _("Member")
+        ADMIN = "ADMIN", _("Administrator")
     role = models.CharField(max_length=15, choices=Role.choices, default=Role.MEMBER)
     email = models.EmailField(unique=True)
     is_email_verified = models.BooleanField(default=False)
@@ -34,8 +35,8 @@ class User(AbstractUser):
 class EmailOTP(models.Model):
 
     class Purpose(models.TextChoices):
-        REGISTER = "REGISTER", "Verification d'inscription"
-        PASSWORD_RESET = "PASSWORD_RESET", "Reinitialisation du mot de passe"
+        REGISTER = "REGISTER", _("Registration verification")
+        PASSWORD_RESET = "PASSWORD_RESET", _("Password reset")
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="otps")
     purpose = models.CharField(max_length=20, choices=Purpose.choices)

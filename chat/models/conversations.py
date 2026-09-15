@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.utils import timezone
 
@@ -67,7 +68,7 @@ class Conversation(models.Model):
     class Type(models.TextChoices):
         """Définit les types de conversation supportés par le modèle."""
 
-        PRIVATE = "PRIVATE", "Conversation privée"
+        PRIVATE = "PRIVATE", _("Private conversation")
 
     type = models.CharField(max_length=20, choices=Type.choices, default=Type.PRIVATE)
     name = models.CharField(max_length=150, blank=True)

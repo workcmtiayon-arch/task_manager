@@ -10,15 +10,15 @@ from datetime import timedelta
 
 class Project(models.Model):
     class Complexity(models.TextChoices):
-        LOW = "LOW", "Low"
-        MEDIUM = "MEDIUM", "Medium"
-        HIGH = "HIGH", "High"
+        LOW = "LOW", _("Low")
+        MEDIUM = "MEDIUM", _("Medium")
+        HIGH = "HIGH", _("High")
 
     class TemporalStatus(models.TextChoices):
-        UPCOMING = "UPCOMING", "Upcoming"
-        IN_PROGRESS = "IN_PROGRESS", "In Progress"
-        OVERDUE = "OVERDUE", "Overdue"
-        COMPLETED = "COMPLETED", "Completed"
+        UPCOMING = "UPCOMING", _("Upcoming")
+        IN_PROGRESS = "IN_PROGRESS", _("In progress")
+        OVERDUE = "OVERDUE", _("Overdue")
+        COMPLETED = "COMPLETED", _("Completed")
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
