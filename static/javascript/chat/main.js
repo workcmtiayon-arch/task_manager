@@ -21,8 +21,8 @@ function initializeChat() {
       case "typing.update": elements.typingIndicator.hidden = !data.is_typing; elements.typingIndicator.textContent = data.is_typing ? `${data.username} écrit…` : ""; break;
       case "presence.update": if (Number(data.user_id) === config.otherUserId) updatePresence(Boolean(data.is_online)); break;
       case "presence.request": if (Number(data.requester_id) !== config.currentUserId) socket.sendEvent({ type: "presence.announce" }); break;
-      case "connection.ready": if (elements.connectionStatus && !app.classList.contains("is-other-online")) elements.connectionStatus.textContent = "Vérification du statut…"; break;
-      case "error": showToast(data.detail || "Une erreur est survenue."); break;
+      case "connection.ready": if (elements.connectionStatus && !app.classList.contains("is-other-online")) elements.connectionStatus.textContent = window.taskManagerI18n.checkingStatus; break;
+      case "error": showToast(data.detail || window.taskManagerI18n.unexpectedError); break;
       default: break;
     }
   };

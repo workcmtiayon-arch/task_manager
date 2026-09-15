@@ -15,10 +15,10 @@ export function getCookie(name) { const match = document.cookie.match(new RegExp
 export function showToast(message) { const toast = document.createElement("div"); toast.className = "chat-toast"; toast.textContent = message; document.body.appendChild(toast); window.setTimeout(function () { toast.remove(); }, 3500); }
 
 // Met à jour l'état de présence de l'autre utilisateur.
-export function updatePresence(isOnline) { window.clearTimeout(state.presenceCheckTimer); app.classList.toggle("is-other-online", isOnline); if (elements.connectionStatus) elements.connectionStatus.textContent = isOnline ? "En ligne" : "Hors ligne"; }
+export function updatePresence(isOnline) { window.clearTimeout(state.presenceCheckTimer); app.classList.toggle("is-other-online", isOnline); if (elements.connectionStatus) elements.connectionStatus.textContent = isOnline ? window.taskManagerI18n.online : window.taskManagerI18n.offline; }
 
 // Prépare le repli hors ligne si aucune présence n'est annoncée.
-export function startPresenceCheck() { window.clearTimeout(state.presenceCheckTimer); state.presenceCheckTimer = window.setTimeout(function () { if (!app.classList.contains("is-other-online") && elements.connectionStatus) elements.connectionStatus.textContent = "Hors ligne"; }, 3000); }
+export function startPresenceCheck() { window.clearTimeout(state.presenceCheckTimer); state.presenceCheckTimer = window.setTimeout(function () { if (!app.classList.contains("is-other-online") && elements.connectionStatus) elements.connectionStatus.textContent = window.taskManagerI18n.offline; }, 3000); }
 
 // Indique si la zone de messages est proche de son bas.
 export function isNearBottom() { return elements.messages.scrollHeight - elements.messages.scrollTop - elements.messages.clientHeight < 120; }

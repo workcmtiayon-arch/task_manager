@@ -202,6 +202,22 @@
         .btn--outline { background: transparent; border:1px solid var(--border-color); color:var(--text-color); }
     </style>
 
+    <script>
+        window.taskManagerI18n = {
+            checkingStatus: "{% translate 'Checking status…' %}",
+            statusUnavailable: "{% translate 'Status unavailable' %}",
+            online: "{% translate 'Online' %}",
+            offline: "{% translate 'Offline' %}",
+            unexpectedError: "{% translate 'An unexpected error occurred.' %}",
+            cannotLoadMessages: "{% translate 'Unable to load messages.' %}",
+            deleteMessage: "{% translate 'Delete this message?' %}",
+            deletedMessage: "{% translate 'Message deleted' %}",
+            edited: "{% translate 'edited' %}",
+            edit: "{% translate 'Edit' %}",
+            delete: "{% translate 'Delete' %}",
+            reactWith: "{% translate 'React with' %}"
+        };
+    </script>
     <script src="{% static 'javascript/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
