@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -26,22 +27,22 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'autocomplete' : 'username'}))
-    password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'autocomplete' : 'current-password'}))
+    username = forms.CharField(label=_('Username'), widget=forms.TextInput(attrs={'autocomplete': 'username'}))
+    password = forms.CharField(label=_('Password'), widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}))
 
 
 class OTPForm(forms.Form):
-    code = forms.CharField(min_length=6, max_length=6)
+    code = forms.CharField(label=_('Verification code'), min_length=6, max_length=6)
 
     def clean_code(self):
         code = self.cleaned_data['code']
         if not code.isdigit():
-            raise forms.ValidationError("Le code doit etre compose de 6 chiffres")
+            raise forms.ValidationError(_('The code must contain 6 digits.'))
         return code
 
 
 class ForgotPasswordEmailForm(forms.Form):
-    email = forms.EmailField(label="Adresse email")
+    email = forms.EmailField(label=_('Email address'))
 
 
 class ProfileForm(forms.ModelForm):
@@ -51,15 +52,15 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = ["username", "first_name", "last_name", "email"]
         labels = {
-            "username": "Nom d'utilisateur",
-            "first_name": "Prénom",
-            "last_name": "Nom",
-            "email": "Adresse e-mail",
+            "username": _("Username"),
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
+            "email": _("Email address"),
         }
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
         duplicate = User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
         if duplicate.exists():
-            raise forms.ValidationError("Cette adresse e-mail est déjà utilisée.")
+            raise forms.ValidationError(_('This email address is already in use.'))
         return email
