@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -22,8 +22,8 @@
                 <span class="brand-name">TaskFlow</span>
             </div>
 
-            <nav class="sidebar__nav" aria-label="Navigation principale">
-                <p class="nav-section-label">Navigation</p>
+            <nav class="sidebar__nav" aria-label="{% translate 'Main navigation' %}">
+                <p class="nav-section-label">{% translate "Navigation" %}</p>
 
                 <a href="{% url 'dashboard' %}"
                    class="nav-link {% if active_nav == 'dashboard' %}nav-link--active{% endif %}">
@@ -35,7 +35,7 @@
                             <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Tableau de bord</span>
+                    <span class="nav-link__label">{% translate "Dashboard" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -46,7 +46,7 @@
                             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Projets</span>
+                    <span class="nav-link__label">{% translate "Projects" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -60,7 +60,7 @@
                             <path d="M4.5 18l1 1 2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Tâches</span>
+                    <span class="nav-link__label">{% translate "Tasks" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -72,7 +72,7 @@
                             <path d="M8 12h.01M12 12h.01M16 12h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Messagerie</span>
+                    <span class="nav-link__label">{% translate "Messages" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
@@ -83,12 +83,12 @@
                             <path d="M12 8.5 13.2 11l2.8 1-2.8 1.1-1.2 2.4-1.2-2.4L8 12l2.8-1L12 8.5Z" fill="currentColor"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Assistant IA</span>
+                    <span class="nav-link__label">{% translate "AI assistant" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
 
                 {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
-                <p class="nav-section-label">Administration</p>
+                <p class="nav-section-label">{% translate "Administration" %}</p>
                 <a href="{% url 'user_list' %}"
                    class="nav-link {% if active_nav == 'users' %}nav-link--active{% endif %}">
                     <span class="nav-link__icon" aria-hidden="true">
@@ -97,7 +97,7 @@
                             <path d="M3.5 20a5.5 5.5 0 0 1 11 0M17 8h4M19 6v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Utilisateurs</span>
+                    <span class="nav-link__label">{% translate "Users" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
                 <a href="{% url 'system_settings' %}"
@@ -108,7 +108,7 @@
                             <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.3 2.3-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.1h-3.25v-.1a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.3-2.3.06-.06A1.7 1.7 0 0 0 6.4 15a1.7 1.7 0 0 0-1.56-1.03h-.1v-3.25h.1A1.7 1.7 0 0 0 6.4 9.69a1.7 1.7 0 0 0-.34-1.88L6 7.75l2.3-2.3.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.1h3.25v.1a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.3 2.3-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.1v3.25h-.1A1.7 1.7 0 0 0 19.4 15Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="nav-link__label">Configuration</span>
+                    <span class="nav-link__label">{% translate "Settings" %}</span>
                     <span class="nav-link__chevron" aria-hidden="true">&#8250;</span>
                 </a>
                 {% endif %}
@@ -138,12 +138,12 @@
             </div>
         </aside>
 
-        <button class="sidebar-overlay" id="sidebarOverlay" aria-label="Fermer le menu" tabindex="-1"></button>
+        <button class="sidebar-overlay" id="sidebarOverlay" aria-label="{% translate 'Close menu' %}" tabindex="-1"></button>
 
         <div class="app__main">
 
             <header class="topbar">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="{% translate 'Open menu' %}" aria-controls="sidebar" aria-expanded="false">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                     </svg>
@@ -155,7 +155,7 @@
                 </div>
 
                 <div class="topbar__user">
-                    <a href="{% url 'profile' %}" class="topbar__profile-link">Modifier mon profil</a>
+                    <a href="{% url 'profile' %}" class="topbar__profile-link">{% translate "Edit my profile" %}</a>
                     <span class="badge badge--role">{% if request.user.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span>
                     <span class="topbar__avatar">
                         {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
@@ -180,14 +180,14 @@
     <div id="logout-confirm-overlay" class="modal-overlay" hidden>
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
             <div class="modal__body">
-                <h2 id="logout-confirm-title">Confirmer la déconnexion</h2>
-                <p>Voulez-vous vraiment vous déconnecter ? Votre session sera fermée. Vous pouvez annuler pour rester connecté.</p>
+                <h2 id="logout-confirm-title">{% translate "Confirm logout" %}</h2>
+                <p>{% translate "Are you sure you want to log out? Your session will be closed. You can cancel to stay signed in." %}</p>
                 <div style="display:flex; gap:12px; margin-top:18px; justify-content:flex-end">
-                    <button type="button" class="btn btn--outline logout-cancel">Annuler</button>
-                    <button type="button" class="btn btn--primary" id="confirmSignoutBtn">Déconnexion</button>
+                    <button type="button" class="btn btn--outline logout-cancel">{% translate "Cancel" %}</button>
+                    <button type="button" class="btn btn--primary" id="confirmSignoutBtn">{% translate "Log out" %}</button>
                 </div>
             </div>
-            <button type="button" class="modal__close" aria-label="Fermer" data-logout-modal-close>&times;</button>
+            <button type="button" class="modal__close" aria-label="{% translate 'Close' %}" data-logout-modal-close>&times;</button>
         </div>
     </div>
 
