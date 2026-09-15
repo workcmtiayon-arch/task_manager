@@ -1,11 +1,11 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANGUAGE_CODE }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un compte — Task Manager</title>
+    <title>{% translate "Create an account" %} — Task Manager</title>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
 
@@ -23,10 +23,10 @@
             
             <section class="auth-card">
 
-                <p class="eyebrow">Inscription</p>
+                <p class="eyebrow">{% translate "Sign up" %}</p>
 
                 <h1 class="auth-card__title">
-                    Créer un compte
+                    {% translate "Create an account" %}
                 </h1>
 
                 <p class="auth-card__lead">Un espace simple pour organiser vos projets, vos tâches et votre progression.</p>
@@ -52,7 +52,7 @@
                     <div class="form-group">
 
                         <label for="{{ form.username.id_for_label }}" class="form-label">
-                            Nom d'utilisateur
+                            {{ form.username.label }}
                         </label>
 
                         <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
@@ -73,7 +73,7 @@
                     <div class="form-group">
 
                         <label for="{{ form.email.id_for_label }}" class="form-label">
-                            Adresse e-mail
+                            {{ form.email.label }}
                         </label>
 
                         <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}"
@@ -94,7 +94,7 @@
                     <div class="form-group">
 
                         <label for="{{ form.password1.id_for_label }}" class="form-label">
-                            Mot de passe
+                            {{ form.password1.label }}
                         </label>
 
                         <input type="password" name="{{ form.password1.html_name }}"
@@ -116,7 +116,7 @@
                     <div class="form-group">
 
                         <label for="{{ form.password2.id_for_label }}" class="form-label">
-                            Confirmer le mot de passe
+                            {{ form.password2.label }}
                         </label>
 
                         <input type="password" name="{{ form.password2.html_name }}"
@@ -136,7 +136,7 @@
 
                     
                     <button type="submit" class="btn btn--primary btn--block">
-                        Créer le compte
+                        {% translate "Create account" %}
                     </button>
 
                 </form>
@@ -144,9 +144,9 @@
 
                 
                 <p class="auth-card__footer">
-                    Vous avez déjà un compte ?
+                    {% translate "Already have an account?" %}
                     <a href="{% url 'login' %}" class="auth-link">
-                        Se connecter
+                        {% translate "Log in" %}
                     </a>
                 </p>
 
