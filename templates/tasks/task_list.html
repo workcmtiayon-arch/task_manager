@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/tasks.css' %}">
@@ -12,28 +12,28 @@
 {% block content %}
 <section class="tasks-hero">
     <div>
-        <p class="tasks-hero__eyebrow">Organisation personnelle</p>
-        <h2>Gardez le cap sur vos priorités.</h2>
-        <p>Suivez chaque tâche de vos projets sans changer d’espace.</p>
+        <p class="tasks-hero__eyebrow">{% translate "Personal organization" %}</p>
+        <h2>{% translate "Stay on top of your priorities." %}</h2>
+        <p>{% translate "Track every task in your projects without changing workspace." %}</p>
     </div>
     <div class="tasks-hero__progress" aria-label="{{ completion_percentage }} pour cent des tâches sont terminées">
         <strong>{{ completion_percentage }}%</strong>
-        <span>terminé</span>
+        <span>{% translate "completed" %}</span>
         <div><i style="width: {{ completion_percentage }}%"></i></div>
     </div>
 </section>
 
-<section class="task-stats" aria-label="Résumé des tâches">
-    <article class="task-stat task-stat--all"><span>Total</span><strong>{{ total_tasks }}</strong></article>
-    <article class="task-stat task-stat--todo"><span>À faire</span><strong>{{ todo_tasks }}</strong></article>
-    <article class="task-stat task-stat--progress"><span>En cours</span><strong>{{ in_progress_tasks }}</strong></article>
-    <article class="task-stat task-stat--done"><span>Terminées</span><strong>{{ done_tasks }}</strong></article>
+<section class="task-stats" aria-label="{% translate 'Task summary' %}">
+    <article class="task-stat task-stat--all"><span>{% translate "Total" %}</span><strong>{{ total_tasks }}</strong></article>
+    <article class="task-stat task-stat--todo"><span>{% translate "To do" %}</span><strong>{{ todo_tasks }}</strong></article>
+    <article class="task-stat task-stat--progress"><span>{% translate "In progress" %}</span><strong>{{ in_progress_tasks }}</strong></article>
+    <article class="task-stat task-stat--done"><span>{% translate "Completed" %}</span><strong>{{ done_tasks }}</strong></article>
 </section>
 
 <section class="tasks-section">
     <div class="tasks-section__header">
         <div>
-            <h2>Liste des tâches</h2>
+            <h2>{% translate "Task list" %}</h2>
             <p>{{ total_tasks }} tâche{{ total_tasks|pluralize }} dans vos projets.</p>
         </div>
     </div>
@@ -43,13 +43,13 @@
         <article class="task-item task-item--{{ task.status|lower }}">
             <div class="task-item__top">
                 {% if task.status == 'DONE' %}
-                    <span class="task-status task-status--done">Terminée</span>
+                    <span class="task-status task-status--done">{% translate "Completed" %}</span>
                 {% elif task.status == 'IN_PROGRESS' %}
-                    <span class="task-status task-status--progress">En cours</span>
+                    <span class="task-status task-status--progress">{% translate "In progress" %}</span>
                 {% else %}
-                    <span class="task-status task-status--todo">À faire</span>
+                    <span class="task-status task-status--todo">{% translate "To do" %}</span>
                 {% endif %}
-                <a class="task-item__open" href="{% url 'show_details' task.id %}" aria-label="Voir la tâche {{ task.title }}">↗</a>
+                <a class="task-item__open" href="{% url 'show_details' task.id %}" aria-label="{% translate 'View task' %} {{ task.title }}">↗</a>
             </div>
             <h3><a href="{% url 'show_details' task.id %}">{{ task.title }}</a></h3>
             <p class="task-item__description">{{ task.description|default:"Aucune description pour cette tâche." }}</p>
@@ -57,18 +57,18 @@
                 <a href="{% url 'project_detail' task.project.id %}" class="task-item__project">{{ task.project.name }}</a>
                 {% if task.subtask_progress %}<span class="task-item__subtasks">{{ task.subtask_progress }} SubTasks</span>{% endif %}
                 {% if task.due_date %}
-                <span class="task-item__date">Échéance : {{ task.due_date|date:"d/m/Y" }}</span>
+                <span class="task-item__date">{% translate "Due date:" %} {{ task.due_date|date:"d/m/Y" }}</span>
                 {% else %}
-                <span class="task-item__date">Sans échéance</span>
+                <span class="task-item__date">{% translate "No due date" %}</span>
                 {% endif %}
             </div>
         </article>
         {% empty %}
         <div class="tasks-empty">
             <span aria-hidden="true">✓</span>
-            <h3>Aucune tâche pour le moment</h3>
-            <p>Créez un projet puis ajoutez-y des tâches pour les retrouver ici.</p>
-            <a class="btn btn--primary" href="{% url 'project_list' %}">Voir mes projets</a>
+            <h3>{% translate "No tasks yet" %}</h3>
+            <p>{% translate "Create a project and add tasks to find them here." %}</p>
+            <a class="btn btn--primary" href="{% url 'project_list' %}">{% translate "View my projects" %}</a>
         </div>
         {% endfor %}
     </div>
