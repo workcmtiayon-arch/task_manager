@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-15 23:11+0100\n"
+"POT-Creation-Date: 2026-09-15 23:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,6 +99,120 @@ msgstr "Position d'affichage"
 msgid "Subtask title"
 msgstr "Titre de la sous-tâche"
 
+#: templates/accounts/dashboard.html:15
+msgid "Hello"
+msgstr ""
+
+#: templates/accounts/dashboard.html:18 templates/projects/project_form.html:9
+msgid "New project"
+msgstr ""
+
+#: templates/accounts/dashboard.html:21
+msgid "Key metrics"
+msgstr ""
+
+#: templates/accounts/dashboard.html:24 templates/accounts/dashboard.html:81
+#, fuzzy
+#| msgid "Username"
+msgid "Users"
+msgstr "Nom d'utilisateur"
+
+#: templates/accounts/dashboard.html:30
+msgid "Managed projects"
+msgstr ""
+
+#: templates/accounts/dashboard.html:30
+msgid "My projects"
+msgstr ""
+
+#: templates/accounts/dashboard.html:35
+#, fuzzy
+#| msgid "Create account"
+msgid "Created conversations"
+msgstr "Créer le compte"
+
+#: templates/accounts/dashboard.html:35
+msgid "My conversations"
+msgstr ""
+
+#: templates/accounts/dashboard.html:40
+msgid "Total tasks"
+msgstr ""
+
+#: templates/accounts/dashboard.html:40
+msgid "My tasks"
+msgstr ""
+
+#: templates/accounts/dashboard.html:50
+msgid "Task progress"
+msgstr ""
+
+#: templates/accounts/dashboard.html:65
+msgid "of projects completed"
+msgstr ""
+
+#: templates/accounts/dashboard.html:73
+msgid "Quick access"
+msgstr ""
+
+#: templates/accounts/dashboard.html:74
+msgid "Find your essential workspaces."
+msgstr ""
+
+#: templates/accounts/dashboard.html:78 templates/projects/project_list.html:27
+#, fuzzy
+#| msgid "Project name"
+msgid "Projects"
+msgstr "Nom du projet"
+
+#: templates/accounts/dashboard.html:79 templates/projects/project_list.html:28
+#, fuzzy
+#| msgid "Task status"
+msgid "Tasks"
+msgstr "Statut de la tâche"
+
+#: templates/accounts/dashboard.html:80
+msgid "Messages"
+msgstr ""
+
+#: templates/accounts/dashboard.html:88
+#: templates/projects/project_list.html:127
+msgid "Close"
+msgstr ""
+
+#: templates/accounts/dashboard.html:89
+#, fuzzy
+#| msgid "Create an account"
+msgid "Create a new project"
+msgstr "Créer un compte"
+
+#: templates/accounts/dashboard.html:90
+msgid "Add the initial details of your project."
+msgstr ""
+
+#: templates/accounts/dashboard.html:95 templates/projects/project_form.html:46
+msgid "E.g. Website redesign"
+msgstr ""
+
+#: templates/accounts/dashboard.html:98
+msgid "optional"
+msgstr ""
+
+#: templates/accounts/dashboard.html:99
+msgid "Briefly describe this project."
+msgstr ""
+
+#: templates/accounts/dashboard.html:102
+#: templates/projects/project_form.html:87
+msgid "Create project"
+msgstr ""
+
+#: templates/accounts/dashboard.html:103 templates/profile/profile.html:22
+#: templates/projects/project_form.html:90 templates/tasks/subtask_form.html:25
+#: templates/tasks/task_form.html:102
+msgid "Cancel"
+msgstr ""
+
 #: templates/accounts/forgot_password.html:8
 #: templates/accounts/forgot_password.html:26
 msgid "Forgot password"
@@ -144,6 +258,117 @@ msgstr "Créer le compte"
 #: templates/accounts/register.html:147
 msgid "Already have an account?"
 msgstr "Vous avez déjà un compte ?"
+
+#: templates/ai/assistant_workspace.html:7
+msgid "AI assistant"
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:8
+msgid "Non-functional preview"
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:11
+#, fuzzy
+#| msgid "Back to login"
+msgid "Back to workspace"
+msgstr "Retour à la connexion"
+
+#: templates/ai/assistant_workspace.html:13
+msgid "Conversation with the AI assistant"
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:15
+msgid "Information"
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:16
+msgid "This feature is still being implemented."
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:19
+msgid "Hello. Gemini will soon help you organize your projects and tasks."
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:22
+msgid "For now, nothing will be sent or analyzed."
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:23
+msgid "AI assistant chat area"
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:24
+msgid "Write your request..."
+msgstr ""
+
+#: templates/ai/assistant_workspace.html:25
+#: templates/chat/conversation_detail.html:57
+#, fuzzy
+#| msgid "Send code"
+msgid "Send"
+msgstr "Envoyer le code"
+
+#: templates/chat/conversation_detail.html:28
+#, fuzzy
+#| msgid "Back to login"
+msgid "Back to conversations"
+msgstr "Retour à la connexion"
+
+#: templates/chat/conversation_detail.html:32
+msgid "Offline"
+msgstr ""
+
+#: templates/chat/conversation_detail.html:38
+msgid "New invitation from"
+msgstr ""
+
+#: templates/chat/conversation_detail.html:39
+msgid "respond to accept and start the conversation."
+msgstr ""
+
+#: templates/chat/conversation_detail.html:46
+msgid "The conversation starts here"
+msgstr ""
+
+#: templates/chat/conversation_detail.html:47
+msgid "Send a message to start chatting with"
+msgstr ""
+
+#: templates/chat/conversation_detail.html:54
+msgid "Attach a file"
+msgstr ""
+
+#: templates/chat/conversation_detail.html:56
+msgid "Write a message..."
+msgstr ""
+
+#: templates/chat/conversation_list.html:9
+msgid "Conversations"
+msgstr ""
+
+#: templates/chat/conversation_list.html:10
+msgid "Find your conversations in a clear and organized space."
+msgstr ""
+
+#: templates/chat/conversation_list.html:14
+msgid "Invitations"
+msgstr ""
+
+#: templates/chat/conversation_list.html:20
+msgid "New conversation"
+msgstr ""
+
+#: templates/chat/conversation_list.html:43
+msgid "No conversations yet"
+msgstr ""
+
+#: templates/chat/conversation_list.html:44
+msgid "Start a new one to begin chatting."
+msgstr ""
+
+#: templates/chat/conversation_list.html:45
+msgid "Find a user"
+msgstr ""
 
 #: templates/home.html:9
 msgid "Task Manager — Organisez vos projets et vos tâches"
@@ -360,16 +585,26 @@ msgstr ""
 msgid "Tous droits réservés."
 msgstr ""
 
+#: templates/profile/profile.html:4 templates/profile/profile.html:5
+msgid "My profile"
+msgstr ""
+
+#: templates/profile/profile.html:6
+msgid "Update your personal information."
+msgstr ""
+
+#: templates/profile/profile.html:21
+msgid "Save changes"
+msgstr ""
+
 #: templates/projects/project_form.html:9
 #: templates/projects/project_form.html:12
+#: templates/projects/project_list.html:60
 msgid "Edit project"
 msgstr ""
 
-#: templates/projects/project_form.html:9
-msgid "New project"
-msgstr ""
-
 #: templates/projects/project_form.html:12
+#: templates/projects/project_list.html:120
 msgid "Create a project"
 msgstr ""
 
@@ -389,10 +624,6 @@ msgstr ""
 msgid "Back to projects"
 msgstr ""
 
-#: templates/projects/project_form.html:46
-msgid "E.g. Website redesign"
-msgstr ""
-
 #: templates/projects/project_form.html:60
 msgid "What is it about?"
 msgstr ""
@@ -401,13 +632,75 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: templates/projects/project_form.html:87
-msgid "Create project"
+#: templates/projects/project_list.html:15
+msgid "Overview"
 msgstr ""
 
-#: templates/projects/project_form.html:90 templates/tasks/subtask_form.html:25
-#: templates/tasks/task_form.html:102
-msgid "Cancel"
+#: templates/projects/project_list.html:21
+msgid "of tasks completed"
+msgstr ""
+
+#: templates/projects/project_list.html:26
+#, fuzzy
+#| msgid "Project name"
+msgid "Project summary"
+msgstr "Nom du projet"
+
+#: templates/projects/project_list.html:29
+msgid "Completed tasks"
+msgstr ""
+
+#: templates/projects/project_list.html:30
+#: templates/projects/project_list.html:46
+msgid "Completed projects"
+msgstr ""
+
+#: templates/projects/project_list.html:35
+msgid "Your workspaces"
+msgstr ""
+
+#: templates/projects/project_list.html:43
+msgid "Filter projects"
+msgstr ""
+
+#: templates/projects/project_list.html:44
+msgid "Active projects"
+msgstr ""
+
+#: templates/projects/project_list.html:45
+msgid "Upcoming projects"
+msgstr ""
+
+#: templates/projects/project_list.html:60
+msgid "Edit"
+msgstr ""
+
+#: templates/projects/project_list.html:65
+msgid "Delete project"
+msgstr ""
+
+#: templates/projects/project_list.html:65
+msgid "Delete"
+msgstr ""
+
+#: templates/projects/project_list.html:92
+msgid "Progress"
+msgstr ""
+
+#: templates/projects/project_list.html:99
+msgid "No tasks added yet."
+msgstr ""
+
+#: templates/projects/project_list.html:113
+msgid "Open project"
+msgstr ""
+
+#: templates/projects/project_list.html:118
+msgid "Your workspace is ready"
+msgstr ""
+
+#: templates/projects/project_list.html:119
+msgid "Create your first project to start organizing your tasks."
 msgstr ""
 
 #: templates/tasks/subtask_form.html:5
@@ -465,4 +758,80 @@ msgstr ""
 
 #: templates/tasks/task_form.html:99
 msgid "Create task"
+msgstr ""
+
+#: templates/tasks/task_list.html:15
+msgid "Personal organization"
+msgstr ""
+
+#: templates/tasks/task_list.html:16
+msgid "Stay on top of your priorities."
+msgstr ""
+
+#: templates/tasks/task_list.html:17
+msgid "Track every task in your projects without changing workspace."
+msgstr ""
+
+#: templates/tasks/task_list.html:21
+#, fuzzy
+#| msgid "Complexity"
+msgid "completed"
+msgstr "Complexité"
+
+#: templates/tasks/task_list.html:26
+#, fuzzy
+#| msgid "Task status"
+msgid "Task summary"
+msgstr "Statut de la tâche"
+
+#: templates/tasks/task_list.html:27
+msgid "Total"
+msgstr ""
+
+#: templates/tasks/task_list.html:28 templates/tasks/task_list.html:50
+msgid "To do"
+msgstr ""
+
+#: templates/tasks/task_list.html:29 templates/tasks/task_list.html:48
+msgid "In progress"
+msgstr ""
+
+#: templates/tasks/task_list.html:30 templates/tasks/task_list.html:46
+#, fuzzy
+#| msgid "Complexity"
+msgid "Completed"
+msgstr "Complexité"
+
+#: templates/tasks/task_list.html:36
+#, fuzzy
+#| msgid "Task title"
+msgid "Task list"
+msgstr "Titre de la tâche"
+
+#: templates/tasks/task_list.html:52
+msgid "View task"
+msgstr ""
+
+#: templates/tasks/task_list.html:60
+#, fuzzy
+#| msgid "Due date"
+msgid "Due date:"
+msgstr "Date d'échéance"
+
+#: templates/tasks/task_list.html:62
+#, fuzzy
+#| msgid "Due date"
+msgid "No due date"
+msgstr "Date d'échéance"
+
+#: templates/tasks/task_list.html:69
+msgid "No tasks yet"
+msgstr ""
+
+#: templates/tasks/task_list.html:70
+msgid "Create a project and add tasks to find them here."
+msgstr ""
+
+#: templates/tasks/task_list.html:71
+msgid "View my projects"
 msgstr ""
