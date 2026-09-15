@@ -1,8 +1,8 @@
-Bonjour {{ username }},
+{% load i18n %}{% blocktranslate with username=username %}Hello {{ username }},{% endblocktranslate %}
 
-Voici vos tâches en attente :
+{% translate "Here are your pending tasks:" %}
 
 {% for task in tasks %}- {{ task.title }} ({{ task.project.name }}){% if task.due_date %} — échéance : {{ task.due_date }}{% endif %}
 {% endfor %}
 
-Task Manager American boy
+Task Manager

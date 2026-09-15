@@ -1,11 +1,6 @@
-L'équipe Task Manager
-registration_alert.txt :
-Bonjour,
-Quelqu'un a tenté de créer un compte Task Manager avec cette adresse e-
-mail,
-qui est déjà associée à un compte existant chez nous.
-Si ce n'était pas vous, aucune action n'est nécessaire. Si vous avez oublié
-vos identifiants, utilisez la fonction « mot de passe oublié » depuis la
-page de connexion.
---
-L'équipe Task Manager
+{% load i18n %}{% translate "Task Manager team" %}
+{% translate "Hello," %}
+{% translate "Someone tried to create a Task Manager account with this email address, which is already associated with an existing account." %}
+{% translate "If this was not you, no action is needed. If you forgot your credentials, use the password reset feature from the login page." %}
+
+{% translate "Task Manager team" %}

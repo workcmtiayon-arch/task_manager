@@ -1,7 +1,7 @@
-Bonjour {{ username }},
-Voici votre code de vérification Task Manager :
+{% load i18n %}{% blocktranslate with username=username %}Hello {{ username }},{% endblocktranslate %}
+{% translate "Here is your Task Manager verification code:" %}
 {{ code }}
-Ce code expire dans quelques minutes et ne peut être utilisé qu'une seule fois.
-Si vous n'êtes pas à l'origine de cette inscription, ignorez cet e-mail.
+{% translate "This code expires in a few minutes and can only be used once." %}
+{% translate "If you did not initiate this registration, ignore this email." %}
 --
 Task Manager Team...
