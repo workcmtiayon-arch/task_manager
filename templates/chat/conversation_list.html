@@ -1,23 +1,23 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 <div class="chat-page chat-list-page">
   <div class="chat-toolbar">
     <div>
-      <h1 class="chat-title">Conversations</h1>
-      <p class="chat-subtitle">Retrouvez vos échanges dans un espace clair et organisé.</p>
+      <h1 class="chat-title">{% translate "Conversations" %}</h1>
+      <p class="chat-subtitle">{% translate "Find your conversations in a clear and organized space." %}</p>
     </div>
     <div class="chat-toolbar-actions">
       <a href="{% url 'chat:invitations_list' %}" class="chat-btn chat-btn-secondary chat-invitations-link">
-        Invitations
+        {% translate "Invitations" %}
         {% if invitations_count > 0 %}
           <span class="chat-badge">{{ invitations_count }}</span>
         {% endif %}
       </a>
       <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">
-        Nouvelle conversation
+        {% translate "New conversation" %}
       </a>
     </div>
   </div>
@@ -40,9 +40,9 @@
     </ul>
   {% else %}
     <div class="chat-empty-state">
-      <p class="chat-empty-title">Aucune conversation pour le moment</p>
-      <p class="chat-empty-text">Démarrez-en une nouvelle pour commencer à échanger.</p>
-      <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">Rechercher un utilisateur</a>
+      <p class="chat-empty-title">{% translate "No conversations yet" %}</p>
+      <p class="chat-empty-text">{% translate "Start a new one to begin chatting." %}</p>
+      <a href="{% url 'chat:user_search' %}" class="chat-btn chat-btn-primary">{% translate "Find a user" %}</a>
     </div>
   {% endif %}
   </div>

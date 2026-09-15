@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
@@ -25,11 +25,11 @@
 >
   <div class="chat-conversation-header">
     <a href="{% if is_invitation %}{% url 'chat:invitations_list' %}{% else %}{% url 'chat:conversation_list' %}{% endif %}"
-       class="chat-back-link chat-back-link--round" aria-label="Retour aux conversations">&larr;</a>
+       class="chat-back-link chat-back-link--round" aria-label="{% translate 'Back to conversations' %}">&larr;</a>
     <span class="chat-avatar chat-avatar--conversation">{{ other_user.username|slice:":1"|upper }}</span>
     <span class="chat-conversation-identity">
       <span class="chat-conversation-name">{{ other_user.username }}</span>
-      <span class="chat-conversation-status" id="chat-connection-status">Hors ligne</span>
+      <span class="chat-conversation-status" id="chat-connection-status">{% translate "Offline" %}</span>
     </span>
   </div>
 
