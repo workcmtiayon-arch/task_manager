@@ -304,5 +304,5 @@ def profile(request):
 @login_required
 def system_settings(request):
     if not is_platform_admin(request.user):
-        return HttpResponseForbidden("Cette page est réservée aux administrateurs.")
+        return HttpResponseForbidden(_("This page is reserved for administrators."))
     return render(request, "accounts/system_settings.html", {"active_nav": "settings"})

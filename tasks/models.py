@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from projects.models import Project
 
 # Create your models here.
@@ -30,7 +31,7 @@ class Task(models.Model):
             )
             if self.status != expected_status:
                 raise ValidationError({
-                    'status': 'Le statut est géré automatiquement par les SubTasks.'
+                    'status': _('The status is managed automatically by subtasks.')
                 })
 
     def save(self, *args, **kwargs):
@@ -72,7 +73,7 @@ class SubTask(models.Model):
 
     def clean(self):
         if self.task_id and self.task.project_id is None:
-            raise ValidationError({'task': 'A subtask must belong to a project task.'})
+            raise ValidationError({'task': _('A subtask must belong to a project task.')})
 
     def save(self, *args, **kwargs):
         self.full_clean()

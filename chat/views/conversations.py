@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 
 from ..models import Conversation
 from .common import preview_text
@@ -54,7 +55,7 @@ def conversation_start(request, user_id):
     """Crée ou retrouve une conversation privée puis redirige vers son détail."""
     target = get_object_or_404(User, pk=user_id)
     if target.pk == request.user.pk:
-        return HttpResponseBadRequest("Impossible de démarrer une conversation avec soi-même.")
+        return HttpResponseBadRequest(_("You cannot start a conversation with yourself."))
     conversation = Conversation.objects.get_or_create_private(request.user, target)
     return redirect("chat:conversation_detail", pk=conversation.pk)
 
@@ -64,6 +65,6 @@ def conversation_detail(request, pk):
     """Affiche une conversation après avoir vérifié l'adhésion active de l'utilisateur."""
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
-        return HttpResponseForbidden("Vous n'etes pas membre de cette conversation.")
+        return HttpResponseForbidden(_("You are not a member of this conversation."))
     other_user = conversation.get_members().exclude(pk=request.user.pk).first()
     return render(request, "chat/conversation_detail.html", {"conversation": conversation, "other_user": other_user, "is_invitation": conversation.is_invitation_for(request.user), "active_nav": "messages"})
