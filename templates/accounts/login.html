@@ -1,11 +1,11 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANGUAGE_CODE }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion — Task Manager</title>
+    <title>{% translate "Log in" %} — Task Manager</title>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
 
@@ -25,10 +25,10 @@
             
             <section class="auth-card">
 
-                <p class="eyebrow">Connexion</p>
+                <p class="eyebrow">{% translate "Log in" %}</p>
 
                 <h1 class="auth-card__title">
-                    Se connecter
+                    {% translate "Log in" %}
                 </h1>
 
                 <p class="auth-card__lead">Retrouvez votre espace de travail et reprenez là où vous vous êtes arrêté.</p>
@@ -89,7 +89,7 @@
                         
                         <p class="form-hint form-hint--action">
                             <a href="{% url 'forgot-password' %}" class="auth-link">
-                                Mot de passe oublié ?
+                                {% translate "Forgot your password?" %}
                             </a>
                         </p>
 
@@ -110,9 +110,9 @@
 
                 
                 <p class="auth-card__footer">
-                    Pas encore de compte ?
+                    {% translate "Don't have an account yet?" %}
                     <a href="{% url 'registration' %}" class="auth-link">
-                        S'inscrire
+                        {% translate "Sign up" %}
                     </a>
                 </p>
 
