@@ -21,35 +21,35 @@ msgstr ""
 
 #: accounts/forms.py:30 accounts/forms.py:55
 msgid "Username"
-msgstr ""
+msgstr "Nom d'utilisateur"
 
 #: accounts/forms.py:31
 msgid "Password"
-msgstr ""
+msgstr "Mot de passe"
 
 #: accounts/forms.py:35
 msgid "Verification code"
-msgstr ""
+msgstr "Code de vérification"
 
 #: accounts/forms.py:40
 msgid "The code must contain 6 digits."
-msgstr ""
+msgstr "Le code doit contenir 6 chiffres."
 
 #: accounts/forms.py:45 accounts/forms.py:58
 msgid "Email address"
-msgstr ""
+msgstr "Adresse e-mail"
 
 #: accounts/forms.py:56
 msgid "First name"
-msgstr ""
+msgstr "Prénom"
 
 #: accounts/forms.py:57
 msgid "Last name"
-msgstr ""
+msgstr "Nom"
 
 #: accounts/forms.py:65
 msgid "This email address is already in use."
-msgstr ""
+msgstr "Cette adresse e-mail est déjà utilisée."
 
 #: config/settings.py:123
 msgid "Français"
@@ -61,89 +61,89 @@ msgstr ""
 
 #: projects/forms.py:18
 msgid "Project name"
-msgstr ""
+msgstr "Nom du projet"
 
 #: projects/forms.py:19 tasks/forms.py:39
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #: projects/forms.py:20
 msgid "Planned start date"
-msgstr ""
+msgstr "Date de début prévue"
 
 #: projects/forms.py:21
 msgid "Planned duration (days)"
-msgstr ""
+msgstr "Durée prévue (jours)"
 
 #: projects/forms.py:22
 msgid "Complexity"
-msgstr ""
+msgstr "Complexité"
 
 #: tasks/forms.py:38
 msgid "Task title"
-msgstr ""
+msgstr "Titre de la tâche"
 
 #: tasks/forms.py:40
 msgid "Task status"
-msgstr ""
+msgstr "Statut de la tâche"
 
 #: tasks/forms.py:41
 msgid "Due date"
-msgstr ""
+msgstr "Date d'échéance"
 
 #: tasks/forms.py:50 tasks/forms.py:57
 msgid "Display position"
-msgstr ""
+msgstr "Position d'affichage"
 
 #: tasks/forms.py:56
 msgid "Subtask title"
-msgstr ""
+msgstr "Titre de la sous-tâche"
 
 #: templates/accounts/forgot_password.html:8
 #: templates/accounts/forgot_password.html:26
 msgid "Forgot password"
-msgstr ""
+msgstr "Mot de passe oublié"
 
 #: templates/accounts/forgot_password.html:29
 msgid "Reset your password"
-msgstr ""
+msgstr "Réinitialiser votre mot de passe"
 
 #: templates/accounts/forgot_password.html:68
 msgid "Send code"
-msgstr ""
+msgstr "Envoyer le code"
 
 #: templates/accounts/forgot_password.html:75
 msgid "Back to login"
-msgstr ""
+msgstr "Retour à la connexion"
 
 #: templates/accounts/login.html:8 templates/accounts/login.html:28
 #: templates/accounts/login.html:31 templates/accounts/register.html:149
 msgid "Log in"
-msgstr ""
+msgstr "Connexion"
 
 #: templates/accounts/login.html:92
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Mot de passe oublié ?"
 
 #: templates/accounts/login.html:113
 msgid "Don't have an account yet?"
-msgstr ""
+msgstr "Vous n'avez pas encore de compte ?"
 
 #: templates/accounts/login.html:115 templates/accounts/register.html:26
 msgid "Sign up"
-msgstr ""
+msgstr "Inscription"
 
 #: templates/accounts/register.html:8 templates/accounts/register.html:29
 msgid "Create an account"
-msgstr ""
+msgstr "Créer un compte"
 
 #: templates/accounts/register.html:139
 msgid "Create account"
-msgstr ""
+msgstr "Créer le compte"
 
 #: templates/accounts/register.html:147
 msgid "Already have an account?"
-msgstr ""
+msgstr "Vous avez déjà un compte ?"
 
 #: templates/home.html:9
 msgid "Task Manager — Organisez vos projets et vos tâches"

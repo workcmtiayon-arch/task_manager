@@ -48,48 +48,44 @@ msgid "English"
 msgstr "English"
 
 #: projects/forms.py:18
-#, fuzzy
-#| msgid "Projets"
 msgid "Project name"
-msgstr "Projects"
+msgstr "Project name"
 
 #: projects/forms.py:19 tasks/forms.py:39
-#, fuzzy
-#| msgid "Inscription"
 msgid "Description"
-msgstr "Sign up"
+msgstr "Description"
 
 #: projects/forms.py:20
 msgid "Planned start date"
-msgstr ""
+msgstr "Planned start date"
 
 #: projects/forms.py:21
 msgid "Planned duration (days)"
-msgstr ""
+msgstr "Planned duration (days)"
 
 #: projects/forms.py:22
 msgid "Complexity"
-msgstr ""
+msgstr "Complexity"
 
 #: tasks/forms.py:38
 msgid "Task title"
-msgstr ""
+msgstr "Task title"
 
 #: tasks/forms.py:40
 msgid "Task status"
-msgstr ""
+msgstr "Task status"
 
 #: tasks/forms.py:41
 msgid "Due date"
-msgstr ""
+msgstr "Due date"
 
 #: tasks/forms.py:50 tasks/forms.py:57
 msgid "Display position"
-msgstr ""
+msgstr "Display position"
 
 #: tasks/forms.py:56
 msgid "Subtask title"
-msgstr ""
+msgstr "Subtask title"
 
 #: templates/accounts/forgot_password.html:8
 #: templates/accounts/forgot_password.html:26
