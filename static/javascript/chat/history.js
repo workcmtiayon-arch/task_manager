@@ -27,7 +27,7 @@ export function createHistory(sendEvent) {
     state.isLoadingHistory = true;
     let url = `${config.messagesUrl}?limit=50`;
     if (beforeId) url += `&before=${encodeURIComponent(beforeId)}`;
-    fetch(url).then((response) => { if (!response.ok) throw new Error("Impossible de charger les messages."); return response.json(); }).then((data) => {
+      fetch(url).then((response) => { if (!response.ok) throw new Error(window.taskManagerI18n.cannotLoadMessages); return response.json(); }).then((data) => {
       const messages = data.messages;
       if (!messages.length) { state.hasMoreHistory = false; updateEmptyState(); return; }
       if (messages.length < 50) state.hasMoreHistory = false;
@@ -44,7 +44,7 @@ export function createHistory(sendEvent) {
       }
       state.oldestMessageId = messages[0].id;
       updateEmptyState();
-    }).catch(() => showToast("Impossible de charger les messages.")).finally(() => { state.isLoadingHistory = false; });
+    }).catch(() => showToast(window.taskManagerI18n.cannotLoadMessages)).finally(() => { state.isLoadingHistory = false; });
   }
 
   // Active la pagination quand le lecteur atteint le début de l'historique.
