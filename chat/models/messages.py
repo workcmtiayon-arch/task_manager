@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils import timezone
 
@@ -35,7 +36,7 @@ class Message(models.Model):
     def edit(self, new_content):
         """Modifie le contenu d'un message non supprimé et horodate la modification."""
         if self.is_deleted():
-            raise ValidationError("Impossible de modifier un message supprimé.")
+            raise ValidationError(_("A deleted message cannot be edited."))
         self.content = new_content
         self.edited_at = timezone.now()
         self.save(update_fields=["content", "edited_at", "updated_at"])

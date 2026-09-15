@@ -3,6 +3,7 @@
 import os
 
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 from .messages import Message
@@ -48,9 +49,9 @@ class MessageAttachment(models.Model):
     def clean(self):
         """Valide le type MIME et la taille avant l'enregistrement du fichier."""
         if self.content_type not in self.ALLOWED_CONTENT_TYPES:
-            raise ValidationError(f"Type de fichier non autorisé : {self.content_type}")
+            raise ValidationError(_("File type not allowed: %(content_type)s") % {"content_type": self.content_type})
         if self.file_size > self.MAX_FILE_SIZE:
-            raise ValidationError("Fichier trop volumineux (10 Mo maximum).")
+            raise ValidationError(_("File too large (10 MB maximum)."))
 
     def __str__(self):
         """Retourne le nom original affiché à l'utilisateur."""

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -94,7 +95,7 @@ def task_update_status(request, id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     if request.method == 'POST':
         if task.subtasks.exists():
-            messages.info(request, 'Le statut de cette tâche est géré automatiquement par ses SubTasks.')
+            messages.info(request, _('This task status is managed automatically by its subtasks.'))
             return redirect('project_detail', id=task.project.id)
         status = request.POST.get('status')
         if status in Task.Status.values:
@@ -102,7 +103,7 @@ def task_update_status(request, id):
             try:
                 task.full_clean()
             except ValidationError:
-                messages.error(request, 'La tâche ne peut pas être terminée tant que toutes ses SubTasks ne le sont pas.')
+                messages.error(request, _('The task cannot be completed until all its subtasks are completed.'))
             else:
                 task.save(update_fields=['status', 'updated_at'])
     return redirect('project_detail', id=task.project.id)

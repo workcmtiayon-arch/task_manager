@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
@@ -26,7 +27,7 @@ class Project(models.Model):
     planned_duration_days = models.PositiveIntegerField(
         default=1,
         validators=[MinValueValidator(1)],
-        help_text="Planned duration in calendar days.",
+        help_text=_("Planned duration in calendar days."),
     )
     complexity = models.CharField(
         max_length=10,
@@ -77,4 +78,4 @@ class Project(models.Model):
 
     def clean(self):
         if self.planned_duration_days is not None and self.planned_duration_days < 1:
-            raise ValidationError({'planned_duration_days': 'Duration must be at least one day.'})
+            raise ValidationError({'planned_duration_days': _('Duration must be at least one day.')})
