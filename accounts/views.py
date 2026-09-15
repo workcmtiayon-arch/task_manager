@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
 
@@ -60,10 +61,10 @@ def verify_otp(request):
             if otp and otp.check_email(form.cleaned_data['code']):
                 User.objects.filter(pk=user_id).update(is_active=True, is_email_verified=True)
                 request.session.pop('pending_user_id', None)
-                messages.success(request, "Adresse e-mail verifiee. Vous pouvez vous connecter")
+                messages.success(request, _("Email address verified. You can log in."))
                 return redirect('login')
 
-            error = "Code invalide ou expire"
+            error = _("Invalid or expired code.")
 
     else:
         form=OTPForm()
@@ -80,7 +81,7 @@ def resend_otp(request):
         if user:
             otp, code = EmailOTP.generate_for(user, EmailOTP.Purpose.REGISTER)
             send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.REGISTER)
-    messages.info(request, "Si une demande est en attente, un nouveau code vient d'etre envoye")
+    messages.info(request, _("If a request is pending, a new code has been sent."))
     return redirect('verify-otp')
 
 
@@ -97,7 +98,7 @@ def forgot_password(request):
                 otp, code = EmailOTP.generate_for(user, EmailOTP.Purpose.PASSWORD_RESET)
                 send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.PASSWORD_RESET)
                 request.session['reset_user_id'] = user.id
-                messages.info(request, "Si cette adresse est associee a un compte un code a ete envoye")
+                messages.info(request, _("If this address is associated with an account, a code has been sent."))
             return redirect('verify-reset-otp')
     else:
         form = ForgotPasswordEmailForm()
@@ -126,7 +127,7 @@ def verify_reset_otp(request):
                 request.session['reset_verified_user_id'] = user_id
                 request.session.pop('reset_user_id', None)
                 return redirect('reset-password')
-            error = "Code Invalide ou expire"
+            error = _("Invalid or expired code.")
 
     else:
         form = OTPForm()
@@ -146,7 +147,7 @@ def reset_password(request):
         if form.is_valid():
             form.save()
             request.session.pop('reset_verified_user_id', None)
-            messages.success(request, "Mot de passe reinitialise. Tu peux te connecter...")
+            messages.success(request, _("Password reset. You can log in."))
             return redirect('login')
 
     else:
@@ -261,7 +262,7 @@ def is_platform_admin(user):
 @login_required
 def user_list(request):
     if not is_platform_admin(request.user):
-        return HttpResponseForbidden("Cette page est réservée aux administrateurs.")
+        return HttpResponseForbidden(_("This page is reserved for administrators."))
 
     users = User.objects.all().order_by("-date_joined", "username")
     return render(request, "accounts/user_list.html", {
@@ -273,20 +274,20 @@ def user_list(request):
 @login_required
 def toggle_user_status(request, user_id):
     if not is_platform_admin(request.user):
-        return HttpResponseForbidden("Cette action est réservée aux administrateurs.")
+        return HttpResponseForbidden(_("This action is reserved for administrators."))
     if request.method != "POST":
         return redirect("user_list")
 
     user = get_object_or_404(User, pk=user_id)
     if user.pk == request.user.pk:
-        messages.error(request, "Vous ne pouvez pas désactiver votre propre compte.")
+        messages.error(request, _("You cannot disable your own account."))
     elif user.is_superuser:
-        messages.error(request, "Le compte super-administrateur ne peut pas être modifié ici.")
+        messages.error(request, _("The superuser account cannot be modified here."))
     else:
         user.is_active = not user.is_active
         user.save(update_fields=["is_active"])
-        state = "activé" if user.is_active else "désactivé"
-        messages.success(request, f"Le compte de {user.username} a été {state}.")
+        state = _("enabled") if user.is_active else _("disabled")
+        messages.success(request, _("The account of %(username)s has been %(state)s.") % {"username": user.username, "state": state})
     return redirect("user_list")
 
 
@@ -295,7 +296,7 @@ def profile(request):
     form = ProfileForm(request.POST or None, instance=request.user)
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, "Vos informations de profil ont été mises à jour.")
+        messages.success(request, _("Your profile information has been updated."))
         return redirect("profile")
     return render(request, "profile/profile.html", {"form": form, "active_nav": "profile"})
 
