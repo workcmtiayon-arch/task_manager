@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-15 23:22+0100\n"
+"POT-Creation-Date: 2026-09-15 23:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,12 +51,189 @@ msgstr "Nom"
 msgid "This email address is already in use."
 msgstr "Cette adresse e-mail est déjà utilisée."
 
-#: config/settings.py:123
-msgid "Français"
+#: accounts/models.py:16
+msgid "French"
 msgstr ""
 
-#: config/settings.py:124
+#: accounts/models.py:17 config/settings.py:124
 msgid "English"
+msgstr ""
+
+#: accounts/models.py:20 templates/accounts/user_list.html:45
+msgid "Member"
+msgstr ""
+
+#: accounts/models.py:21 templates/accounts/user_list.html:45
+msgid "Administrator"
+msgstr ""
+
+#: accounts/models.py:38
+msgid "Registration verification"
+msgstr ""
+
+#: accounts/models.py:39 templates/accounts/emails/otp_reset.html:6
+#: templates/accounts/reset_password.html:24
+#: templates/accounts/verify_reset_otp.html:7
+#: templates/accounts/verify_reset_otp.html:16
+#, fuzzy
+#| msgid "Password"
+msgid "Password reset"
+msgstr "Mot de passe"
+
+#: accounts/tasks.py:13
+#, fuzzy
+#| msgid "Verification code"
+msgid "Your Task Manager verification code"
+msgstr "Code de vérification"
+
+#: accounts/tasks.py:18
+msgid "Your Task Manager password reset code"
+msgstr ""
+
+#: accounts/tasks.py:53
+msgid "Task Manager account creation attempt"
+msgstr ""
+
+#: accounts/views.py:64
+msgid "Email address verified. You can log in."
+msgstr ""
+
+#: accounts/views.py:67 accounts/views.py:130
+msgid "Invalid or expired code."
+msgstr ""
+
+#: accounts/views.py:84
+msgid "If a request is pending, a new code has been sent."
+msgstr ""
+
+#: accounts/views.py:101
+msgid "If this address is associated with an account, a code has been sent."
+msgstr ""
+
+#: accounts/views.py:150
+msgid "Password reset. You can log in."
+msgstr ""
+
+#: accounts/views.py:265 accounts/views.py:307
+msgid "This page is reserved for administrators."
+msgstr ""
+
+#: accounts/views.py:277
+msgid "This action is reserved for administrators."
+msgstr ""
+
+#: accounts/views.py:283
+msgid "You cannot disable your own account."
+msgstr ""
+
+#: accounts/views.py:285
+msgid "The superuser account cannot be modified here."
+msgstr ""
+
+#: accounts/views.py:289
+msgid "enabled"
+msgstr ""
+
+#: accounts/views.py:289
+msgid "disabled"
+msgstr ""
+
+#: accounts/views.py:290
+#, python-format
+msgid "The account of %(username)s has been %(state)s."
+msgstr ""
+
+#: accounts/views.py:299
+msgid "Your profile information has been updated."
+msgstr ""
+
+#: chat/models/attachments.py:52
+#, python-format
+msgid "File type not allowed: %(content_type)s"
+msgstr ""
+
+#: chat/models/attachments.py:54 chat/views/messages.py:70
+msgid "File too large (10 MB maximum)."
+msgstr ""
+
+#: chat/models/conversations.py:71
+#, fuzzy
+#| msgid "Create account"
+msgid "Private conversation"
+msgstr "Créer le compte"
+
+#: chat/models/messages.py:18
+msgid "Text"
+msgstr ""
+
+#: chat/models/messages.py:19
+msgid "Attachment"
+msgstr ""
+
+#: chat/models/messages.py:39
+msgid "A deleted message cannot be edited."
+msgstr ""
+
+#: chat/models/messages.py:118
+msgid "like"
+msgstr ""
+
+#: chat/models/messages.py:119
+msgid "love"
+msgstr ""
+
+#: chat/models/messages.py:120
+msgid "laugh"
+msgstr ""
+
+#: chat/models/messages.py:121
+msgid "wow"
+msgstr ""
+
+#: chat/models/messages.py:122
+msgid "sad"
+msgstr ""
+
+#: chat/models/messages.py:123
+msgid "angry"
+msgstr ""
+
+#: chat/views/conversations.py:58
+msgid "You cannot start a conversation with yourself."
+msgstr ""
+
+#: chat/views/conversations.py:68 chat/views/messages.py:20
+#: chat/views/messages.py:40 chat/views/messages.py:63
+#: chat/views/messages.py:90 chat/views/reactions.py:18
+msgid "You are not a member of this conversation."
+msgstr ""
+
+#: chat/views/messages.py:24
+msgid "The limit must be an integer."
+msgstr ""
+
+#: chat/views/messages.py:43
+msgid "The message cannot be empty."
+msgstr ""
+
+#: chat/views/messages.py:45
+msgid "Message too long (4000 characters maximum)."
+msgstr ""
+
+#: chat/views/messages.py:66
+msgid "No file received."
+msgstr ""
+
+#: chat/views/messages.py:68
+msgid "File type not allowed (images, PDF or TXT only)."
+msgstr ""
+
+#: chat/views/reactions.py:26
+msgid "Invalid reaction."
+msgstr ""
+
+#: config/settings.py:123
+msgid "Français"
 msgstr ""
 
 #: projects/forms.py:18
@@ -79,6 +256,55 @@ msgstr "Durée prévue (jours)"
 msgid "Complexity"
 msgstr "Complexité"
 
+#: projects/models.py:13
+msgid "Low"
+msgstr ""
+
+#: projects/models.py:14
+msgid "Medium"
+msgstr ""
+
+#: projects/models.py:15
+msgid "High"
+msgstr ""
+
+#: projects/models.py:18 templates/projects/project_detail.html:27
+msgid "Upcoming"
+msgstr ""
+
+#: projects/models.py:19 tasks/models.py:15 templates/accounts/login.html:177
+#: templates/accounts/register.html:211
+#: templates/projects/project_detail.html:27
+#: templates/projects/project_detail.html:165 templates/tasks/task_list.html:29
+#: templates/tasks/task_list.html:48
+msgid "In progress"
+msgstr ""
+
+#: projects/models.py:20 templates/projects/project_detail.html:27
+#: templates/projects/project_detail.html:154
+msgid "Overdue"
+msgstr ""
+
+#: projects/models.py:21 tasks/models.py:16 tasks/models.py:55
+#: templates/accounts/login.html:183 templates/accounts/register.html:217
+#: templates/projects/project_detail.html:27
+#: templates/projects/project_detail.html:166 templates/tasks/task_list.html:30
+#: templates/tasks/task_list.html:46
+#, fuzzy
+#| msgid "Complexity"
+msgid "Completed"
+msgstr "Complexité"
+
+#: projects/models.py:30
+#, fuzzy
+#| msgid "Planned duration (days)"
+msgid "Planned duration in calendar days."
+msgstr "Durée prévue (jours)"
+
+#: projects/models.py:81
+msgid "Duration must be at least one day."
+msgstr ""
+
 #: tasks/forms.py:38
 msgid "Task title"
 msgstr "Titre de la tâche"
@@ -99,6 +325,39 @@ msgstr "Position d'affichage"
 msgid "Subtask title"
 msgstr "Titre de la sous-tâche"
 
+#: tasks/models.py:14 templates/accounts/login.html:171
+#: templates/accounts/register.html:205
+#: templates/projects/project_detail.html:164 templates/tasks/task_list.html:28
+#: templates/tasks/task_list.html:50
+msgid "To do"
+msgstr ""
+
+#: tasks/models.py:34
+msgid "The status is managed automatically by subtasks."
+msgstr ""
+
+#: tasks/models.py:54
+#, fuzzy
+#| msgid "Complexity"
+msgid "Not completed"
+msgstr "Complexité"
+
+#: tasks/models.py:76
+msgid "A subtask must belong to a project task."
+msgstr ""
+
+#: tasks/tasks.py:44
+msgid "Your tasks for today"
+msgstr ""
+
+#: tasks/views.py:98
+msgid "This task status is managed automatically by its subtasks."
+msgstr ""
+
+#: tasks/views.py:106
+msgid "The task cannot be completed until all its subtasks are completed."
+msgstr ""
+
 #: templates/accounts/dashboard.html:15
 msgid "Hello"
 msgstr ""
@@ -112,6 +371,8 @@ msgid "Key metrics"
 msgstr ""
 
 #: templates/accounts/dashboard.html:24 templates/accounts/dashboard.html:81
+#: templates/accounts/user_list.html:4 templates/accounts/user_list.html:5
+#: templates/base.html:100
 #, fuzzy
 #| msgid "Username"
 msgid "Users"
@@ -159,23 +420,29 @@ msgstr ""
 msgid "Find your essential workspaces."
 msgstr ""
 
-#: templates/accounts/dashboard.html:78 templates/projects/project_list.html:27
+#: templates/accounts/dashboard.html:78 templates/accounts/login.html:140
+#: templates/accounts/register.html:174 templates/base.html:49
+#: templates/projects/project_list.html:27
 #, fuzzy
 #| msgid "Project name"
 msgid "Projects"
 msgstr "Nom du projet"
 
-#: templates/accounts/dashboard.html:79 templates/projects/project_list.html:28
+#: templates/accounts/dashboard.html:79 templates/accounts/login.html:145
+#: templates/accounts/register.html:179 templates/base.html:63
+#: templates/projects/project_detail.html:112
+#: templates/projects/project_list.html:28
 #, fuzzy
 #| msgid "Task status"
 msgid "Tasks"
 msgstr "Statut de la tâche"
 
-#: templates/accounts/dashboard.html:80
+#: templates/accounts/dashboard.html:80 templates/base.html:75
 msgid "Messages"
 msgstr ""
 
-#: templates/accounts/dashboard.html:88
+#: templates/accounts/dashboard.html:88 templates/base.html:190
+#: templates/projects/project_detail.html:192
 #: templates/projects/project_list.html:127
 msgid "Close"
 msgstr ""
@@ -207,10 +474,102 @@ msgstr ""
 msgid "Create project"
 msgstr ""
 
-#: templates/accounts/dashboard.html:103 templates/profile/profile.html:22
+#: templates/accounts/dashboard.html:103 templates/base.html:186
+#: templates/profile/profile.html:22
+#: templates/projects/confirm_supp_project.html:24
 #: templates/projects/project_form.html:90 templates/tasks/subtask_form.html:25
 #: templates/tasks/task_form.html:102
 msgid "Cancel"
+msgstr ""
+
+#: templates/accounts/emails/otp_register.html:6
+#, fuzzy
+#| msgid "Email address"
+msgid "Verify your email address"
+msgstr "Adresse e-mail"
+
+#: templates/accounts/emails/otp_register.html:7
+#, python-format
+msgid "Hello %(username)s, use the code below to activate your account."
+msgstr ""
+
+#: templates/accounts/emails/otp_register.html:9
+msgid "This code is temporary. If you did not request it, ignore this email."
+msgstr ""
+
+#: templates/accounts/emails/otp_register.txt:1
+#: templates/accounts/emails/otp_reset.txt:1
+#: templates/tasks/emails/daily_reminder.txt:1
+#, python-format
+msgid "Hello %(username)s,"
+msgstr ""
+
+#: templates/accounts/emails/otp_register.txt:2
+msgid "Here is your Task Manager verification code:"
+msgstr ""
+
+#: templates/accounts/emails/otp_register.txt:4
+#: templates/accounts/emails/otp_reset.txt:4
+msgid "This code expires in a few minutes and can only be used once."
+msgstr ""
+
+#: templates/accounts/emails/otp_register.txt:5
+msgid "If you did not initiate this registration, ignore this email."
+msgstr ""
+
+#: templates/accounts/emails/otp_reset.html:7
+#, python-format
+msgid "Hello %(username)s, use this code to set a new password."
+msgstr ""
+
+#: templates/accounts/emails/otp_reset.html:9
+msgid ""
+"If you did not request this reset, your account remains protected: simply "
+"ignore this message."
+msgstr ""
+
+#: templates/accounts/emails/otp_reset.txt:2
+msgid "Here is your Task Manager password reset code:"
+msgstr ""
+
+#: templates/accounts/emails/otp_reset.txt:5
+msgid ""
+"If you did not request this, ignore this email: your current password will "
+"remain unchanged."
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.html:6
+msgid "Account creation request"
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.html:7
+msgid "An account creation attempt was made with this email address."
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.html:8
+msgid ""
+"If you did not perform this action, no changes were made to your account."
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.txt:1
+#: templates/accounts/emails/registration_alert.txt:6
+msgid "Task Manager team"
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.txt:2
+msgid "Hello,"
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.txt:3
+msgid ""
+"Someone tried to create a Task Manager account with this email address, "
+"which is already associated with an existing account."
+msgstr ""
+
+#: templates/accounts/emails/registration_alert.txt:4
+msgid ""
+"If this was not you, no action is needed. If you forgot your credentials, "
+"use the password reset feature from the login page."
 msgstr ""
 
 #: templates/accounts/forgot_password.html:8
@@ -227,6 +586,7 @@ msgid "Send code"
 msgstr "Envoyer le code"
 
 #: templates/accounts/forgot_password.html:75
+#: templates/accounts/reset_password.html:54
 msgid "Back to login"
 msgstr "Retour à la connexion"
 
@@ -234,6 +594,10 @@ msgstr "Retour à la connexion"
 #: templates/accounts/login.html:31 templates/accounts/register.html:149
 msgid "Log in"
 msgstr "Connexion"
+
+#: templates/accounts/login.html:34
+msgid "Find your workspace and pick up where you left off."
+msgstr ""
 
 #: templates/accounts/login.html:92
 msgid "Forgot your password?"
@@ -247,9 +611,33 @@ msgstr "Vous n'avez pas encore de compte ?"
 msgid "Sign up"
 msgstr "Inscription"
 
+#: templates/accounts/login.html:150 templates/accounts/register.html:184
+#: templates/projects/project_detail.html:79
+#: templates/projects/project_list.html:92
+msgid "Progress"
+msgstr ""
+
+#: templates/accounts/login.html:170 templates/accounts/register.html:204
+#: templates/projects/project_form.html:12
+#: templates/projects/project_list.html:120
+msgid "Create a project"
+msgstr ""
+
+#: templates/accounts/login.html:176 templates/accounts/register.html:210
+msgid "Develop a task"
+msgstr ""
+
+#: templates/accounts/login.html:182 templates/accounts/register.html:216
+msgid "Test the application"
+msgstr ""
+
 #: templates/accounts/register.html:8 templates/accounts/register.html:29
 msgid "Create an account"
 msgstr "Créer un compte"
+
+#: templates/accounts/register.html:32
+msgid "A simple space to organize your projects, tasks and progress."
+msgstr ""
 
 #: templates/accounts/register.html:139
 msgid "Create account"
@@ -259,7 +647,165 @@ msgstr "Créer le compte"
 msgid "Already have an account?"
 msgstr "Vous avez déjà un compte ?"
 
-#: templates/ai/assistant_workspace.html:7
+#: templates/accounts/reset_password.html:8
+#, fuzzy
+#| msgid "Password"
+msgid "New password"
+msgstr "Mot de passe"
+
+#: templates/accounts/reset_password.html:26
+#, fuzzy
+#| msgid "Reset your password"
+msgid "Set a new password"
+msgstr "Réinitialiser votre mot de passe"
+
+#: templates/accounts/reset_password.html:28
+msgid ""
+"Choose a long and secure password. It must contain at least 8 characters."
+msgstr ""
+
+#: templates/accounts/reset_password.html:51
+msgid "Confirm"
+msgstr ""
+
+#: templates/accounts/system_settings.html:4 templates/base.html:111
+msgid "Settings"
+msgstr ""
+
+#: templates/accounts/system_settings.html:5
+msgid "System settings"
+msgstr ""
+
+#: templates/accounts/system_settings.html:6
+msgid "Global platform settings."
+msgstr ""
+
+#: templates/accounts/system_settings.html:15
+msgid "A settings area is being prepared."
+msgstr ""
+
+#: templates/accounts/system_settings.html:16
+msgid ""
+"We are preparing a clear and reliable interface for platform settings. This "
+"feature will be available soon."
+msgstr ""
+
+#: templates/accounts/system_settings.html:17
+#, fuzzy
+#| msgid "Back to login"
+msgid "Back to dashboard"
+msgstr "Retour à la connexion"
+
+#: templates/accounts/user_list.html:6
+msgid "Manage access to platform accounts."
+msgstr ""
+
+#: templates/accounts/user_list.html:15
+#, fuzzy
+#| msgid "Create account"
+msgid "User accounts"
+msgstr "Créer le compte"
+
+#: templates/accounts/user_list.html:16
+#, python-format
+msgid "%(count)s user listed."
+msgid_plural "%(count)s users listed."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: templates/accounts/user_list.html:20
+msgid "Search by name, email or role…"
+msgstr ""
+
+#: templates/accounts/user_list.html:29
+#, fuzzy
+#| msgid "Username"
+msgid "User"
+msgstr "Nom d'utilisateur"
+
+#: templates/accounts/user_list.html:30
+msgid "Role"
+msgstr ""
+
+#: templates/accounts/user_list.html:31
+msgid "Joined"
+msgstr ""
+
+#: templates/accounts/user_list.html:32
+msgid "Status"
+msgstr ""
+
+#: templates/accounts/user_list.html:33
+msgid "Action"
+msgstr ""
+
+#: templates/accounts/user_list.html:48
+msgid "Active"
+msgstr ""
+
+#: templates/accounts/user_list.html:48
+msgid "Disabled"
+msgstr ""
+
+#: templates/accounts/user_list.html:52
+#, fuzzy
+#| msgid "Create account"
+msgid "Your account"
+msgstr "Créer le compte"
+
+#: templates/accounts/user_list.html:54
+msgid "Protected"
+msgstr ""
+
+#: templates/accounts/user_list.html:59
+msgid "Disable"
+msgstr ""
+
+#: templates/accounts/user_list.html:61
+msgid "Enable"
+msgstr ""
+
+#: templates/accounts/user_list.html:68
+msgid "No users to display."
+msgstr ""
+
+#: templates/accounts/user_list.html:70
+msgid "No users match your search."
+msgstr ""
+
+#: templates/accounts/verify_otp.html:9
+msgid "Verify your email"
+msgstr ""
+
+#: templates/accounts/verify_otp.html:17
+#, fuzzy
+#| msgid "Verification code"
+msgid "Verification"
+msgstr "Code de vérification"
+
+#: templates/accounts/verify_otp.html:18
+#: templates/accounts/verify_reset_otp.html:19
+msgid "Enter the code sent by email"
+msgstr ""
+
+#: templates/accounts/verify_otp.html:20
+#: templates/accounts/verify_reset_otp.html:23
+msgid ""
+"A 6-digit code was sent to your email address. It expires in a few minutes."
+msgstr ""
+
+#: templates/accounts/verify_otp.html:41
+msgid "Didn't receive anything?"
+msgstr ""
+
+#: templates/accounts/verify_otp.html:42
+#, fuzzy
+#| msgid "Send code"
+msgid "Resend code"
+msgstr "Envoyer le code"
+
+#: templates/ai/assistant_workspace.html:7 templates/base.html:86
 msgid "AI assistant"
 msgstr ""
 
@@ -308,15 +854,106 @@ msgstr ""
 msgid "Send"
 msgstr "Envoyer le code"
 
+#: templates/base.html:25
+msgid "Main navigation"
+msgstr ""
+
+#: templates/base.html:26
+msgid "Navigation"
+msgstr ""
+
+#: templates/base.html:38
+msgid "Dashboard"
+msgstr ""
+
+#: templates/base.html:91
+msgid "Administration"
+msgstr ""
+
+#: templates/base.html:141
+msgid "Close menu"
+msgstr ""
+
+#: templates/base.html:146
+msgid "Open menu"
+msgstr ""
+
+#: templates/base.html:158
+msgid "Edit my profile"
+msgstr ""
+
+#: templates/base.html:183
+msgid "Confirm logout"
+msgstr ""
+
+#: templates/base.html:184
+msgid ""
+"Are you sure you want to log out? Your session will be closed. You can "
+"cancel to stay signed in."
+msgstr ""
+
+#: templates/base.html:187
+#, fuzzy
+#| msgid "Log in"
+msgid "Log out"
+msgstr "Connexion"
+
+#: templates/base.html:207
+msgid "Checking status…"
+msgstr ""
+
+#: templates/base.html:208
+msgid "Status unavailable"
+msgstr ""
+
+#: templates/base.html:209
+msgid "Online"
+msgstr ""
+
+#: templates/base.html:210 templates/chat/conversation_detail.html:32
+msgid "Offline"
+msgstr ""
+
+#: templates/base.html:211
+msgid "An unexpected error occurred."
+msgstr ""
+
+#: templates/base.html:212
+msgid "Unable to load messages."
+msgstr ""
+
+#: templates/base.html:213
+msgid "Delete this message?"
+msgstr ""
+
+#: templates/base.html:214
+msgid "Message deleted"
+msgstr ""
+
+#: templates/base.html:215
+msgid "edited"
+msgstr ""
+
+#: templates/base.html:216 templates/projects/project_detail.html:173
+#: templates/projects/project_list.html:60
+msgid "Edit"
+msgstr ""
+
+#: templates/base.html:217 templates/projects/project_detail.html:178
+#: templates/projects/project_list.html:65 templates/tasks/task_detail.html:50
+msgid "Delete"
+msgstr ""
+
+#: templates/base.html:218
+msgid "React with"
+msgstr ""
+
 #: templates/chat/conversation_detail.html:28
+#: templates/chat/invitations_list.html:32
 #, fuzzy
 #| msgid "Back to login"
 msgid "Back to conversations"
 msgstr "Retour à la connexion"
-
-#: templates/chat/conversation_detail.html:32
-msgid "Offline"
-msgstr ""
 
 #: templates/chat/conversation_detail.html:38
 msgid "New invitation from"
@@ -343,6 +980,7 @@ msgid "Write a message..."
 msgstr ""
 
 #: templates/chat/conversation_list.html:9
+#: templates/chat/invitations_list.html:8 templates/chat/user_search.html:8
 msgid "Conversations"
 msgstr ""
 
@@ -366,8 +1004,32 @@ msgstr ""
 msgid "Start a new one to begin chatting."
 msgstr ""
 
-#: templates/chat/conversation_list.html:45
+#: templates/chat/conversation_list.html:45 templates/chat/user_search.html:11
 msgid "Find a user"
+msgstr ""
+
+#: templates/chat/invitations_list.html:11
+#, fuzzy
+#| msgid "Create account"
+msgid "Message invitations"
+msgstr "Créer le compte"
+
+#: templates/chat/invitations_list.html:23
+msgid "View"
+msgstr ""
+
+#: templates/chat/invitations_list.html:30
+msgid "No pending invitations"
+msgstr ""
+
+#: templates/chat/invitations_list.html:31
+msgid ""
+"New messages from people you do not have a conversation with yet will appear "
+"here."
+msgstr ""
+
+#: templates/chat/user_search.html:17
+msgid "Search by username..."
 msgstr ""
 
 #: templates/home.html:9
@@ -597,15 +1259,67 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
+#: templates/projects/confirm_supp_project.html:8
+#: templates/projects/confirm_supp_project.html:9
+#: templates/projects/project_list.html:65
+msgid "Delete project"
+msgstr ""
+
+#: templates/projects/confirm_supp_project.html:10
+#: templates/tasks/confirm_suppr_task.html:9
+msgid "This action cannot be undone."
+msgstr ""
+
+#: templates/projects/confirm_supp_project.html:13
+#: templates/projects/project_detail.html:13
+#: templates/projects/project_form.html:22
+msgid "Back to projects"
+msgstr ""
+
+#: templates/projects/confirm_supp_project.html:18
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: templates/projects/confirm_supp_project.html:18
+msgid "The project and all its tasks will be permanently deleted."
+msgstr ""
+
+#: templates/projects/confirm_supp_project.html:23
+msgid "Yes, delete"
+msgstr ""
+
+#: templates/projects/project_detail.html:10
+msgid "Project and task details."
+msgstr ""
+
+#: templates/projects/project_detail.html:33
+msgid "Add a task"
+msgstr ""
+
+#: templates/projects/project_detail.html:159
+msgid "Automatic status"
+msgstr ""
+
+#: templates/projects/project_detail.html:173
+#: templates/tasks/task_detail.html:19 templates/tasks/task_form.html:9
+#: templates/tasks/task_form.html:12
+msgid "Edit task"
+msgstr ""
+
+#: templates/projects/project_detail.html:178
+#: templates/tasks/confirm_suppr_task.html:7
+#: templates/tasks/confirm_suppr_task.html:8
+msgid "Delete task"
+msgstr ""
+
+#: templates/projects/project_detail.html:186
+msgid "No tasks in this project yet."
+msgstr ""
+
 #: templates/projects/project_form.html:9
 #: templates/projects/project_form.html:12
 #: templates/projects/project_list.html:60
 msgid "Edit project"
-msgstr ""
-
-#: templates/projects/project_form.html:12
-#: templates/projects/project_list.html:120
-msgid "Create a project"
 msgstr ""
 
 #: templates/projects/project_form.html:15
@@ -618,10 +1332,6 @@ msgstr ""
 
 #: templates/projects/project_form.html:20
 msgid "Back to project"
-msgstr ""
-
-#: templates/projects/project_form.html:22
-msgid "Back to projects"
 msgstr ""
 
 #: templates/projects/project_form.html:60
@@ -671,22 +1381,6 @@ msgstr ""
 msgid "Upcoming projects"
 msgstr ""
 
-#: templates/projects/project_list.html:60
-msgid "Edit"
-msgstr ""
-
-#: templates/projects/project_list.html:65
-msgid "Delete project"
-msgstr ""
-
-#: templates/projects/project_list.html:65
-msgid "Delete"
-msgstr ""
-
-#: templates/projects/project_list.html:92
-msgid "Progress"
-msgstr ""
-
 #: templates/projects/project_list.html:99
 msgid "No tasks added yet."
 msgstr ""
@@ -703,11 +1397,15 @@ msgstr ""
 msgid "Create your first project to start organizing your tasks."
 msgstr ""
 
+#: templates/tasks/emails/daily_reminder.txt:3
+msgid "Here are your pending tasks:"
+msgstr ""
+
 #: templates/tasks/subtask_form.html:5
 msgid "New subtask"
 msgstr ""
 
-#: templates/tasks/subtask_form.html:6
+#: templates/tasks/subtask_form.html:6 templates/tasks/task_detail.html:36
 msgid "Add a subtask"
 msgstr ""
 
@@ -724,8 +1422,44 @@ msgstr ""
 msgid "Create subtask"
 msgstr ""
 
-#: templates/tasks/task_form.html:9 templates/tasks/task_form.html:12
-msgid "Edit task"
+#: templates/tasks/task_detail.html:7
+msgid "Task and subtask details."
+msgstr ""
+
+#: templates/tasks/task_detail.html:10 templates/tasks/task_form.html:22
+msgid "Back to tasks"
+msgstr ""
+
+#: templates/tasks/task_detail.html:33
+#, fuzzy
+#| msgid "Subtask title"
+msgid "Subtasks"
+msgstr "Titre de la sous-tâche"
+
+#: templates/tasks/task_detail.html:34
+msgid "Break this task into simple steps."
+msgstr ""
+
+#: templates/tasks/task_detail.html:44
+msgid "Uncheck"
+msgstr ""
+
+#: templates/tasks/task_detail.html:44
+#, fuzzy
+#| msgid "Complexity"
+msgid "Complete"
+msgstr "Complexité"
+
+#: templates/tasks/task_detail.html:50
+msgid "Delete subtask"
+msgstr ""
+
+#: templates/tasks/task_detail.html:55
+msgid "No subtasks yet."
+msgstr ""
+
+#: templates/tasks/task_detail.html:56
+msgid "Add the first subtask"
 msgstr ""
 
 #: templates/tasks/task_form.html:9
@@ -742,10 +1476,6 @@ msgstr ""
 
 #: templates/tasks/task_form.html:15
 msgid "Add a task to one of your projects."
-msgstr ""
-
-#: templates/tasks/task_form.html:22
-msgid "Back to tasks"
 msgstr ""
 
 #: templates/tasks/task_form.html:46
@@ -787,20 +1517,6 @@ msgstr "Statut de la tâche"
 #: templates/tasks/task_list.html:27
 msgid "Total"
 msgstr ""
-
-#: templates/tasks/task_list.html:28 templates/tasks/task_list.html:50
-msgid "To do"
-msgstr ""
-
-#: templates/tasks/task_list.html:29 templates/tasks/task_list.html:48
-msgid "In progress"
-msgstr ""
-
-#: templates/tasks/task_list.html:30 templates/tasks/task_list.html:46
-#, fuzzy
-#| msgid "Complexity"
-msgid "Completed"
-msgstr "Complexité"
 
 #: templates/tasks/task_list.html:36
 #, fuzzy
