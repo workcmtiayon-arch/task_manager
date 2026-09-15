@@ -31,7 +31,7 @@
                     {% translate "Log in" %}
                 </h1>
 
-                <p class="auth-card__lead">Retrouvez votre espace de travail et reprenez là où vous vous êtes arrêté.</p>
+                <p class="auth-card__lead">{% translate "Find your workspace and pick up where you left off." %}</p>
 
                 {% if form.non_field_errors %}
                 <div class="form-alert" role="alert">
@@ -137,17 +137,17 @@
 
                         <li class="auth-side__item">
                             <span class="auth-side__icon">&#9635;</span>
-                            <span>Projets</span>
+                            <span>{% translate "Projects" %}</span>
                         </li>
 
                         <li class="auth-side__item">
                             <span class="auth-side__icon">&#10003;</span>
-                            <span>Tâches</span>
+                            <span>{% translate "Tasks" %}</span>
                         </li>
 
                         <li class="auth-side__item">
                             <span class="auth-side__icon">&#8635;</span>
-                            <span>Progression</span>
+                            <span>{% translate "Progress" %}</span>
                         </li>
 
                     </ul>
@@ -167,20 +167,20 @@
 
                             <div class="mock-task">
                                 <span class="mock-task__dot mock-task__dot--todo"></span>
-                                <span>Créer un projet</span>
-                                <span class="badge badge--todo">À faire</span>
+                                <span>{% translate "Create a project" %}</span>
+                                <span class="badge badge--todo">{% translate "To do" %}</span>
                             </div>
 
                             <div class="mock-task">
                                 <span class="mock-task__dot mock-task__dot--progress"></span>
-                                <span>Développer une tâche</span>
-                                <span class="badge badge--progress">En cours</span>
+                                <span>{% translate "Develop a task" %}</span>
+                                <span class="badge badge--progress">{% translate "In progress" %}</span>
                             </div>
 
                             <div class="mock-task">
                                 <span class="mock-task__dot mock-task__dot--done"></span>
-                                <span>Tester l'application</span>
-                                <span class="badge badge--done">Terminé</span>
+                                <span>{% translate "Test the application" %}</span>
+                                <span class="badge badge--done">{% translate "Completed" %}</span>
                             </div>
 
                         </div>
