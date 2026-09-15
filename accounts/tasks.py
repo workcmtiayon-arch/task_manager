@@ -3,18 +3,19 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 
 User = get_user_model()
 
 
 OTP_EMAIL_CONTEXT = {
     "REGISTER": {
-        "subject": "Votre code de verification Task Manager",
+        "subject": _("Your Task Manager verification code"),
         "text_template": "accounts/emails/otp_register.txt",
         "html_template": "accounts/emails/otp_register.html",
     },
     "PASSWORD_RESET": {
-        "subject": "Votre code de Reinitialisation Task Manager",
+        "subject": _("Your Task Manager password reset code"),
         "text_template": "accounts/emails/otp_reset.txt",
         "html_template": "accounts/emails/otp_reset.html",
     },
@@ -49,7 +50,7 @@ def send_registration_alert_email_task(email):
     message = render_to_string("accounts/emails/registration_alert.txt", context)
     html_message = render_to_string("accounts/emails/registration_alert.html", context)
     email_message = EmailMultiAlternatives(
-        subject="Tentative de creation de compte Task Manager",
+        subject=_("Task Manager account creation attempt"),
         body=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[email],

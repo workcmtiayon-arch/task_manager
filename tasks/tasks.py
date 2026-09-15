@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 
 from .models import Task
 
@@ -40,7 +41,7 @@ def send_reminder_email_task(self, user_id, task_ids):
     message = render_to_string("tasks/emails/daily_reminder.txt", {"username": user.username, "tasks": tasks})
     try:
         send_mail(
-            subject="Vos tâches du jour",
+            subject=_("Your tasks for today"),
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
