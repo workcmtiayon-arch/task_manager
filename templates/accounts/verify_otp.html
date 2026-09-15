@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,
 initial-scale=1.0">
-    <title>Vérifiez votre e-mail — Task Manager</title>
+    <title>{% translate "Verify your email" %} — Task Manager</title>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
 
@@ -14,11 +14,10 @@ initial-scale=1.0">
     <main class="auth">
         <div class="auth__inner">
             <section class="auth-card auth-card--compact">
-                <p class="eyebrow">Vérification</p>
-                <h1 class="auth-card__title">Entrez le code reçu par e-mail</h1>
+                <p class="eyebrow">{% translate "Verification" %}</p>
+                <h1 class="auth-card__title">{% translate "Enter the code sent by email" %}</h1>
                 <p class="auth-card__text">
-                    Un code à 6 chiffres a été envoyé à votre adresse e-mail.
-                    Il expire dans quelques minutes.
+                    {% translate "A 6-digit code was sent to your email address. It expires in a few minutes." %}
                 </p>
                 {% if error %}
                 <div class="form-alert" role="alert">
@@ -39,8 +38,8 @@ initial-scale=1.0">
                     <input type="hidden" name="code" id="id_code">
                 </form>
                 <p class="auth-card__footer">
-                    Vous n'avez rien reçu ?
-                    <a href="{% url 'resend-otp' %}" class="auth-link">Renvoyer le code</a>
+                    {% translate "Didn't receive anything?" %}
+                    <a href="{% url 'resend-otp' %}" class="auth-link">{% translate "Resend code" %}</a>
                 </p>
             </section>
         </div>

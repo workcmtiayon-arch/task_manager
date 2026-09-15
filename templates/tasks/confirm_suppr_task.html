@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block extra_css %} <link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
-{% block title %}Supprimer la tâche — TaskFlow{% endblock %}
-{% block page_title %}Supprimer la tâche{% endblock %}
-{% block page_subtitle %}Cette action est irréversible.{% endblock %}
+{% block title %}{% translate "Delete task" %} — TaskFlow{% endblock %}
+{% block page_title %}{% translate "Delete task" %}{% endblock %}
+{% block page_subtitle %}{% translate "This action cannot be undone." %}{% endblock %}
 
 {% block content %} <a href="{% url 'project_detail' task.project.id %}" class="back-link">
 ← Retour au projet </a>

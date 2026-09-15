@@ -1,27 +1,27 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
-{% block title %}Supprimer le projet — TaskFlow{% endblock %}
-{% block page_title %}Supprimer le projet{% endblock %}
-{% block page_subtitle %}Cette action est irréversible.{% endblock %}
+{% block title %}{% translate "Delete project" %} — TaskFlow{% endblock %}
+{% block page_title %}{% translate "Delete project" %}{% endblock %}
+{% block page_subtitle %}{% translate "This action cannot be undone." %}{% endblock %}
 
 {% block content %}
-    <a href="{% url 'project_list'%}" class="back-link">&#8592; Retour aux projets</a>
+    <a href="{% url 'project_list'%}" class="back-link">&#8592; {% translate "Back to projects" %}</a>
 
     <div class="card form-card">
         <div class="form-card__body">
             <div class="form-alert" role="alert">
-                <p>Voulez-vous vraiment supprimer <strong>{{ project.name }}</strong> ? Le projet et toutes ses tâches seront supprimés définitivement.</p>
+                <p>{% translate "Are you sure you want to delete" %} <strong>{{ project.name }}</strong> ? {% translate "The project and all its tasks will be permanently deleted." %}</p>
             </div>
 
             <form method="post" class="form-actions">
                 {% csrf_token %}
-                <button type="submit" class="btn btn--danger">Oui, supprimer</button>
-                <a href="{% url 'project_list' %}" class="btn btn--outline">Annuler</a>
+                <button type="submit" class="btn btn--danger">{% translate "Yes, delete" %}</button>
+                <a href="{% url 'project_list' %}" class="btn btn--outline">{% translate "Cancel" %}</a>
             </form>
         </div>
     </div>
