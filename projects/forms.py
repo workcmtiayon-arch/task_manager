@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import Project
 
@@ -14,11 +15,11 @@ class ProjectForm(forms.ModelForm):
             'complexity',
         ]
         labels = {
-            'name': 'Project name',
-            'description': 'Description',
-            'planned_start_date': 'Planned start date',
-            'planned_duration_days': 'Planned duration (days)',
-            'complexity': 'Complexity',
+            'name': _('Project name'),
+            'description': _('Description'),
+            'planned_start_date': _('Planned start date'),
+            'planned_duration_days': _('Planned duration (days)'),
+            'complexity': _('Complexity'),
         }
         widgets = {
             'planned_start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
