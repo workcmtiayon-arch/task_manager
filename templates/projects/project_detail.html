@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/projects.css' %}">
@@ -7,10 +7,10 @@
 
 {% block title %}{{ project.name }} — TaskFlow{% endblock %}
 {% block page_title %}{{ project.name }}{% endblock %}
-{% block page_subtitle %}Détails du projet et de ses tâches.{% endblock %}
+{% block page_subtitle %}{% translate "Project and task details." %}{% endblock %}
 
 {% block content %}
-<a href="{% url 'project_list' %}" class="back-link">&#8592; Retour aux projets</a>
+<a href="{% url 'project_list' %}" class="back-link">&#8592; {% translate "Back to projects" %}</a>
 
 <div class="card detail-card">
     <div class="detail-card__header">
@@ -24,13 +24,13 @@
                 <h2 class="detail-card__title">{{ project.name }}</h2>
                 <p class="detail-card__description">{{ project.description }}</p>
                 <p class="project-status project-status--{{ project.display_status|lower }}">
-                    {% if project.display_status == 'UPCOMING' %}À venir{% elif project.display_status == 'IN_PROGRESS' %}En cours{% elif project.display_status == 'OVERDUE' %}En retard{% else %}Terminé{% endif %}
+            {% if project.display_status == 'UPCOMING' %}{% translate "Upcoming" %}{% elif project.display_status == 'IN_PROGRESS' %}{% translate "In progress" %}{% elif project.display_status == 'OVERDUE' %}{% translate "Overdue" %}{% else %}{% translate "Completed" %}{% endif %}
                 </p>
             </div>
         </div>
 
         <a href="{% url 'add_task' project.id %}?project={{ project.id }}" class="btn btn--primary" data-modal-trigger>
-            <span aria-hidden="true">+</span> Ajouter une tâche
+            <span aria-hidden="true">+</span> {% translate "Add a task" %}
         </a>
     </div>
 
@@ -76,7 +76,7 @@
     {% if project.task_count %}
     <div class="detail-card__progress">
         <div class="detail-card__progress-row">
-            <span class="detail-card__progress-title">Progression</span>
+            <span class="detail-card__progress-title">{% translate "Progress" %}</span>
             <span class="detail-card__progress-percent">{{ project.progress_percent }}% terminé</span>
         </div>
         <div class="progress-bar progress-bar--segmented">
@@ -109,7 +109,7 @@
 </div>
 
 <div class="section-row">
-    <h2 class="section-row__title">Tâches <span class="section-row__count">{{ project.task_count }}</span></h2>
+    <h2 class="section-row__title">{% translate "Tasks" %} <span class="section-row__count">{{ project.task_count }}</span></h2>
 </div>
 
 <div class="tasks-list">
@@ -151,31 +151,31 @@
                     <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
                 {{ task.due_date|date:"M j, Y" }}
-                {% if task.is_overdue %}<span class="task-row__overdue-label">En retard</span>{% endif %}
+                {% if task.is_overdue %}<span class="task-row__overdue-label">{% translate "Overdue" %}</span>{% endif %}
             </span>
             {% endif %}
 
             {% if task.subtask_count %}
-            <span class="task-row__automatic-status">Statut automatique</span>
+            <span class="task-row__automatic-status">{% translate "Automatic status" %}</span>
             {% else %}
             <form method="post" action="{% url 'task_update_status' task.id %}" class="task-row__status-form">
                 {% csrf_token %}
                 <select name="status" class="task-row__status-select task-row__status-select--{{ task.status|lower }}" onchange="this.form.submit()">
-                    <option value="TODO" {% if task.status == 'TODO' %}selected{% endif %}>À faire</option>
-                    <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>En cours</option>
-                    <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>Terminé</option>
+                    <option value="TODO" {% if task.status == 'TODO' %}selected{% endif %}>{% translate "To do" %}</option>
+                    <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>{% translate "In progress" %}</option>
+                    <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>{% translate "Completed" %}</option>
                 </select>
             </form>
             {% endif %}
         </div>
 
         <div class="task-row__actions">
-                <a href="{% url 'update_task' task.id %}" class="btn-icon btn-icon--edit" aria-label="Modifier la tâche" title="Modifier" data-modal-trigger>
+                <a href="{% url 'update_task' task.id %}" class="btn-icon btn-icon--edit" aria-label="{% translate 'Edit task' %}" title="{% translate 'Edit' %}" data-modal-trigger>
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </a>
-                <a href="{% url 'delete_task' task.id %}" class="btn-icon btn-icon--delete" aria-label="Supprimer la tâche" title="Supprimer" data-modal-trigger>
+                <a href="{% url 'delete_task' task.id %}" class="btn-icon btn-icon--delete" aria-label="{% translate 'Delete task' %}" title="{% translate 'Delete' %}" data-modal-trigger>
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -183,13 +183,13 @@
         </div>
     </article>
     {% empty %}
-    <p class="empty-state">Aucune tâche dans ce projet pour le moment.</p>
+    <p class="empty-state">{% translate "No tasks in this project yet." %}</p>
     {% endfor %}
 </div>
 
 <div id="modal-overlay" class="modal-overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true">
-            <button type="button" class="modal__close" id="modal-close" aria-label="Fermer">&times;</button>
+            <button type="button" class="modal__close" id="modal-close" aria-label="{% translate 'Close' %}">&times;</button>
         <div class="modal__body" id="modal-body"></div>
     </div>
 </div>
