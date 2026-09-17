@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -7,6 +8,8 @@ from django.views.decorators.http import require_POST
 from .exceptions import AIError
 from .models import Conversation
 from .services import chat
+
+logger = logging.getLogger(__name__)
 
 
 def csrf_failure(request, reason=""):
@@ -30,4 +33,7 @@ def chat_view(request):
         return JsonResponse({"detail": "Conversation introuvable."}, status=404)
     except AIError as exc:
         return JsonResponse({"detail": str(exc)}, status=503)
+    except Exception:
+        logger.exception("Unexpected error while processing an AI request")
+        return JsonResponse({"detail": "Le service Gemini a rencontré une erreur inattendue."}, status=500)
     return JsonResponse({"conversation_id": conversation.pk, "answer": answer})

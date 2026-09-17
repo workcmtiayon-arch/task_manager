@@ -18,7 +18,7 @@ class BaseProvider:
         try:
             with urlopen(request, timeout=self.timeout) as response:
                 return json.loads(response.read().decode())
-        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+        except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as exc:
             raise AIProviderError("Le fournisseur AI est momentanément indisponible.") from exc
 
     def complete(self, messages):
