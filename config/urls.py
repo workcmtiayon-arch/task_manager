@@ -26,6 +26,7 @@ urlpatterns = [
     path('projects/', include('projects.urls')),
     path('taks/', include('tasks.urls')),
     path('chat/', include('chat.urls', namespace="chat")),
+    path('ai/', include('ai.urls', namespace="ai")),
 ]
 
 if settings.DEBUG:
