@@ -198,6 +198,13 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+# AI provider configuration. Secrets stay in the local environment and are
+# never committed to the repository.
+AI_PROVIDER = os.environ.get("AI_PROVIDER", "gemini").lower()
+AI_MODEL = os.environ.get("AI_MODEL", "gemini-2.0-flash")
+AI_API_KEY = os.environ.get("AI_API_KEY", "")
+AI_API_TIMEOUT = int(os.environ.get("AI_API_TIMEOUT", "30"))
+
 
 
 OTP_TTL_MINUTES = 10
