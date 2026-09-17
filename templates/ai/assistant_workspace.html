@@ -5,23 +5,21 @@
             <div class="ai-assistant-modal__icon" aria-hidden="true">✦</div>
             <div>
                 <h2 id="ai-assistant-title">{% translate "AI assistant" %}</h2>
-                <span class="ai-assistant-modal__status">{% translate "Non-functional preview" %}</span>
+        <span class="ai-assistant-modal__status">Gemini</span>
             </div>
         </div>
         <button type="button" class="btn btn--outline" data-ai-close>{% translate "Back to workspace" %}</button>
     </div>
     <div class="ai-chat-window" aria-label="{% translate 'Conversation with the AI assistant' %}">
-        <div class="ai-chat-message ai-chat-message--system">
-            <strong>{% translate "Information" %}</strong>
-            <span>{% translate "This feature is still being implemented." %}</span>
-        </div>
         <div class="ai-chat-message ai-chat-message--assistant">
-            <span>{% translate "Hello. Gemini will soon help you organize your projects and tasks." %}</span>
+            <span>{% translate "Hello. I can help you organize your projects and tasks." %}</span>
         </div>
     </div>
-    <p class="ai-assistant-modal__text">{% translate "For now, nothing will be sent or analyzed." %}</p>
-    <div class="ai-assistant-composer" aria-label="{% translate 'AI assistant chat area' %}">
-        <input type="text" placeholder="{% translate 'Write your request...' %}" disabled>
-        <button type="button" class="btn btn--primary" disabled>{% translate "Send" %}</button>
-    </div>
+    <p class="ai-assistant-modal__text">{% translate "Ask for a summary, a plan, or task organization." %}</p>
+    <form class="ai-assistant-composer" id="ai-assistant-form" data-chat-url="{% url 'ai:chat' %}" aria-label="{% translate 'AI assistant chat area' %}">
+        {% csrf_token %}
+        <input id="ai-assistant-input" type="text" placeholder="{% translate 'Write your request...' %}" autocomplete="off" required>
+        <button id="ai-assistant-send" type="submit" class="btn btn--primary">{% translate "Send" %}</button>
+    </form>
 </section>
+<script src="{% static 'javascript/ai.js' %}"></script>
