@@ -211,3 +211,4 @@ AI_MAX_INPUT_CHARS = int(os.environ.get("AI_MAX_INPUT_CHARS", "4000"))
 
 OTP_TTL_MINUTES = 10
 OTP_MAX_ATTEMPTS = 5
+CSRF_FAILURE_VIEW = "ai.views.csrf_failure"

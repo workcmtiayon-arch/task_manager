@@ -9,6 +9,10 @@ from .models import Conversation
 from .services import chat
 
 
+def csrf_failure(request, reason=""):
+    return JsonResponse({"detail": "Session expirée ou jeton CSRF invalide."}, status=403)
+
+
 @login_required
 @require_POST
 def chat_view(request):
