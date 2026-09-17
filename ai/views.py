@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
@@ -35,5 +36,8 @@ def chat_view(request):
         return JsonResponse({"detail": str(exc)}, status=503)
     except Exception:
         logger.exception("Unexpected error while processing an AI request")
-        return JsonResponse({"detail": "Le service Gemini a rencontré une erreur inattendue."}, status=500)
+        detail = "Erreur Gemini inattendue. Consulte les logs du serveur."
+        if settings.DEBUG:
+            detail = "Erreur Gemini inattendue. Consulte les logs du serveur (mode DEBUG)."
+        return JsonResponse({"detail": detail}, status=500)
     return JsonResponse({"conversation_id": conversation.pk, "answer": answer})
