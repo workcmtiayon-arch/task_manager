@@ -115,6 +115,7 @@
 <div class="tasks-list">
     {% for task in project.project_tasks %}
     <article class="task-row {% if task.status == 'DONE' %}task-row--done{% endif %}">
+        <a class="task-row__card-link" href="{% url 'task_detail' task.id %}" aria-label="{% translate 'Open task' %}: {{ task.title }}"></a>
         <span class="task-row__status-icon task-row__status-icon--{{ task.status|lower }}" aria-hidden="true">
             {% if task.status == 'DONE' %}
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
