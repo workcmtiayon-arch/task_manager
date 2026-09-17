@@ -544,6 +544,7 @@
 }
 
 .task-row {
+    position: relative;
     display: flex;
     min-height: 220px;
     flex-direction: column;
@@ -553,6 +554,18 @@
     border-radius: var(--radius-sm, 0.5rem);
     padding: 20px;
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.task-row__card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+.task-row > *:not(.task-row__card-link) {
+    position: relative;
+    z-index: 1;
 }
 
 .task-row:hover {
