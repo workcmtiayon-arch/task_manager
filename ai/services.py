@@ -27,8 +27,8 @@ def _context_message(user, project_id=None):
 
 def chat(user, content, conversation=None, project_id=None):
     content = content.strip()
-    if not content:
-        raise ValueError("La demande ne peut pas être vide.")
+    if not content or len(content) > settings.AI_MAX_INPUT_CHARS:
+        raise ValueError("La demande est vide ou trop longue.")
     conversation = conversation or Conversation.objects.create(user=user, title=content[:120])
     history = list(conversation.messages.values("role", "content"))
     messages = [_context_message(user, project_id), *history, {"role": "user", "content": content}]

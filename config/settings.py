@@ -205,6 +205,7 @@ AI_PROVIDER = os.environ.get("AI_PROVIDER", "gemini").lower()
 AI_MODEL = os.environ.get("AI_MODEL", "gemini-2.0-flash")
 AI_API_KEY = os.environ.get("AI_API_KEY", "")
 AI_API_TIMEOUT = int(os.environ.get("AI_API_TIMEOUT", "30"))
+AI_MAX_INPUT_CHARS = int(os.environ.get("AI_MAX_INPUT_CHARS", "4000"))
 
 
 
