@@ -571,6 +571,12 @@
 .task-row:hover {
     box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
     border-color: var(--primary-color-light, #e0e7ff);
+    transform: translateY(-3px);
+}
+
+.task-row:focus-within {
+    outline: 3px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+    outline-offset: 2px;
 }
 
 .task-row--done {
