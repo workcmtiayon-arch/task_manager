@@ -539,14 +539,14 @@
 
 .tasks-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
 }
 
 .task-row {
     position: relative;
     display: flex;
-    min-height: 220px;
+    aspect-ratio: 1 / 1;
     flex-direction: column;
     gap: 12px;
     background: var(--surface-color, #fff);
