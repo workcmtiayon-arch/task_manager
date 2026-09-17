@@ -34,10 +34,10 @@ def chat_view(request):
         return JsonResponse({"detail": "Conversation introuvable."}, status=404)
     except AIError as exc:
         return JsonResponse({"detail": str(exc)}, status=503)
-    except Exception:
+    except Exception as exc:
         logger.exception("Unexpected error while processing an AI request")
         detail = "Erreur Gemini inattendue. Consulte les logs du serveur."
         if settings.DEBUG:
-            detail = "Erreur Gemini inattendue. Consulte les logs du serveur (mode DEBUG)."
+            detail = f"Erreur Gemini inattendue : {exc}"
         return JsonResponse({"detail": detail}, status=500)
     return JsonResponse({"conversation_id": conversation.pk, "answer": answer})
