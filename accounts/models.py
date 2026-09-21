@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -70,14 +71,17 @@ class EmailOTP(models.Model):
         )
 
     def check_email(self, submitted_code):
+        with transaction.atomic():
+            otp = type(self).objects.select_for_update().get(pk=self.pk)
+            if not otp.is_valid():
+                return False
 
-        if not self.is_valid():
-            return False
-        self.attempts += 1
-        ok = check_password(submitted_code, self.code_hash)
+            otp.attempts += 1
+            ok = check_password(submitted_code, otp.code_hash)
+            if ok:
+                otp.is_used = True
+            otp.save(update_fields=["attempts", "is_used"])
 
-        if ok:
-            self.is_used = True
-
-        self.save(update_fields=["attempts", "is_used"])
-        return ok
+            self.attempts = otp.attempts
+            self.is_used = otp.is_used
+            return ok

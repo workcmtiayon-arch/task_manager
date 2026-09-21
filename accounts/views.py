@@ -103,12 +103,25 @@ def forgot_password(request):
         form = ForgotPasswordEmailForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email'].lower()
+            rate_key = "password-reset:" + hashlib.sha256(
+                f"{request.META.get('REMOTE_ADDR', '')}:{email}".encode()
+            ).hexdigest()
+            attempts = cache.get(rate_key, 0)
+            max_attempts = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_ATTEMPTS", 3)
+            if attempts >= max_attempts:
+                return redirect('verify-reset-otp')
+
             user = User.objects.filter(email__iexact=email, is_active=True).first()
             if user:
                 otp, code = EmailOTP.generate_for(user, EmailOTP.Purpose.PASSWORD_RESET)
                 send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.PASSWORD_RESET)
                 request.session['reset_user_id'] = user.id
                 messages.info(request, _("If this address is associated with an account, a code has been sent."))
+            cache.set(
+                rate_key,
+                attempts + 1,
+                getattr(settings, "PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", 900),
+            )
             return redirect('verify-reset-otp')
     else:
         form = ForgotPasswordEmailForm()

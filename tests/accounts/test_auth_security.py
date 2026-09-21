@@ -84,7 +84,8 @@ class PasswordResetSecurityTests(TestCase):
             password="OldSecurePass123!",
         )
 
-    def test_reset_request_does_not_enumerate_accounts(self):
+    @patch("accounts.views.send_otp_email_task.delay")
+    def test_reset_request_does_not_enumerate_accounts(self, send_email):
         known = self.client.post(
             reverse("forgot-password"),
             {"email": self.user.email},
@@ -96,6 +97,16 @@ class PasswordResetSecurityTests(TestCase):
 
         self.assertEqual(known.status_code, unknown.status_code)
         self.assertEqual(known["Location"], unknown["Location"])
+
+    @patch("accounts.views.send_otp_email_task.delay")
+    def test_password_reset_requests_are_rate_limited(self, send_email):
+        for _ in range(4):
+            self.client.post(
+                reverse("forgot-password"),
+                {"email": self.user.email},
+            )
+
+        self.assertEqual(send_email.call_count, 3)
 
     def test_password_reset_invalidates_other_authenticated_sessions(self):
         existing_client = self.client_class()
