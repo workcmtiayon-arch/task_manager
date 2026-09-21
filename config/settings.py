@@ -29,7 +29,12 @@ load_dotenv(BASE_DIR / ".env")
 DEPLOYMENT_ENV = os.environ.get("DJANGO_ENV", "development").lower()
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-if not SECRET_KEY or SECRET_KEY == "SECRET_KEY":
+insecure_secret = (
+    not SECRET_KEY
+    or SECRET_KEY in {"SECRET_KEY", "your-secret-key-here"}
+    or len(SECRET_KEY) < 50
+)
+if insecure_secret:
     if DEPLOYMENT_ENV == "production":
         raise ImproperlyConfigured(
             "DJANGO_SECRET_KEY must be set to a strong value before starting Django."

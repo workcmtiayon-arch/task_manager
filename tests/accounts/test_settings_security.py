@@ -8,6 +8,7 @@ class SecuritySettingsTests(SimpleTestCase):
 
     def test_secret_key_is_not_the_insecure_placeholder(self):
         self.assertNotEqual(settings.SECRET_KEY, "SECRET_KEY")
+        self.assertGreaterEqual(len(settings.SECRET_KEY), 50)
 
     def test_authentication_cookies_are_secure(self):
         self.assertTrue(settings.SESSION_COOKIE_SECURE)
