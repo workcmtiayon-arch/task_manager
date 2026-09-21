@@ -1,9 +1,12 @@
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ForgotPasswordEmailForm, OTPForm, ProfileForm
+from django.conf import settings
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
+from django.core.cache import cache
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 from django.db.models import Count, Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,6 +14,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
+import time
+import hashlib
 
 
 # Create your views here.
@@ -74,13 +79,18 @@ def verify_otp(request):
 
 
 
+@require_POST
 def resend_otp(request):
     user_id = request.session.get('pending_user_id')
-    if user_id:
+    now = time.time()
+    last_sent_at = request.session.get("otp_resend_sent_at", 0)
+    cooldown = getattr(settings, "OTP_RESEND_COOLDOWN_SECONDS", 60)
+    if user_id and now - last_sent_at >= cooldown:
         user = User.objects.filter(pk=user_id, is_active=False).first()
         if user:
             otp, code = EmailOTP.generate_for(user, EmailOTP.Purpose.REGISTER)
             send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.REGISTER)
+            request.session["otp_resend_sent_at"] = now
     messages.info(request, _("If a request is pending, a new code has been sent."))
     return redirect('verify-otp')
 
@@ -166,14 +176,35 @@ def reset_password(request):
 @never_cache
 def connection(request):
     if request.method == 'POST':
+        username = request.POST.get("username", "").strip().lower()
+        client_ip = request.META.get("REMOTE_ADDR", "")
+        rate_key = "login-failures:" + hashlib.sha256(
+            f"{client_ip}:{username}".encode()
+        ).hexdigest()
+        failure_count = cache.get(rate_key, 0)
+        max_attempts = getattr(settings, "LOGIN_RATE_LIMIT_ATTEMPTS", 5)
+        if failure_count >= max_attempts:
+            form = CustomAuthenticationForm(request, data=request.POST)
+            return render(
+                request,
+                'accounts/login.html',
+                {'form': form, 'rate_limited': True},
+                status=429,
+            )
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            cache.delete(rate_key)
             login(request, user)
             next_url = request.POST.get("next", "")
             if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
                 return redirect(next_url)
             return redirect("dashboard")
+        cache.set(
+            rate_key,
+            failure_count + 1,
+            getattr(settings, "LOGIN_RATE_LIMIT_WINDOW_SECONDS", 900),
+        )
     else:
         form = CustomAuthenticationForm()
 

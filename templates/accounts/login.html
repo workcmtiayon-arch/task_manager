@@ -40,6 +40,11 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+                {% if rate_limited %}
+                <div class="form-alert" role="alert">
+                    <p>{% translate "Too many failed attempts. Please try again later." %}</p>
+                </div>
+                {% endif %}
 
                 <form method="post" action="{% url 'login' %}" class="auth-form auth-form--login" novalidate>
 
