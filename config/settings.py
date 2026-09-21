@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from celery.schedules import crontab
 from pathlib import Path
 import os
+import secrets
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,11 +26,15 @@ load_dotenv(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "SECRET_KEY",
-)
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+DEPLOYMENT_ENV = os.environ.get("DJANGO_ENV", "development").lower()
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY or SECRET_KEY == "SECRET_KEY":
+    if DEPLOYMENT_ENV == "production":
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY must be set to a strong value before starting Django."
+        )
+    SECRET_KEY = f"django-insecure-{secrets.token_urlsafe(50)}"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 
@@ -144,18 +150,16 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-        "OPTIONS": {
-            "host": os.environ.get("EMAIL_HOST", "smtp.gmail.com"),
-            "port": int(os.environ.get("EMAIL_PORT", "587")),
-            "username": os.environ.get("EMAIL_HOST_USER", ""),
-            "password": os.environ.get("EMAIL_HOST_PASSWORD", ""),
-            "use_tls": os.environ.get("EMAIL_USE_TLS", "True") == "True",
-        },
-    },
-}
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend",
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in {"1", "true", "yes", "on"}
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 
 AUTH_USER_MODEL = "accounts.User"
@@ -171,6 +175,20 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Use WhiteNoise to serve static files in production (and in environments where no separate static server is configured)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+SECURE_SSL_REDIRECT = (
+    DEPLOYMENT_ENV == "production"
+    and os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "True").lower()
+    in {"1", "true", "yes", "on"}
+)
+SECURE_HSTS_SECONDS = 31536000 if DEPLOYMENT_ENV == "production" else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = DEPLOYMENT_ENV == "production"
+SECURE_HSTS_PRELOAD = DEPLOYMENT_ENV == "production"
 
 ASGI_APPLICATION = "config.asgi.application"
 
