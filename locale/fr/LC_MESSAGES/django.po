@@ -1363,7 +1363,7 @@ msgstr ""
 #: templates/projects/project_list.html:30
 #: templates/projects/project_list.html:46
 msgid "Completed projects"
-msgstr ""
+msgstr "Projets terminés"
 
 #: templates/projects/project_list.html:35
 msgid "Your workspaces"
@@ -1379,7 +1379,7 @@ msgstr "Projets actifs"
 
 #: templates/projects/project_list.html:45
 msgid "Upcoming projects"
-msgstr ""
+msgstr "Projets à venir"
 
 #: templates/projects/project_list.html:99
 msgid "No tasks added yet."
