@@ -1375,7 +1375,7 @@ msgstr ""
 
 #: templates/projects/project_list.html:44
 msgid "Active projects"
-msgstr ""
+msgstr "Projets actifs"
 
 #: templates/projects/project_list.html:45
 msgid "Upcoming projects"
@@ -1492,11 +1492,11 @@ msgstr ""
 
 #: templates/tasks/task_list.html:15
 msgid "Personal organization"
-msgstr ""
+msgstr "Organisation personnelle"
 
 #: templates/tasks/task_list.html:16
 msgid "Stay on top of your priorities."
-msgstr ""
+msgstr "Gardez le cap sur vos priorités."
 
 #: templates/tasks/task_list.html:17
 msgid "Track every task in your projects without changing workspace."

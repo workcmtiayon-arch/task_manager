@@ -186,6 +186,23 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+# Local development commonly runs over plain HTTP; secure cookies are enabled
+# only when the application is deployed behind HTTPS.
+if DEPLOYMENT_ENV != "production":
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ.get("REDIS_CACHE_URL", "redis://localhost:6379/3"),
+    }
+    if DEPLOYMENT_ENV == "production"
+    else {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "task-manager-development",
+    }
+}
 SECURE_SSL_REDIRECT = (
     DEPLOYMENT_ENV == "production"
     and os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "True").lower()
