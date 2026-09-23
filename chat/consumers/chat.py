@@ -84,6 +84,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         new_text = (content.get("content") or "").strip()
         if not message_id or not new_text:
             raise ValueError("message_id et content sont requis.")
+        if len(new_text) > 4000:
+            raise ValueError("Message trop long (4000 caractères maximum).")
         message_data = await database_sync_to_async(self._edit_message)(message_id, new_text)
         await self._send_to_conversation({"type": "chat.message_edited", "message": message_data})
 

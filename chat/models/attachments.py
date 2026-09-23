@@ -11,7 +11,7 @@ from .messages import Message
 
 def attachment_upload_path(instance, filename):
     """Construit le chemin de stockage regroupé par conversation."""
-    return f"chat_attachments/conversation_{instance.message.conversation_id}/{filename}"
+    return f"chat_attachments/conversation_{instance.message.conversation_id}/{os.path.basename(filename)}"
 
 
 class MessageAttachment(models.Model):
@@ -22,6 +22,27 @@ class MessageAttachment(models.Model):
         "application/pdf": "pdf", "text/plain": "text",
     }
     MAX_FILE_SIZE = 10 * 1024 * 1024
+
+    @classmethod
+    def validate_upload(cls, uploaded_file):
+        """Validate the declared MIME type against a small file signature."""
+        if uploaded_file.content_type not in cls.ALLOWED_CONTENT_TYPES:
+            raise ValidationError(_("File type not allowed."))
+        if uploaded_file.size > cls.MAX_FILE_SIZE:
+            raise ValidationError(_("File too large (10 MB maximum)."))
+
+        header = uploaded_file.read(16)
+        uploaded_file.seek(0)
+        signatures = {
+            "image/png": header.startswith(b"\x89PNG\r\n\x1a\n"),
+            "image/jpeg": header.startswith(b"\xff\xd8\xff"),
+            "image/gif": header.startswith((b"GIF87a", b"GIF89a")),
+            "image/webp": header.startswith(b"RIFF") and header[8:12] == b"WEBP",
+            "application/pdf": header.startswith(b"%PDF-"),
+            "text/plain": b"\x00" not in header,
+        }
+        if not signatures.get(uploaded_file.content_type, False):
+            raise ValidationError(_("The file content does not match its type."))
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
     file = models.FileField(upload_to=attachment_upload_path)

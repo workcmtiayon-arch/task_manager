@@ -6,6 +6,7 @@ from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonRespo
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
 
 from ..models import Conversation, ConversationMember, Message, MessageAttachment, MessageReceipt
 from ..utils import serialize_message
@@ -64,13 +65,13 @@ def conversation_attachment_upload(request, pk):
     uploaded_file = request.FILES.get("file")
     if uploaded_file is None:
         return HttpResponseBadRequest(_("No file received."))
-    if uploaded_file.content_type not in MessageAttachment.ALLOWED_CONTENT_TYPES:
-        return HttpResponseBadRequest(_("File type not allowed (images, PDF or TXT only)."))
-    if uploaded_file.size > MessageAttachment.MAX_FILE_SIZE:
-        return HttpResponseBadRequest(_("File too large (10 MB maximum)."))
+    try:
+        MessageAttachment.validate_upload(uploaded_file)
+    except ValidationError:
+        return HttpResponseBadRequest(_("File content or type is not allowed (images, PDF or TXT only)."))
     with transaction.atomic():
         message = Message.objects.create(conversation=conversation, sender=request.user, content="", message_type=Message.MessageType.ATTACHMENT)
-        MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=uploaded_file.name, file_size=uploaded_file.size, content_type=uploaded_file.content_type)
+        MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=uploaded_file.name[:255], file_size=uploaded_file.size, content_type=uploaded_file.content_type)
         other_members = conversation.get_members().exclude(pk=request.user.pk)
         MessageReceipt.objects.bulk_create([MessageReceipt(message=message, user=member) for member in other_members])
         maybe_accept_conversation(conversation, request.user)
