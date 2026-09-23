@@ -23,8 +23,11 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .auth-header { position: absolute; z-index: 2; top: 0; left: 0; display: flex; align-items: center; width: 100%; padding: 28px clamp(22px, 5vw, 72px); }
 .auth-header__logo { display: inline-flex; align-items: center; gap: 11px; color: var(--auth-white); font-size: 1.02rem; font-weight: 800; letter-spacing: -0.03em; }
 .auth-header__logo-mark { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 12px; color: var(--auth-night); background: var(--auth-lime); font-size: 0.7rem; font-weight: 900; }
+.auth-header--light .auth-header__logo { color: var(--auth-ink); }
+.auth-header--light .auth-header__logo-mark { border-color: rgba(16, 35, 63, 0.1); }
 .auth { min-height: 100vh; padding: 0; }
 .auth__inner { display: grid; grid-template-columns: minmax(360px, 0.92fr) minmax(460px, 1.08fr); min-height: 100vh; }
+.auth__inner > .auth-card:only-child { grid-column: 1 / -1; }
 
 .auth-side { position: relative; display: flex; align-items: flex-end; overflow: hidden; padding: 150px clamp(28px, 7vw, 110px) 72px; color: var(--auth-white); background: var(--auth-night); }
 .auth-side::before, .auth-side::after { position: absolute; content: ""; border: 1px solid rgba(200, 241, 105, 0.22); border-radius: 50%; }

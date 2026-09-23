@@ -9,13 +9,19 @@
 </head>
 
 <body>
+<header class="auth-header auth-header--light">
+    <a href="{% url 'home' %}" class="auth-header__logo" aria-label="Task Manager — accueil">
+        <span class="auth-header__logo-mark" aria-hidden="true">TM</span>
+        <span class="auth-header__logo-text">Task Manager</span>
+    </a>
+</header>
 <main class="auth">
     <div class="auth__inner">
-        <section class="auth-card auth-card--compact">
+        <section class="auth-card auth-card--compact" aria-labelledby="reset-code-title">
 
             <p class="eyebrow">{% translate "Password reset" %}</p>
 
-            <h1 class="auth-card__title">
+            <h1 id="reset-code-title" class="auth-card__title">
                 {% translate "Enter the code sent by email" %}
             </h1>
 

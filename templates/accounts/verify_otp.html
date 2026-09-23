@@ -11,11 +11,17 @@ initial-scale=1.0">
 </head>
 
 <body>
+    <header class="auth-header auth-header--light">
+        <a href="{% url 'home' %}" class="auth-header__logo" aria-label="Task Manager — accueil">
+            <span class="auth-header__logo-mark" aria-hidden="true">TM</span>
+            <span class="auth-header__logo-text">Task Manager</span>
+        </a>
+    </header>
     <main class="auth">
         <div class="auth__inner">
-            <section class="auth-card auth-card--compact">
+            <section class="auth-card auth-card--compact" aria-labelledby="verify-title">
                 <p class="eyebrow">{% translate "Verification" %}</p>
-                <h1 class="auth-card__title">{% translate "Enter the code sent by email" %}</h1>
+                <h1 id="verify-title" class="auth-card__title">{% translate "Enter the code sent by email" %}</h1>
                 <p class="auth-card__text">
                     {% translate "A 6-digit code was sent to your email address. It expires in a few minutes." %}
                 </p>
