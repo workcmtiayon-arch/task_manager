@@ -188,7 +188,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 # Local development commonly runs over plain HTTP; secure cookies are enabled
 # only when the application is deployed behind HTTPS.
-if DEPLOYMENT_ENV != "production":
+if DEPLOYMENT_ENV != "production" and DEBUG:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 

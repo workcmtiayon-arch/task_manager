@@ -1,203 +1,58 @@
 {% load static i18n %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% translate "Log in" %} — Task Manager</title>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-
 <body>
-
     <header class="auth-header">
-        <a href="{% url 'home' %}" class="auth-header__logo">
+        <a href="{% url 'home' %}" class="auth-header__logo" aria-label="Task Manager — accueil">
             <span class="auth-header__logo-mark" aria-hidden="true">TM</span>
             <span class="auth-header__logo-text">Task Manager</span>
         </a>
     </header>
-
-
     <main class="auth">
         <div class="auth__inner">
-
-            
-            <section class="auth-card">
-
-                <p class="eyebrow">{% translate "Log in" %}</p>
-
-                <h1 class="auth-card__title">
-                    {% translate "Log in" %}
-                </h1>
-
-                <p class="auth-card__lead">{% translate "Find your workspace and pick up where you left off." %}</p>
-
-                {% if form.non_field_errors %}
-                <div class="form-alert" role="alert">
-                    {% for error in form.non_field_errors %}
-                    <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% if rate_limited %}
-                <div class="form-alert" role="alert">
-                    <p>{% translate "Too many failed attempts. Please try again later." %}</p>
-                </div>
-                {% endif %}
-
-                <form method="post" action="{% url 'login' %}" class="auth-form auth-form--login" novalidate>
-
-                    {% csrf_token %}
-
-
-                    
-                    <div class="form-group">
-
-                        <label for="{{ form.username.id_for_label }}" class="form-label">
-                            Nom d'utilisateur
-                        </label>
-
-                        <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
-                            class="form-input {% if form.username.errors %}form-input--error{% endif %}"
-                            value="{{ form.username.value|default:'' }}" autocomplete="username" required autofocus>
-
-                        
-                        {% for error in form.username.errors %}
-                        <p class="form-error">
-                            {{ error }}
-                        </p>
-                        {% endfor %}
-
-                    </div>
-
-
-                    
-                    <div class="form-group">
-
-                        <label for="{{ form.password.id_for_label }}" class="form-label">
-                            Mot de passe
-                        </label>
-
-                        <input type="password" name="{{ form.password.html_name }}"
-                            id="{{ form.password.id_for_label }}"
-                            class="form-input {% if form.password.errors %}form-input--error{% endif %}"
-                            autocomplete="current-password" required>
-
-                        
-                        {% for error in form.password.errors %}
-                        <p class="form-error">
-                            {{ error }}
-                        </p>
-                        {% endfor %}
-
-                        
-                        <p class="form-hint form-hint--action">
-                            <a href="{% url 'forgot-password' %}" class="auth-link">
-                                {% translate "Forgot your password?" %}
-                            </a>
-                        </p>
-
-                    </div>
-
-
-                    
-                    <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
-
-
-                    
-                    <button type="submit" class="btn btn--primary btn--block">
-                        Se connecter
-                    </button>
-
-                </form>
-
-
-                
-                <p class="auth-card__footer">
-                    {% translate "Don't have an account yet?" %}
-                    <a href="{% url 'registration' %}" class="auth-link">
-                        {% translate "Sign up" %}
-                    </a>
-                </p>
-
-            </section>
-
-
-            
-            <aside class="auth-side" aria-hidden="true">
-
+            <aside class="auth-side">
                 <div class="auth-side__inner">
-
-                    <p class="auth-side__eyebrow">
-                        Task Manager
-                    </p>
-
-                    <h2 class="auth-side__title">
-                        Gérez vos tâches
-                    </h2>
-
-
-                    <ul class="auth-side__list">
-
-                        <li class="auth-side__item">
-                            <span class="auth-side__icon">&#9635;</span>
-                            <span>{% translate "Projects" %}</span>
-                        </li>
-
-                        <li class="auth-side__item">
-                            <span class="auth-side__icon">&#10003;</span>
-                            <span>{% translate "Tasks" %}</span>
-                        </li>
-
-                        <li class="auth-side__item">
-                            <span class="auth-side__icon">&#8635;</span>
-                            <span>{% translate "Progress" %}</span>
-                        </li>
-
+                    <p class="auth-side__eyebrow">Task Manager / espace de travail</p>
+                    <h1 class="auth-side__title">Votre travail, enfin clair.</h1>
+                    <p class="auth-side__copy">Retrouvez vos projets, vos tâches et votre progression dans un espace qui vous aide à avancer.</p>
+                    <ul class="auth-side__list" aria-label="Fonctionnalités">
+                        <li class="auth-side__item"><span class="auth-side__icon">✓</span><span>{% translate "Projects" %} et échéances au même endroit</span></li>
+                        <li class="auth-side__item"><span class="auth-side__icon">✓</span><span>{% translate "Tasks" %} simples à prioriser</span></li>
+                        <li class="auth-side__item"><span class="auth-side__icon">✓</span><span>Une progression visible chaque jour</span></li>
                     </ul>
-
-
-                    
-                    <div class="mock-window">
-
-                        <div class="mock-window__bar">
-                            <span class="mock-dot mock-dot--red"></span>
-                            <span class="mock-dot mock-dot--yellow"></span>
-                            <span class="mock-dot mock-dot--green"></span>
-                        </div>
-
-
-                        <div class="mock-window__body">
-
-                            <div class="mock-task">
-                                <span class="mock-task__dot mock-task__dot--todo"></span>
-                                <span>{% translate "Create a project" %}</span>
-                                <span class="badge badge--todo">{% translate "To do" %}</span>
-                            </div>
-
-                            <div class="mock-task">
-                                <span class="mock-task__dot mock-task__dot--progress"></span>
-                                <span>{% translate "Develop a task" %}</span>
-                                <span class="badge badge--progress">{% translate "In progress" %}</span>
-                            </div>
-
-                            <div class="mock-task">
-                                <span class="mock-task__dot mock-task__dot--done"></span>
-                                <span>{% translate "Test the application" %}</span>
-                                <span class="badge badge--done">{% translate "Completed" %}</span>
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
-
             </aside>
-
+            <section class="auth-card" aria-labelledby="login-title">
+                <p class="eyebrow">{% translate "Welcome back" %}</p>
+                <h2 id="login-title" class="auth-card__title">{% translate "Log in" %}</h2>
+                <p class="auth-card__lead">{% translate "Find your workspace and pick up where you left off." %}</p>
+                {% if form.non_field_errors %}<div class="form-alert" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+                {% if rate_limited %}<div class="form-alert" role="alert"><p>{% translate "Too many failed attempts. Please try again later." %}</p></div>{% endif %}
+                <form method="post" action="{% url 'login' %}" class="auth-form" novalidate>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                        <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}" class="form-input {% if form.username.errors %}form-input--error{% endif %}" value="{{ form.username.value|default:'' }}" autocomplete="username" required autofocus>
+                        {% for error in form.username.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                        <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" class="form-input {% if form.password.errors %}form-input--error{% endif %}" autocomplete="current-password" required>
+                        {% for error in form.password.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                        <p class="form-hint form-hint--action"><a href="{% url 'forgot-password' %}" class="auth-link">{% translate "Forgot your password?" %}</a></p>
+                    </div>
+                    <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+                    <button type="submit" class="btn btn--primary btn--block">{% translate "Log in" %}</button>
+                </form>
+                <p class="auth-card__footer">{% translate "Don't have an account yet?" %} <a href="{% url 'registration' %}" class="auth-link">{% translate "Sign up" %}</a></p>
+            </section>
         </div>
     </main>
-
 </body>
 </html>
