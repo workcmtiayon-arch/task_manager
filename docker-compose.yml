@@ -51,7 +51,6 @@ services:
         condition: service_healthy
     volumes:
       - static_data:/app/staticfiles
-      - media_data:/app/media
     networks:
       - task_manager
     command: ["true"]
@@ -76,7 +75,7 @@ services:
       migrate:
         condition: service_completed_successfully
     ports:
-      - "8000:8000"
+      - "${WEB_PORT:-8000}:8000"
     volumes:
       - static_data:/app/staticfiles
       - media_data:/app/media
@@ -105,8 +104,6 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-    volumes:
-      - media_data:/app/media
     networks:
       - task_manager
     entrypoint: []
