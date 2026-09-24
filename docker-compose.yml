@@ -1,4 +1,20 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-task_manager}
+      POSTGRES_USER: ${POSTGRES_USER:-task_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -14,16 +30,21 @@ services:
       - .env
     environment:
       DJANGO_ENV: ${DJANGO_ENV:-development}
-      SQLITE_DB_PATH: /data/db.sqlite3
+      POSTGRES_DB: ${POSTGRES_DB:-task_manager}
+      POSTGRES_USER: ${POSTGRES_USER:-task_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
       REDIS_CACHE_URL: redis://redis:6379/3
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      - sqlite_data:/data
       - static_data:/app/staticfiles
       - media_data:/app/media
     command: ["true"]
@@ -35,7 +56,11 @@ services:
       - .env
     environment:
       DJANGO_ENV: ${DJANGO_ENV:-development}
-      SQLITE_DB_PATH: /data/db.sqlite3
+      POSTGRES_DB: ${POSTGRES_DB:-task_manager}
+      POSTGRES_USER: ${POSTGRES_USER:-task_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
@@ -46,7 +71,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - sqlite_data:/data
       - static_data:/app/staticfiles
       - media_data:/app/media
     command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
@@ -58,7 +82,11 @@ services:
       - .env
     environment:
       DJANGO_ENV: ${DJANGO_ENV:-development}
-      SQLITE_DB_PATH: /data/db.sqlite3
+      POSTGRES_DB: ${POSTGRES_DB:-task_manager}
+      POSTGRES_USER: ${POSTGRES_USER:-task_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
@@ -67,7 +95,6 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes:
-      - sqlite_data:/data
       - media_data:/app/media
     entrypoint: []
     command: ["celery", "-A", "config", "worker", "--loglevel=info"]
@@ -79,7 +106,11 @@ services:
       - .env
     environment:
       DJANGO_ENV: ${DJANGO_ENV:-development}
-      SQLITE_DB_PATH: /data/db.sqlite3
+      POSTGRES_DB: ${POSTGRES_DB:-task_manager}
+      POSTGRES_USER: ${POSTGRES_USER:-task_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
@@ -88,13 +119,12 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes:
-      - sqlite_data:/data
       - celerybeat_data:/var/lib/celery
     entrypoint: []
     command: ["celery", "-A", "config", "beat", "--loglevel=info", "--schedule=/var/lib/celery/celerybeat-schedule"]
 
 volumes:
-  sqlite_data:
+  postgres_data:
   static_data:
   media_data:
   celerybeat_data:
