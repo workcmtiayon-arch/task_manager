@@ -14,6 +14,8 @@ services:
       start_period: 5s
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - task_manager
 
   redis:
     image: redis:7-alpine
@@ -23,6 +25,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+      start_period: 5s
+    networks:
+      - task_manager
 
   migrate:
     build: .
@@ -47,6 +52,8 @@ services:
     volumes:
       - static_data:/app/staticfiles
       - media_data:/app/media
+    networks:
+      - task_manager
     command: ["true"]
 
   web:
@@ -73,6 +80,8 @@ services:
     volumes:
       - static_data:/app/staticfiles
       - media_data:/app/media
+    networks:
+      - task_manager
     command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
 
   worker:
@@ -96,6 +105,8 @@ services:
         condition: service_completed_successfully
     volumes:
       - media_data:/app/media
+    networks:
+      - task_manager
     entrypoint: []
     command: ["celery", "-A", "config", "worker", "--loglevel=info"]
 
@@ -120,6 +131,8 @@ services:
         condition: service_completed_successfully
     volumes:
       - celerybeat_data:/var/lib/celery
+    networks:
+      - task_manager
     entrypoint: []
     command: ["celery", "-A", "config", "beat", "--loglevel=info", "--schedule=/var/lib/celery/celerybeat-schedule"]
 
@@ -128,3 +141,6 @@ volumes:
   static_data:
   media_data:
   celerybeat_data:
+
+networks:
+  task_manager:
