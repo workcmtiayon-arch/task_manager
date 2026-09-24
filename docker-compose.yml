@@ -1,0 +1,100 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DJANGO_ENV: ${DJANGO_ENV:-development}
+      SQLITE_DB_PATH: /data/db.sqlite3
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
+      REDIS_CACHE_URL: redis://redis:6379/3
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - sqlite_data:/data
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    command: ["true"]
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DJANGO_ENV: ${DJANGO_ENV:-development}
+      SQLITE_DB_PATH: /data/db.sqlite3
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
+      REDIS_CACHE_URL: redis://redis:6379/3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite_data:/data
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
+
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DJANGO_ENV: ${DJANGO_ENV:-development}
+      SQLITE_DB_PATH: /data/db.sqlite3
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
+      REDIS_CACHE_URL: redis://redis:6379/3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - sqlite_data:/data
+      - media_data:/app/media
+    entrypoint: []
+    command: ["celery", "-A", "config", "worker", "--loglevel=info"]
+
+  beat:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DJANGO_ENV: ${DJANGO_ENV:-development}
+      SQLITE_DB_PATH: /data/db.sqlite3
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
+      REDIS_CACHE_URL: redis://redis:6379/3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - sqlite_data:/data
+      - celerybeat_data:/var/lib/celery
+    entrypoint: []
+    command: ["celery", "-A", "config", "beat", "--loglevel=info", "--schedule=/var/lib/celery/celerybeat-schedule"]
+
+volumes:
+  sqlite_data:
+  static_data:
+  media_data:
+  celerybeat_data:

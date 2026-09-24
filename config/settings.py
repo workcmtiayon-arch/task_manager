@@ -28,7 +28,7 @@ load_dotenv(BASE_DIR / ".env")
 
 DEPLOYMENT_ENV = os.environ.get("DJANGO_ENV", "development").lower()
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or os.environ.get("SECRET_KEY")
 insecure_secret = (
     not SECRET_KEY
     or SECRET_KEY in {"SECRET_KEY", "your-secret-key-here"}
@@ -40,7 +40,7 @@ if insecure_secret:
             "DJANGO_SECRET_KEY must be set to a strong value before starting Django."
         )
     SECRET_KEY = f"django-insecure-{secrets.token_urlsafe(50)}"
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")).split(",")
 
 
 # Application definition
@@ -101,7 +101,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ.get("SQLITE_DB_PATH", BASE_DIR / 'db.sqlite3'),
     }
 }
 
