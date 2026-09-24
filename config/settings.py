@@ -221,6 +221,10 @@ SECURE_SSL_REDIRECT = (
     and os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "True").lower()
     in {"1", "true", "yes", "on"}
 )
+# Nginx (or the external TLS terminator in production) is the only public
+# entry point, so its forwarded protocol header can be trusted here.
+if DEPLOYMENT_ENV == "production":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_HSTS_SECONDS = 31536000 if DEPLOYMENT_ENV == "production" else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = DEPLOYMENT_ENV == "production"
 SECURE_HSTS_PRELOAD = DEPLOYMENT_ENV == "production"

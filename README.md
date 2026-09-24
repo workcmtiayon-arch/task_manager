@@ -29,6 +29,69 @@ The application also distinguishes between public content and authenticated user
 * User-specific data isolation
 * Administrative permissions
 
+## Docker Compose
+
+The Compose environment runs the complete development stack:
+
+```text
+client -> nginx -> Daphne/Django -> PostgreSQL
+                              -> Redis (cache, Channels, Celery)
+                              -> Celery worker
+                              -> Celery Beat
+```
+
+### Prerequisites and first start
+
+Install Docker Engine with the Compose plugin, then create the local environment file:
+
+```bash
+cp .env.example .env
+# Set DJANGO_SECRET_KEY and any provider/email credentials needed locally.
+docker compose config
+docker compose up -d --build
+docker compose ps
+```
+
+Nginx is published on port `8000` by default. If that port is already in use, choose another host port without changing the internal services:
+
+```bash
+NGINX_PORT=18080 docker compose up -d
+```
+
+The `migrate` service waits for healthy PostgreSQL and Redis, runs migrations, and collects staticfiles before Daphne, the worker, Beat, and Nginx start. A failure stops the dependent services. To repeat this explicitly:
+
+```bash
+docker compose run --rm migrate
+```
+
+The named volumes preserve PostgreSQL data, uploaded media, collected staticfiles, and the Beat schedule. `docker compose down` removes containers and the network but keeps these volumes; do not use `docker compose down -v` unless deleting local data is intentional.
+
+### Operations and troubleshooting
+
+```bash
+# Rebuild application images and restart the stack
+docker compose up -d --build
+
+# Follow application or proxy logs
+docker compose logs -f web
+docker compose logs -f nginx
+docker compose logs -f worker beat
+
+# Django checks and shell
+docker compose exec web python manage.py check
+docker compose exec web python manage.py shell
+
+# PostgreSQL and Redis diagnostics
+docker compose exec postgres psql -U task_manager -d task_manager
+docker compose exec redis redis-cli ping
+docker compose exec worker celery -A config inspect ping
+
+# Run the Django test suite from the project virtualenv
+python manage.py test
+```
+
+Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack and must be terminated by external infrastructure before enabling production HTTPS redirects.
+
 
 ## Project Objectives
 
