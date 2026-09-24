@@ -101,6 +101,8 @@ services:
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
       REDIS_CACHE_URL: redis://redis:6379/3
     depends_on:
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     volumes:
@@ -127,6 +129,8 @@ services:
       CHANNEL_LAYER_REDIS_URL: redis://redis:6379/2
       REDIS_CACHE_URL: redis://redis:6379/3
     depends_on:
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     volumes:
