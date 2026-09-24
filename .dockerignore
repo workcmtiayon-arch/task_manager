@@ -10,7 +10,6 @@ __pycache__
 htmlcov
 .env
 .env.*
-!.env.example
 db.sqlite3
 db.sqlite3-journal
 media
@@ -18,3 +17,7 @@ staticfiles
 celerybeat-schedule
 celerybeat.pid
 *.log
+docs
+tests
+AI_INTEGRATION_PLAN.md
+d.html
