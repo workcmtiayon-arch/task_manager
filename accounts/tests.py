@@ -68,6 +68,15 @@ class DashboardAndAdministrationTests(TestCase):
         self.member.refresh_from_db()
         self.assertFalse(self.member.is_active)
 
+    def test_admin_user_list_exposes_profile_photo_url(self):
+        self.member.profile_photo = SimpleUploadedFile(
+            "member.png", b"\x89PNG\r\n\x1a\nmember", content_type="image/png"
+        )
+        self.member.save()
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("user_list"))
+        self.assertContains(response, self.member.profile_photo_url)
+
     def test_profile_can_be_updated_by_the_owner(self):
         self.client.force_login(self.member)
         response = self.client.post(reverse("profile"), {
