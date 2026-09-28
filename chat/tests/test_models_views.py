@@ -1,9 +1,10 @@
 """Tests des modèles et endpoints HTTP du chat."""
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, TransactionTestCase, override_settings
 
-from ..models import Conversation, Message, MessageReaction
+from ..models import Conversation, Message, MessageAttachment, MessageReaction
 
 User = get_user_model()
 
@@ -136,3 +137,25 @@ class MessageSendingTests(TestCase):
         self.client.force_login(outsider)
         response = self.client.post(f"/chat/{conversation.pk}/reactions/set/", {"message_id": message.pk, "reaction": MessageReaction.Reaction.LIKE})
         self.assertEqual(response.status_code, 403)
+
+    def test_attachment_download_is_limited_to_conversation_members(self):
+        owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="recipient", email="recipient@example.com", password="pass1234")
+        outsider = User.objects.create_user(username="outsider", email="outsider@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(owner, recipient)
+        message = Message.objects.create(conversation=conversation, sender=owner, content="", message_type=Message.MessageType.ATTACHMENT)
+        attachment = MessageAttachment.objects.create(
+            message=message,
+            file=SimpleUploadedFile("note.txt", b"private note", content_type="text/plain"),
+            file_name="note.txt",
+            file_size=12,
+            content_type="text/plain",
+        )
+
+        self.client.force_login(recipient)
+        response = self.client.get(f"/chat/attachments/{attachment.pk}/download/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(response.streaming_content), b"private note")
+
+        self.client.force_login(outsider)
+        self.assertEqual(self.client.get(f"/chat/attachments/{attachment.pk}/download/").status_code, 403)

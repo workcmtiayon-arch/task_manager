@@ -2,7 +2,7 @@ def serialize_attachment(attachment):
     """Transforme une pièce jointe Django en objet consommable par le client."""
     return {
         "id": attachment.id,
-        "file_url": attachment.file.url,
+        "file_url": f"/chat/attachments/{attachment.id}/download/",
         "file_name": attachment.file_name,
         "file_size": attachment.file_size,
         "content_type": attachment.content_type,

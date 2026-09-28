@@ -12,6 +12,7 @@ urlpatterns = [
     path("<int:pk>/messages/", views.conversation_messages_json, name='conversation_messages_json'),
     path("<int:pk>/messages/send/", views.conversation_message_send, name='conversation_message_send'),
     path("<int:pk>/attachments/", views.conversation_attachment_upload, name='conversation_attachment_upload'),
+    path("attachments/<int:attachment_id>/download/", views.attachment_download, name='attachment_download'),
     path("<int:pk>/leave/", views.conversation_leave, name="conversation_leave"),
     path("<int:pk>/reactions/set/", views.conversation_reaction_set, name="conversation_reaction_set"),
     path("<int:pk>/reactions/remove/", views.conversation_reaction_remove, name="conversation_reaction_remove"),

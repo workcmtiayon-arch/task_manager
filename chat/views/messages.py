@@ -2,7 +2,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
@@ -79,6 +79,21 @@ def conversation_attachment_upload(request, pk):
     payload = serialize_message(message)
     broadcast_event(conversation, {"type": "chat.message", "message": payload}, ignore_errors=False)
     return JsonResponse(payload, status=201)
+
+
+@login_required
+def attachment_download(request, attachment_id):
+    """Serve an attachment only to an active member of its conversation."""
+    attachment = get_object_or_404(
+        MessageAttachment.objects.select_related("message__conversation"),
+        pk=attachment_id,
+    )
+    conversation = attachment.message.conversation
+    if not conversation.is_member(request.user):
+        return HttpResponseForbidden(_("You are not a member of this conversation."))
+    response = FileResponse(attachment.file.open("rb"), content_type=attachment.content_type)
+    response["Content-Disposition"] = f'inline; filename="{attachment.file_name.replace(chr(34), "")}"'
+    return response
 
 
 @login_required
