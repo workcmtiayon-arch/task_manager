@@ -73,6 +73,23 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def save(self, *args, **kwargs):
+        old_photo_name = None
+        if self.pk:
+            old_photo_name = type(self).objects.filter(pk=self.pk).values_list(
+                "profile_photo", flat=True
+            ).first()
+        super().save(*args, **kwargs)
+        if old_photo_name and old_photo_name != self.profile_photo.name:
+            self.profile_photo.storage.delete(old_photo_name)
+
+    def delete(self, *args, **kwargs):
+        photo_name = self.profile_photo.name if self.profile_photo else None
+        result = super().delete(*args, **kwargs)
+        if photo_name:
+            self.profile_photo.storage.delete(photo_name)
+        return result
+
     @property
     def profile_photo_url(self):
         """Return the authenticated endpoint used to display this photo."""
