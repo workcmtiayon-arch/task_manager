@@ -1,6 +1,7 @@
 """Tests du protocole WebSocket du chat."""
 
 from channels.db import database_sync_to_async
+from channels.layers import channel_layers
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
 from django.contrib.auth import get_user_model
@@ -17,6 +18,9 @@ class ChatConsumerTests(TransactionTestCase):
 
     def setUp(self):
         """Crée les utilisateurs et la conversation de test WebSocket."""
+        # Django's settings override does not invalidate Channels' global
+        # backend cache when this class follows tests using Redis settings.
+        channel_layers.backends.clear()
         self.malik = User.objects.create_user(username="malik", email="maliktiayon95@gmail.com", password="pass1234")
         self.honore = User.objects.create_user(username="honore", email="honoretiayon@gmail.com", password="pass1234")
         self.americanboy = User.objects.create_user(username="americanboy", email="etudesamerican@gmail.com", password="pass1234")
