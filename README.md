@@ -26,6 +26,8 @@ The application also distinguishes between public content and authenticated user
 * Project management
 * Task management
 * User profile
+* Profile photo upload with validated image formats
+* Profile photo display in the workspace, administration and chat
 * User-specific data isolation
 * Administrative permissions
 
