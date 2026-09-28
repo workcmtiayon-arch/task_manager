@@ -69,7 +69,11 @@ class UserSearchViewTests(TestCase):
         self.client.force_login(self.current_user)
         response = self.client.get("/chat/users/search/", {"q": "mal"}, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["users"], [{"id": self.available_user.id, "username": "malik"}])
+        self.assertEqual(response.json()["users"], [{
+            "id": self.available_user.id,
+            "username": "malik",
+            "profile_photo_url": "",
+        }])
 
 
 class ConversationDetailTemplateTests(TestCase):

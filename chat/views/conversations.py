@@ -47,7 +47,12 @@ def user_search(request):
     if query:
         users = users.filter(Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(email__icontains=query))
     users = users.order_by("username")[:20]
-    return JsonResponse({"users": [{"id": u.id, "username": u.username} for u in users]})
+    return JsonResponse({
+        "users": [
+            {"id": u.id, "username": u.username, "profile_photo_url": u.profile_photo_url}
+            for u in users
+        ]
+    })
 
 
 @login_required

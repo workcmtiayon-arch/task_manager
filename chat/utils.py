@@ -36,7 +36,11 @@ def serialize_message(message):
     return {
         "id": message.id,
         "conversation_id": message.conversation_id,
-        "sender": {"id": message.sender_id, "username": message.sender.username},
+        "sender": {
+            "id": message.sender_id,
+            "username": message.sender.username,
+            "profile_photo_url": message.sender.profile_photo_url,
+        },
         "message_type": message.message_type,
         "content": "" if message.is_deleted() else message.content,
         "is_edited": message.is_edited(),
