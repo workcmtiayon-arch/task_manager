@@ -41,8 +41,11 @@
       const link = document.createElement("a");
       link.href = buildStartUrl(user.id);
       link.className = "chat-search-result";
+      const avatar = user.profile_photo_url
+        ? `<img src="${escapeHtml(user.profile_photo_url)}" alt="Photo de profil">`
+        : escapeHtml(user.username.slice(0, 1).toUpperCase());
       link.innerHTML = `
-        <span class="chat-avatar">${escapeHtml(user.username.slice(0, 1).toUpperCase())}</span>
+        <span class="chat-avatar">${avatar}</span>
         <span>${escapeHtml(user.username)}</span>
       `;
       resultsContainer.appendChild(link);
