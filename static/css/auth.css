@@ -77,6 +77,15 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .otp-box:focus { border-color: var(--auth-night-soft); outline: 0; box-shadow: 0 0 0 4px rgba(23, 52, 92, 0.1); }
 .inline-form { display: inline; }
 
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
 @media (max-width: 860px) {
     .auth__inner { grid-template-columns: 1fr; }
     .auth-side { min-height: 360px; padding: 130px 28px 44px; }
