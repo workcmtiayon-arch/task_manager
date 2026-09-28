@@ -95,6 +95,13 @@ Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connec
 
 ## Project Objectives
 
+### Interface visual consistency
+
+Authentication and account forms reuse the homepage design language: primary
+blue for actions and focus states, orange for emphasis, and the same light
+background and border tones. The homepage language selector follows the same
+interaction states and respects reduced-motion preferences.
+
 This project was assigned to consolidate practical Django knowledge through a progressively structured application.
 
 The main learning objectives are:
