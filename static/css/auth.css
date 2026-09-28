@@ -30,7 +30,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .auth__inner > .auth-card:only-child { grid-column: 1 / -1; }
 
 .auth-side { position: relative; display: flex; align-items: flex-end; overflow: hidden; padding: 150px clamp(28px, 7vw, 110px) 72px; color: var(--auth-white); background: var(--auth-night); }
-.auth-side::before, .auth-side::after { position: absolute; content: ""; border: 1px solid rgba(200, 241, 105, 0.22); border-radius: 50%; }
+.auth-side::before, .auth-side::after { position: absolute; content: ""; border: 1px solid rgba(49, 87, 213, 0.32); border-radius: 50%; }
 .auth-side::before { width: 580px; height: 580px; top: -250px; right: -280px; }
 .auth-side::after { width: 430px; height: 430px; bottom: -270px; left: -230px; }
 .auth-side__inner { position: relative; z-index: 1; width: min(100%, 470px); }
