@@ -24,6 +24,9 @@ urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
     path('projects/', include('projects.urls')),
+    # Keep the historical typo as a compatibility alias while exposing the
+    # correctly spelled public URL for new links and reverse() calls.
+    path('tasks/', include('tasks.urls')),
     path('taks/', include('tasks.urls')),
     path('chat/', include('chat.urls', namespace="chat")),
     path('ai/', include('ai.urls', namespace="ai")),
