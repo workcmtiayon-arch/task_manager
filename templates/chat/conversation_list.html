@@ -28,7 +28,13 @@
       {% for item in items %}
         <li class="chat-list-item">
           <a href="{% url 'chat:conversation_detail' item.conversation.pk %}" class="chat-list-link">
-            <span class="chat-avatar">{{ item.other_user.username|slice:":1"|upper }}</span>
+            <span class="chat-avatar">
+              {% if item.other_user.profile_photo %}
+              <img src="{{ item.other_user.profile_photo_url }}" alt="{% translate 'Profile photo' %}">
+              {% else %}
+              {{ item.other_user.username|slice:":1"|upper }}
+              {% endif %}
+            </span>
             <span class="chat-list-body">
               <span class="chat-list-name">{{ item.other_user.username }}</span>
               <span class="chat-list-preview">{{ item.preview|default:"Aucun message pour le moment." }}</span>

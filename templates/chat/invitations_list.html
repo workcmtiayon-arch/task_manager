@@ -15,7 +15,13 @@
       {% for item in items %}
         <li class="chat-list-item chat-invitation-item">
           <a href="{% url 'chat:conversation_detail' item.conversation.pk %}" class="chat-list-link">
-            <span class="chat-avatar">{{ item.initiator.username|slice:":1"|upper }}</span>
+            <span class="chat-avatar">
+              {% if item.initiator.profile_photo %}
+              <img src="{{ item.initiator.profile_photo_url }}" alt="{% translate 'Profile photo' %}">
+              {% else %}
+              {{ item.initiator.username|slice:":1"|upper }}
+              {% endif %}
+            </span>
             <span class="chat-list-body">
               <span class="chat-list-name">{{ item.initiator.username }}</span>
               <span class="chat-list-preview">{{ item.preview }}</span>
