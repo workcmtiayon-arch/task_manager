@@ -38,7 +38,13 @@
                 <tr data-user-row data-search="{{ account.username|lower }} {{ account.get_full_name|lower }} {{ account.email|lower }} {{ account.get_role_display|lower }}">
                     <td>
                         <div class="user-cell">
-                            <span class="user-cell__avatar">{{ account.get_full_name|default:account.username|slice:':2'|upper }}</span>
+                            <span class="user-cell__avatar">
+                                {% if account.profile_photo %}
+                                <img src="{{ account.profile_photo_url }}" alt="{% translate 'Profile photo' %}">
+                                {% else %}
+                                {{ account.get_full_name|default:account.username|slice:':2'|upper }}
+                                {% endif %}
+                            </span>
                             <span><strong>{{ account.get_full_name|default:account.username }}</strong><small>{{ account.email }}</small></span>
                         </div>
                     </td>

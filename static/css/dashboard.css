@@ -190,6 +190,13 @@
     font-size: 0.75rem;
     font-weight: 700;
     flex: 0 0 auto;
+    overflow: hidden;
+}
+
+.user-cell__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .users-table__action { text-align: right; white-space: nowrap; }
