@@ -1,4 +1,6 @@
 import secrets
+import os
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
@@ -7,6 +9,32 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+
+def profile_photo_upload_path(instance, filename):
+    """Store profile photos in a per-user directory with a non-user filename."""
+    extension = os.path.splitext(filename)[1].lower()
+    return f"profile_photos/user_{instance.pk}/{uuid.uuid4().hex}{extension}"
+
+
+def validate_profile_photo(uploaded_file):
+    """Accept only small raster images whose header matches their MIME type."""
+    allowed_types = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+    if uploaded_file.content_type not in allowed_types:
+        raise ValidationError(_("Profile photos must be JPEG, PNG, GIF or WebP images."))
+    if uploaded_file.size > 5 * 1024 * 1024:
+        raise ValidationError(_("Profile photos must not exceed 5 MB."))
+
+    header = uploaded_file.read(16)
+    uploaded_file.seek(0)
+    signatures = {
+        "image/jpeg": header.startswith(b"\xff\xd8\xff"),
+        "image/png": header.startswith(b"\x89PNG\r\n\x1a\n"),
+        "image/gif": header.startswith((b"GIF87a", b"GIF89a")),
+        "image/webp": header.startswith(b"RIFF") and header[8:12] == b"WEBP",
+    }
+    if not signatures.get(uploaded_file.content_type, False):
+        raise ValidationError(_("The profile photo content does not match its type."))
 
 
 # Create your models here.
@@ -24,6 +52,13 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_email_verified = models.BooleanField(default=False)
     langue = models.CharField(max_length=5, choices=Langue.choices, default=Langue.FRANCAIS)
+    profile_photo = models.FileField(
+        upload_to=profile_photo_upload_path,
+        blank=True,
+        null=True,
+        validators=[validate_profile_photo],
+        verbose_name=_("Profile photo"),
+    )
 
     # username = models.CharField(max_length=50)
     # password = models.CharField()
