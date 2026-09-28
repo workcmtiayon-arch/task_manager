@@ -7,6 +7,7 @@ from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.db import transaction
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -66,6 +67,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def profile_photo_url(self):
+        """Return the authenticated endpoint used to display this photo."""
+        if not self.profile_photo:
+            return ""
+        return reverse("profile_photo", args=[self.pk])
 
 
 class EmailOTP(models.Model):

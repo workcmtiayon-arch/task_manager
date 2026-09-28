@@ -1,3 +1,5 @@
+import os
+
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ForgotPasswordEmailForm, OTPForm, ProfileForm
 from django.conf import settings
 from django.contrib.auth import login, logout, get_user_model
@@ -8,7 +10,7 @@ from django.core.cache import cache
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 from django.db.models import Count, Q
-from django.http import HttpResponseForbidden
+from django.http import FileResponse, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
@@ -343,6 +345,29 @@ def profile(request):
         messages.success(request, _("Your profile information has been updated."))
         return redirect("profile")
     return render(request, "profile/profile.html", {"form": form, "active_nav": "profile"})
+
+
+@login_required
+def profile_photo(request, user_id):
+    """Serve an active user's profile photo to authenticated visitors only."""
+    user = get_object_or_404(User, pk=user_id, is_active=True)
+    if not user.profile_photo:
+        raise Http404
+    response = FileResponse(
+        user.profile_photo.open("rb"),
+        content_type=_profile_photo_content_type(user.profile_photo.name),
+    )
+    response["Content-Disposition"] = "inline"
+    response["Cache-Control"] = "private, max-age=3600"
+    return response
+
+
+def _profile_photo_content_type(filename):
+    """Return a safe content type based on the controlled upload extension."""
+    return {
+        ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+        ".gif": "image/gif", ".webp": "image/webp",
+    }.get(os.path.splitext(filename)[1].lower(), "application/octet-stream")
 
 
 @login_required
