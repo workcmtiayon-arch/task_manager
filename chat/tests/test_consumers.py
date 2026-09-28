@@ -1,9 +1,8 @@
 """Tests du protocole WebSocket du chat."""
 
-import importlib
-
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
+from channels.routing import URLRouter
 from django.contrib.auth import get_user_model
 from django.test import TransactionTestCase, override_settings
 
@@ -25,8 +24,12 @@ class ChatConsumerTests(TransactionTestCase):
 
     async def _connect(self, user):
         """Ouvre un communicator authentifié sur la conversation de test."""
-        import config.asgi
-        application = importlib.reload(config.asgi).application
+        from ..routing import websocket_urlpatterns
+
+        # The consumer is tested with an explicit user scope.  Bypassing the
+        # session middleware keeps this test focused on consumer permissions
+        # and avoids AuthMiddlewareStack replacing the injected test user.
+        application = URLRouter(websocket_urlpatterns)
         communicator = WebsocketCommunicator(application, f"/ws/chat/{self.conversation.pk}/")
         communicator.scope["user"] = user
         connected, _ = await communicator.connect()
