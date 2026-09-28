@@ -18,7 +18,7 @@ body { min-height: 100vh; margin: 0; color: var(--auth-ink); background: var(--a
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; }
 button { cursor: pointer; }
-a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid rgba(167, 216, 61, 0.75); outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 87, 213, 0.55); outline-offset: 3px; }
 
 .auth-header { position: absolute; z-index: 2; top: 0; left: 0; display: flex; align-items: center; width: 100%; padding: 28px clamp(22px, 5vw, 72px); }
 .auth-header__logo { display: inline-flex; align-items: center; gap: 11px; color: var(--auth-white); font-size: 1.02rem; font-weight: 800; letter-spacing: -0.03em; }
@@ -59,8 +59,8 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .form-alert p { margin: 0; }
 .form-hint { margin: 0; color: var(--auth-ink-soft); font-size: 0.8rem; }
 .form-hint--action { text-align: right; }
-.auth-link { color: #557d0d; font-weight: 800; }
-.auth-link:hover { color: #355400; text-decoration: underline; text-underline-offset: 3px; }
+.auth-link { color: var(--auth-lime-dark); font-weight: 800; }
+.auth-link:hover { color: var(--auth-night-soft); text-decoration: underline; text-underline-offset: 3px; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 57px; padding: 14px 22px; border: 0; border-radius: 14px; font-size: 0.92rem; font-weight: 850; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease; }
 .btn--primary { color: var(--auth-night); background: var(--auth-lime); box-shadow: 0 12px 24px rgba(137, 176, 43, 0.25); }
