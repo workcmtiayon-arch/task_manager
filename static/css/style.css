@@ -1032,6 +1032,8 @@ button:focus-visible,
 .language-select:focus-visible {
     outline: 2px solid var(--primary-color, #2952A3);
     outline-offset: 2px;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--primary-color-light);
 }
 
 @media (prefers-reduced-motion: reduce) {
