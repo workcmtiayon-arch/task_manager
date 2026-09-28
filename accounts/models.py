@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
@@ -20,6 +21,10 @@ def profile_photo_upload_path(instance, filename):
 
 def validate_profile_photo(uploaded_file):
     """Accept only small raster images whose header matches their MIME type."""
+    # Model validation receives a FieldFile after the form has already
+    # validated the uploaded object; the persisted wrapper has no MIME field.
+    if not hasattr(uploaded_file, "content_type"):
+        return
     allowed_types = {"image/jpeg", "image/png", "image/gif", "image/webp"}
     if uploaded_file.content_type not in allowed_types:
         raise ValidationError(_("Profile photos must be JPEG, PNG, GIF or WebP images."))

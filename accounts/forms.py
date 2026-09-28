@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from .models import validate_profile_photo
+
 User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
@@ -65,3 +67,9 @@ class ProfileForm(forms.ModelForm):
         if duplicate.exists():
             raise forms.ValidationError(_('This email address is already in use.'))
         return email
+
+    def clean_profile_photo(self):
+        photo = self.cleaned_data.get("profile_photo")
+        if photo:
+            validate_profile_photo(photo)
+        return photo

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.core import mail
 from django.test import override_settings
@@ -80,6 +81,54 @@ class DashboardAndAdministrationTests(TestCase):
         self.member.refresh_from_db()
         self.assertEqual(self.member.first_name, "Amina")
         self.assertEqual(self.member.email, "amina@example.com")
+
+    def test_profile_photo_can_be_uploaded_and_served_to_authenticated_users(self):
+        self.client.force_login(self.member)
+        photo = SimpleUploadedFile(
+            "avatar.png",
+            b"\x89PNG\r\n\x1a\n" + b"profile-image",
+            content_type="image/png",
+        )
+        response = self.client.post(
+            reverse("profile"),
+            {
+                "username": "member",
+                "first_name": "Member",
+                "last_name": "User",
+                "email": "member@example.com",
+                "profile_photo": photo,
+            },
+        )
+        self.assertRedirects(response, reverse("profile"))
+        self.member.refresh_from_db()
+        self.assertTrue(self.member.profile_photo)
+        self.assertContains(self.client.get(reverse("profile")), "profile-photo-preview")
+        photo_response = self.client.get(reverse("profile_photo", args=[self.member.pk]))
+        self.assertEqual(photo_response.status_code, 200)
+        self.assertEqual(photo_response["Content-Type"], "image/png")
+
+    def test_profile_photo_rejects_non_image_content(self):
+        self.client.force_login(self.member)
+        fake_photo = SimpleUploadedFile(
+            "avatar.png", b"not-an-image", content_type="image/png"
+        )
+        response = self.client.post(
+            reverse("profile"),
+            {
+                "username": "member",
+                "first_name": "",
+                "last_name": "",
+                "email": "member@example.com",
+                "profile_photo": fake_photo,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.member.refresh_from_db()
+        self.assertFalse(self.member.profile_photo)
+
+    def test_profile_photo_requires_authentication(self):
+        response = self.client.get(reverse("profile_photo", args=[self.member.pk]))
+        self.assertEqual(response.status_code, 302)
 
 
 class AuthenticationFlowTests(TestCase):
