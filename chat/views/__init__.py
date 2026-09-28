@@ -8,6 +8,7 @@ from .conversations import (
     user_search,
 )
 from .messages import (
+    attachment_download,
     conversation_attachment_upload,
     conversation_leave,
     conversation_message_send,
@@ -16,7 +17,7 @@ from .messages import (
 from .reactions import conversation_reaction_remove, conversation_reaction_set
 
 __all__ = [
-    "conversation_list", "invitations_list", "user_search", "conversation_start",
+    "attachment_download", "conversation_list", "invitations_list", "user_search", "conversation_start",
     "conversation_detail", "conversation_messages_json", "conversation_message_send",
     "conversation_attachment_upload", "conversation_leave", "conversation_reaction_set",
     "conversation_reaction_remove",
