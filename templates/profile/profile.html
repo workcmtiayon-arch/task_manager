@@ -15,7 +15,7 @@
                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {% if field.name == 'profile_photo' %}
                     {% if request.user.profile_photo %}
-                    <img class="profile-photo-preview" src="{{ request.user.profile_photo.url }}" alt="{% translate 'Current profile photo' %}">
+                    <img class="profile-photo-preview" src="{{ request.user.profile_photo_url }}" alt="{% translate 'Current profile photo' %}">
                     {% endif %}
                     <input class="form-input {% if field.errors %}form-input--error{% endif %}" type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/jpeg,image/png,image/gif,image/webp">
                     <span class="form-hint">{% translate "JPEG, PNG, GIF or WebP, 5 MB maximum." %}</span>

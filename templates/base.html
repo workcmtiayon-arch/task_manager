@@ -117,7 +117,11 @@
             <div class="sidebar__footer">
                 <a href="{% url 'profile' %}" class="user-mini {% if active_nav == 'profile' %}user-mini--active{% endif %}">
                     <span class="user-mini__avatar">
+                        {% if request.user.profile_photo %}
+                        <img src="{{ request.user.profile_photo_url }}" alt="{% translate 'Profile photo' %}">
+                        {% else %}
                         {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+                        {% endif %}
                     </span>
                     <span class="user-mini__info">
                         <span class="user-mini__name">{{ request.user.get_full_name|default:request.user.username }}</span>
@@ -158,7 +162,11 @@
                     <a href="{% url 'profile' %}" class="topbar__profile-link">{% translate "Edit my profile" %}</a>
                     <span class="badge badge--role">{% if request.user.role == 'ADMIN' %}Administrateur{% else %}Membre{% endif %}</span>
                     <span class="topbar__avatar">
+                        {% if request.user.profile_photo %}
+                        <img src="{{ request.user.profile_photo_url }}" alt="{% translate 'Profile photo' %}">
+                        {% else %}
                         {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+                        {% endif %}
                     </span>
                 </div>
             </header>
