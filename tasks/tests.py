@@ -92,7 +92,7 @@ class SubTaskIntegrationTests(TestCase):
         response = self.client.get(reverse('task_detail', args=[self.task.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Créer les modèles')
-        self.assertContains(response, 'Ajouter une SubTask')
+        self.assertContains(response, 'Add a subtask')
 
     def test_subtask_permissions_follow_task_owner(self):
         subtask = SubTask.objects.create(task=self.task, title='Étape privée')
