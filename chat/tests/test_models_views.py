@@ -1,10 +1,12 @@
 """Tests des modèles et endpoints HTTP du chat."""
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, TransactionTestCase, override_settings
 
 from ..models import Conversation, Message, MessageAttachment, MessageReaction
+from ..permissions import user_can_access_conversation
 
 User = get_user_model()
 
@@ -29,6 +31,33 @@ class ConversationModelTests(TransactionTestCase):
         first = Conversation.objects.get_or_create_private(self.malik, self.honore)
         second = Conversation.objects.get_or_create_private(self.honore, self.malik)
         self.assertEqual(first.pk, second.pk)
+
+    def test_starting_again_after_leave_creates_a_fresh_private_thread(self):
+        first = Conversation.objects.get_or_create_private(self.malik, self.honore)
+        first.memberships.get(user=self.malik).leave()
+        second = Conversation.objects.get_or_create_private(self.malik, self.honore)
+        self.assertNotEqual(first.pk, second.pk)
+
+    def test_inactive_account_cannot_start_a_private_thread(self):
+        self.honore.is_active = False
+        self.honore.save(update_fields=["is_active"])
+        with self.assertRaises(ValueError):
+            Conversation.objects.get_or_create_private(self.malik, self.honore)
+
+    def test_private_pair_key_is_unique_at_the_database_level(self):
+        conversation = Conversation.objects.get_or_create_private(self.malik, self.honore)
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Conversation.objects.create(
+                    type=Conversation.Type.PRIVATE,
+                    private_key=conversation.private_key,
+                )
+
+    def test_disabled_account_has_no_websocket_membership_access(self):
+        conversation = Conversation.objects.get_or_create_private(self.malik, self.honore)
+        self.malik.is_active = False
+        self.malik.save(update_fields=["is_active"])
+        self.assertFalse(user_can_access_conversation(self.malik, conversation.pk))
 
     def test_message_delete_is_soft(self):
         """Vérifie qu'une suppression vide le message sans supprimer sa ligne."""
@@ -75,6 +104,15 @@ class UserSearchViewTests(TestCase):
             "profile_photo_url": "",
         }])
 
+    def test_email_is_not_used_as_a_user_search_field(self):
+        self.client.force_login(self.current_user)
+        response = self.client.get(
+            "/chat/users/search/",
+            {"q": "malik@example.com"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.json()["users"], [])
+
 
 class ConversationDetailTemplateTests(TestCase):
     """Vérifie les données essentielles injectées dans le détail."""
@@ -106,6 +144,22 @@ class MessageSendingTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertTrue(Message.objects.filter(conversation=conversation, content="Bonjour Malik").exists())
         self.assertEqual(Conversation.objects.invitations_for_user(recipient).count(), 1)
+
+    def test_conversation_creation_requires_post(self):
+        sender = User.objects.create_user(username="start", email="start@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="target", email="target@example.com", password="pass1234")
+        self.client.force_login(sender)
+        response = self.client.get(f"/chat/start/{recipient.pk}/")
+        self.assertEqual(response.status_code, 405)
+        self.assertFalse(Conversation.objects.exists())
+
+    def test_inactive_account_cannot_be_contacted(self):
+        sender = User.objects.create_user(username="start", email="start@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="target", email="target@example.com", password="pass1234", is_active=False)
+        self.client.force_login(sender)
+        response = self.client.post(f"/chat/start/{recipient.pk}/")
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Conversation.objects.exists())
 
     def test_reaction_http_fallback_sets_and_removes_reaction(self):
         """Vérifie le fallback HTTP de création puis suppression d'une réaction."""
@@ -163,3 +217,21 @@ class MessageSendingTests(TestCase):
 
         self.client.force_login(outsider)
         self.assertEqual(self.client.get(f"/chat/attachments/{attachment.pk}/download/").status_code, 403)
+
+    def test_attachment_download_sanitizes_control_characters_in_filename(self):
+        owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="recipient", email="recipient@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(owner, recipient)
+        message = Message.objects.create(conversation=conversation, sender=owner, content="", message_type=Message.MessageType.ATTACHMENT)
+        attachment = MessageAttachment.objects.create(
+            message=message,
+            file=SimpleUploadedFile("note.txt", b"private note", content_type="text/plain"),
+            file_name="note\r\nX-Evil: yes.txt",
+            file_size=12,
+            content_type="text/plain",
+        )
+        self.client.force_login(recipient)
+        response = self.client.get(f"/chat/attachments/{attachment.pk}/download/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("\r", response["Content-Disposition"])
+        self.assertNotIn("\n", response["Content-Disposition"])
