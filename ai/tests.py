@@ -103,6 +103,22 @@ class AIChatViewTests(TestCase):
         get_provider.assert_not_called()
 
     @patch("ai.services.get_provider")
+    def test_conversation_history_must_belong_to_the_request_user(self, get_provider):
+        other = User.objects.create_user(
+            username="other",
+            email="other@example.com",
+            password="password123",
+        )
+        foreign_conversation = Conversation.objects.create(user=other, title="Private history")
+        response = self.client.post(
+            reverse("ai:chat"),
+            {"content": "Continue this conversation", "conversation_id": foreign_conversation.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 404)
+        get_provider.assert_not_called()
+
+    @patch("ai.services.get_provider")
     def test_failed_provider_call_does_not_leave_an_empty_conversation(self, get_provider):
         get_provider.return_value.complete.side_effect = AIProviderError("Unavailable")
         response = self.client.post(
