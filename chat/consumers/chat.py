@@ -39,8 +39,25 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """Envoie un événement à tous les sockets actifs de cette conversation individuelle."""
         await send_to_conversation(self.channel_layer, self.conversation_id, event)
 
+    async def _ensure_active_membership(self):
+        """Close stale sockets before they receive any further private events."""
+        allowed = await database_sync_to_async(
+            chat_permissions.user_can_access_conversation
+        )(self.user, self.conversation_id)
+        if not allowed:
+            await self.close(code=4003)
+        return allowed
+
     async def receive_json(self, content, **kwargs):
         """Route chaque commande JSON vers le gestionnaire correspondant."""
+        # A socket can outlive the membership that authorized its connection.
+        # Re-check the database before every command so leaving or revoking a
+        # membership takes effect immediately, without relying on a disconnect.
+        if not await self._ensure_active_membership():
+            return
+        if not isinstance(content, dict):
+            await self.send_json({"type": "error", "detail": "La commande doit être un objet JSON."})
+            return
         event_type = content.get("type")
         try:
             handlers = {
@@ -130,41 +147,59 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def chat_message(self, event):
         """Convertit l'événement interne de nouveau message en événement client."""
+        if not await self._ensure_active_membership():
+            return
         await self.send_json({**event["message"], "type": "message.new"})
 
     async def chat_message_edited(self, event):
         """Convertit l'événement interne de modification en événement client."""
+        if not await self._ensure_active_membership():
+            return
         await self.send_json({**event["message"], "type": "message.edited"})
 
     async def chat_message_deleted(self, event):
         """Convertit l'événement interne de suppression en événement client."""
+        if not await self._ensure_active_membership():
+            return
         await self.send_json({**event["message"], "type": "message.deleted"})
 
     async def chat_receipt_update(self, event):
         """Transmet aux clients l'état d'un accusé de réception."""
+        if not await self._ensure_active_membership():
+            return
         await self.send_json({"type": "receipt.update", "message_ids": event["message_ids"], "user_id": event["user_id"], "status": event["status"]})
 
     async def chat_reaction_update(self, event):
         """Transmet le résumé des réactions d'un message aux clients."""
+        if not await self._ensure_active_membership():
+            return
         await self.send_json({"type": "reaction.update", "message_id": event["message_id"], "reactions": event["reactions"]})
 
     async def chat_typing_update(self, event):
         """Transmet l'état de saisie uniquement aux utilisateurs distincts de l'émetteur."""
+        if not await self._ensure_active_membership():
+            return
         if event["user_id"] != self.user.id:
             await self.send_json({"type": "typing.update", "user_id": event["user_id"], "username": event["username"], "is_typing": event["is_typing"]})
 
     async def chat_presence_update(self, event):
         """Transmet les changements de présence des autres membres."""
+        if not await self._ensure_active_membership():
+            return
         if event["user_id"] != self.user.id:
             await self.send_json({"type": "presence.update", "user_id": event["user_id"], "is_online": event["is_online"]})
 
     async def chat_presence_request(self, event):
         """Transmet une demande de présence aux membres distincts du demandeur."""
+        if not await self._ensure_active_membership():
+            return
         if event["requester_id"] != self.user.id:
             await self.send_json({"type": "presence.request", "requester_id": event["requester_id"]})
 
     def _create_text_message(self, text):
         """Crée le message et ses accusés de réception destinataires."""
+        if not chat_permissions.user_can_access_conversation(self.user, self.conversation_id):
+            raise PermissionError
         conversation = Conversation.objects.get(pk=self.conversation_id)
         message = Message.objects.create(conversation=conversation, sender=self.user, content=text, message_type=Message.MessageType.TEXT)
         other_members = conversation.get_members().exclude(pk=self.user.pk)
@@ -176,6 +211,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _edit_message(self, message_id, new_text):
         """Modifie un message après avoir vérifié que l'utilisateur en est l'auteur."""
+        if not chat_permissions.user_can_access_conversation(self.user, self.conversation_id):
+            raise PermissionError
         message = Message.objects.select_related("sender").get(pk=message_id, conversation_id=self.conversation_id)
         if message.sender_id != self.user.id:
             raise PermissionError("Seul l'auteur peut modifier ce message.")
@@ -184,6 +221,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _delete_message(self, message_id):
         """Supprime logiquement un message après vérification de son auteur."""
+        if not chat_permissions.user_can_access_conversation(self.user, self.conversation_id):
+            raise PermissionError
         message = Message.objects.select_related("sender").get(pk=message_id, conversation_id=self.conversation_id)
         if message.sender_id != self.user.id:
             raise PermissionError("Seul l'auteur peut supprimer ce message.")
@@ -192,7 +231,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _mark_message_read(self, message_id):
         """Marque l'accusé de l'utilisateur courant comme lu si celui-ci existe."""
-        receipt = MessageReceipt.objects.filter(message_id=message_id, user=self.user).first()
+        if not chat_permissions.user_can_access_conversation(self.user, self.conversation_id):
+            raise PermissionError
+        receipt = MessageReceipt.objects.filter(
+            message_id=message_id,
+            message__conversation_id=self.conversation_id,
+            user=self.user,
+        ).first()
         if receipt is None:
             return False
         receipt.mark_as_read()
