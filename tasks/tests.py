@@ -1,11 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
+from unittest.mock import patch
 
 from accounts.models import User
 from projects.models import Project
 
 from .models import SubTask, Task
+from .tasks import send_daily_task_reminder
 
 
 class SubTaskModelTests(TestCase):
@@ -122,3 +124,22 @@ class TaskListDisplayTests(TestCase):
         self.assertContains(response, 'Préparer les maquettes')
         self.assertContains(response, 'nav-link--active')
         self.assertEqual(response.context['active_nav'], 'tasks')
+
+
+class DailyReminderEligibilityTests(TestCase):
+    @patch("tasks.tasks.send_reminder_email_task.delay")
+    def test_reminders_are_not_sent_for_inactive_accounts(self, send_email):
+        active = User.objects.create_user(
+            username="active", email="active@example.com", password="password123"
+        )
+        inactive = User.objects.create_user(
+            username="inactive", email="inactive@example.com", password="password123", is_active=False
+        )
+        for owner, name in ((active, "Active task"), (inactive, "Inactive task")):
+            project = Project.objects.create(user=owner, name=name)
+            Task.objects.create(project=project, title=name)
+
+        send_daily_task_reminder.run()
+
+        self.assertEqual(send_email.call_count, 1)
+        self.assertEqual(send_email.call_args.args[0], active.pk)
