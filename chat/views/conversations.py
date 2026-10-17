@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
 from ..models import Conversation
 from .common import preview_text
@@ -45,7 +46,7 @@ def user_search(request):
         return render(request, "chat/user_search.html", {"active_nav": "messages"})
     users = User.objects.filter(is_active=True).exclude(pk=request.user.pk)
     if query:
-        users = users.filter(Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(email__icontains=query))
+        users = users.filter(Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query))
     users = users.order_by("username")[:20]
     return JsonResponse({
         "users": [
@@ -56,9 +57,10 @@ def user_search(request):
 
 
 @login_required
+@require_POST
 def conversation_start(request, user_id):
     """Crée ou retrouve une conversation privée puis redirige vers son détail."""
-    target = get_object_or_404(User, pk=user_id)
+    target = get_object_or_404(User, pk=user_id, is_active=True)
     if target.pk == request.user.pk:
         return HttpResponseBadRequest(_("You cannot start a conversation with yourself."))
     conversation = Conversation.objects.get_or_create_private(request.user, target)
