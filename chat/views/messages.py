@@ -6,6 +6,8 @@ from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
+from django.utils.text import get_valid_filename
+from django.utils.http import content_disposition_header
 from django.core.exceptions import ValidationError
 
 from ..models import Conversation, ConversationMember, Message, MessageAttachment, MessageReceipt
@@ -92,7 +94,8 @@ def attachment_download(request, attachment_id):
     if not conversation.is_member(request.user):
         return HttpResponseForbidden(_("You are not a member of this conversation."))
     response = FileResponse(attachment.file.open("rb"), content_type=attachment.content_type)
-    response["Content-Disposition"] = f'inline; filename="{attachment.file_name.replace(chr(34), "")}"'
+    safe_filename = get_valid_filename(attachment.file_name)[:255] or "attachment"
+    response["Content-Disposition"] = content_disposition_header(False, safe_filename)
     return response
 
 
