@@ -263,6 +263,12 @@ AI_MODEL = os.environ.get("AI_MODEL", "gemini-2.0-flash")
 AI_API_KEY = os.environ.get("AI_API_KEY", "")
 AI_API_TIMEOUT = int(os.environ.get("AI_API_TIMEOUT", "30"))
 AI_MAX_INPUT_CHARS = int(os.environ.get("AI_MAX_INPUT_CHARS", "4000"))
+AI_MAX_CONTEXT_CHARS = int(os.environ.get("AI_MAX_CONTEXT_CHARS", "12000"))
+AI_MAX_HISTORY_MESSAGES = int(os.environ.get("AI_MAX_HISTORY_MESSAGES", "20"))
+AI_MAX_HISTORY_CHARS = int(os.environ.get("AI_MAX_HISTORY_CHARS", "16000"))
+AI_MAX_OUTPUT_CHARS = int(os.environ.get("AI_MAX_OUTPUT_CHARS", "12000"))
+AI_RATE_LIMIT_ATTEMPTS = int(os.environ.get("AI_RATE_LIMIT_ATTEMPTS", "10"))
+AI_RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get("AI_RATE_LIMIT_WINDOW_SECONDS", "3600"))
 
 
 
