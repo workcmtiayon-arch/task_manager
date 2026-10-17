@@ -15,6 +15,7 @@ User = get_user_model()
 
 class OtpSecurityTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user(
             username="pending-user",
             email="pending@example.com",
@@ -24,6 +25,9 @@ class OtpSecurityTests(TestCase):
         session = self.client.session
         session["pending_user_id"] = self.user.pk
         session.save()
+
+    def tearDown(self):
+        cache.clear()
 
     @patch("accounts.views.send_otp_email_task.delay")
     def test_resend_otp_rejects_get_requests(self, send_email):
@@ -52,6 +56,22 @@ class OtpSecurityTests(TestCase):
         self.assertEqual(first_response.status_code, 302)
         self.assertEqual(second_response.status_code, 302)
         self.assertEqual(send_email.call_count, 1)
+
+    @patch("accounts.views.send_registration_alert_email_task.delay")
+    def test_existing_email_signup_alert_is_rate_limited(self, alert_email):
+        from django.urls import reverse
+
+        for _ in range(3):
+            self.client.post(
+                reverse("registration"),
+                {
+                    "username": "different-user",
+                    "email": self.user.email,
+                    "password1": "SecurePass123!",
+                    "password2": "SecurePass123!",
+                },
+            )
+        self.assertEqual(alert_email.call_count, 1)
 
     def test_expired_otp_cannot_be_used(self):
         otp, code = EmailOTP.generate_for(self.user, EmailOTP.Purpose.REGISTER)
