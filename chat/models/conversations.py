@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.utils import timezone
+from django.db import IntegrityError, transaction
 
 
 class ConversationManager(models.Manager):
@@ -14,6 +15,12 @@ class ConversationManager(models.Manager):
         """Retourne la conversation privée existante ou la crée avec ses deux membres."""
         if user_a.pk == user_b.pk:
             raise ValueError("Un utilisateur ne peut pas démarrer une conversation avec lui-même.")
+        if not user_a.is_active or not user_b.is_active:
+            raise ValueError("Les deux comptes doivent être actifs pour démarrer une conversation.")
+        private_key = f"private:{min(user_a.pk, user_b.pk)}:{max(user_a.pk, user_b.pk)}"
+        canonical = self.filter(private_key=private_key).first()
+        if canonical is not None:
+            return canonical
         existing = (
             self.filter(type=Conversation.Type.PRIVATE)
             .filter(
@@ -25,15 +32,32 @@ class ConversationManager(models.Manager):
             .first()
         )
         if existing is not None:
+            try:
+                with transaction.atomic():
+                    self.filter(pk=existing.pk, private_key__isnull=True).update(
+                        private_key=private_key
+                    )
+            except IntegrityError:
+                canonical = self.filter(private_key=private_key).first()
+                if canonical is not None:
+                    return canonical
             return existing
 
-        # user_a reste l'initiateur, comme dans la version monolithique d'origine.
-        conversation = self.create(type=Conversation.Type.PRIVATE, initiated_by=user_a)
-        ConversationMember.objects.bulk_create([
-            ConversationMember(conversation=conversation, user=user_a),
-            ConversationMember(conversation=conversation, user=user_b),
-        ])
-        return conversation
+        try:
+            with transaction.atomic():
+                conversation = self.create(
+                    type=Conversation.Type.PRIVATE,
+                    initiated_by=user_a,
+                    private_key=private_key,
+                )
+                ConversationMember.objects.bulk_create([
+                    ConversationMember(conversation=conversation, user=user_a),
+                    ConversationMember(conversation=conversation, user=user_b),
+                ])
+                return conversation
+        except IntegrityError:
+            # A concurrent request won the unique-key race and created the pair.
+            return self.get(private_key=private_key)
 
     def for_user_inbox(self, user):
         """Sélectionne les conversations actives visibles dans la boîte de réception."""
@@ -79,6 +103,7 @@ class Conversation(models.Model):
         related_name="initiated_conversations",
     )
     accepted_at = models.DateTimeField(null=True, blank=True)
+    private_key = models.CharField(max_length=64, unique=True, null=True, blank=True, editable=False)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, through="ConversationMember", related_name="conversations",
     )
@@ -154,8 +179,13 @@ class ConversationMember(models.Model):
 
     def leave(self):
         """Enregistre le départ sans supprimer l'historique de l'adhésion."""
-        self.left_at = timezone.now()
-        self.save(update_fields=["left_at"])
+        with transaction.atomic():
+            self.left_at = timezone.now()
+            self.save(update_fields=["left_at"])
+            Conversation.objects.filter(
+                pk=self.conversation_id,
+                type=Conversation.Type.PRIVATE,
+            ).update(private_key=None)
 
     def rejoin(self):
         """Réactive une adhésion précédemment quittée."""
