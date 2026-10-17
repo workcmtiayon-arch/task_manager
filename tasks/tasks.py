@@ -16,6 +16,7 @@ def send_daily_task_reminder():
     pending_tasks = (
         Task.objects
         .exclude(status=Task.Status.DONE)
+        .filter(project__user__is_active=True)
         .select_related("project", "project__user")
     )
 
