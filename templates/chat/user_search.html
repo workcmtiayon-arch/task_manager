@@ -21,7 +21,8 @@
 
   <div id="chat-search-results" class="chat-search-results"
        data-search-url="{% url 'chat:user_search' %}"
-       data-start-url-template="{% url 'chat:conversation_start' 999999999 %}">
+       data-start-url-template="{% url 'chat:conversation_start' 999999999 %}"
+       data-csrf-token="{{ csrf_token }}">
   </div>
 </div>
 

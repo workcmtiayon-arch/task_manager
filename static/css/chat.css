@@ -249,6 +249,10 @@
     overflow-y: auto;
 }
 
+.chat-search-result-form {
+    margin: 0;
+}
+
 .chat-search-result {
     display: flex;
     align-items: center;

@@ -36,19 +36,29 @@
       return;
     }
     resultsContainer.innerHTML = "";
-    // Transforme chaque utilisateur en lien de démarrage de conversation.
+    // Chaque démarrage est une mutation protégée par CSRF, donc un formulaire POST.
     users.forEach(function (user) {
-      const link = document.createElement("a");
-      link.href = buildStartUrl(user.id);
-      link.className = "chat-search-result";
+      const form = document.createElement("form");
+      form.method = "post";
+      form.action = buildStartUrl(user.id);
+      form.className = "chat-search-result-form";
+      const csrf = document.createElement("input");
+      csrf.type = "hidden";
+      csrf.name = "csrfmiddlewaretoken";
+      csrf.value = resultsContainer.dataset.csrfToken;
+      form.appendChild(csrf);
+      const button = document.createElement("button");
+      button.type = "submit";
+      button.className = "chat-search-result";
       const avatar = user.profile_photo_url
         ? `<img src="${escapeHtml(user.profile_photo_url)}" alt="Photo de profil">`
         : escapeHtml(user.username.slice(0, 1).toUpperCase());
-      link.innerHTML = `
+      button.innerHTML = `
         <span class="chat-avatar">${avatar}</span>
         <span>${escapeHtml(user.username)}</span>
       `;
-      resultsContainer.appendChild(link);
+      form.appendChild(button);
+      resultsContainer.appendChild(form);
     });
   }
 
