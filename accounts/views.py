@@ -31,7 +31,11 @@ def registration(request):
             existing = User.objects.filter(email__iexact=email).first()
 
             if existing:
-                send_registration_alert_email_task.delay(existing.email)
+                alert_key = "registration-alert:" + hashlib.sha256(
+                    f"{request.META.get('REMOTE_ADDR', '')}:{email}".encode()
+                ).hexdigest()
+                if cache.add(alert_key, True, 900):
+                    send_registration_alert_email_task.delay(existing.email)
             else:
                 user = form.save(commit=False)
                 user.is_active = False
