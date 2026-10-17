@@ -19,5 +19,6 @@ celerybeat.pid
 *.log
 docs
 tests
+auth/
 AI_INTEGRATION_PLAN.md
 d.html
