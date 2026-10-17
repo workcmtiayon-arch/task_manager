@@ -4,10 +4,12 @@ from channels.db import database_sync_to_async
 from channels.layers import channel_layers
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
 from django.contrib.auth import get_user_model
 from django.test import TransactionTestCase, override_settings
 
-from ..models import Conversation, Message
+from ..models import Conversation, Message, MessageReceipt
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -52,6 +54,19 @@ class ChatConsumerTests(TransactionTestCase):
         communicator, connected = await self._connect(self.americanboy)
         self.assertFalse(connected)
 
+    async def test_cross_site_websocket_origin_is_rejected(self):
+        from ..routing import websocket_urlpatterns
+
+        application = AllowedHostsOriginValidator(URLRouter(websocket_urlpatterns))
+        communicator = WebsocketCommunicator(
+            application,
+            f"/ws/chat/{self.conversation.pk}/",
+            headers=[(b"origin", b"https://attacker.example")],
+        )
+        communicator.scope["user"] = self.malik
+        connected, _ = await communicator.connect()
+        self.assertFalse(connected)
+
     async def test_send_message_is_persisted_and_broadcast(self):
         """Vérifie qu'un message est persisté et reçu par l'autre socket."""
         malik_comm, _ = await self._connect(self.malik)
@@ -77,3 +92,35 @@ class ChatConsumerTests(TransactionTestCase):
         self.assertEqual(error_response["type"], "error")
         await malik_comm.disconnect()
         await honore_comm.disconnect()
+
+    async def test_socket_is_closed_after_membership_is_revoked(self):
+        communicator, connected = await self._connect(self.malik)
+        self.assertTrue(connected)
+        await database_sync_to_async(
+            lambda: self.conversation.memberships.filter(user=self.malik).update(left_at=timezone.now())
+        )()
+        await communicator.send_json_to({"type": "message.send", "content": "Still here"})
+        output = await communicator.receive_output(timeout=2)
+        self.assertEqual(output["type"], "websocket.close")
+        count = await database_sync_to_async(Message.objects.filter(conversation=self.conversation).count)()
+        self.assertEqual(count, 0)
+
+    async def test_read_receipt_must_belong_to_socket_conversation(self):
+        communicator, connected = await self._connect(self.malik)
+        self.assertTrue(connected)
+        other_conversation = await database_sync_to_async(
+            Conversation.objects.get_or_create_private
+        )(self.malik, self.americanboy)
+        message = await database_sync_to_async(Message.objects.create)(
+            conversation=other_conversation,
+            sender=self.americanboy,
+            content="Other conversation",
+        )
+        receipt = await database_sync_to_async(MessageReceipt.objects.create)(
+            message=message,
+            user=self.malik,
+        )
+        await communicator.send_json_to({"type": "message.read", "message_id": message.pk})
+        await database_sync_to_async(receipt.refresh_from_db)()
+        self.assertIsNone(receipt.read_at)
+        await communicator.disconnect()
