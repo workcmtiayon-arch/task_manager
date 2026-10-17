@@ -29,7 +29,7 @@ class OpenAIProvider(BaseProvider):
     name = "openai"
 
     def complete(self, messages):
-        data = self._post("https://api.openai.com/v1/chat/completions", {"model": self.model, "messages": messages}, {"Authorization": f"Bearer {self.api_key}"})
+        data = self._post("https://api.openai.com/v1/chat/completions", {"model": self.model, "messages": messages, "max_completion_tokens": 1024}, {"Authorization": f"Bearer {self.api_key}"})
         try:
             return data["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as exc:
@@ -42,7 +42,7 @@ class GeminiProvider(BaseProvider):
     def complete(self, messages):
         contents = [{"role": "user" if item["role"] == "user" else "model", "parts": [{"text": item["content"]}]} for item in messages]
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
-        data = self._post(url, {"contents": contents}, {})
+        data = self._post(url, {"contents": contents, "generationConfig": {"maxOutputTokens": 1024}}, {})
         try:
             return data["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError, TypeError) as exc:
