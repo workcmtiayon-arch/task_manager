@@ -41,6 +41,7 @@ if insecure_secret:
         )
     SECRET_KEY = f"django-insecure-{secrets.token_urlsafe(50)}"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")).split(",")
+RATE_LIMIT_CLIENT_IP_HEADER = os.environ.get("RATE_LIMIT_CLIENT_IP_HEADER", "")
 
 
 # Application definition
