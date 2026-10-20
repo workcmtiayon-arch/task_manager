@@ -7,6 +7,7 @@ from accounts.models import User
 from projects.models import Project
 
 from .models import SubTask, Task
+from .forms import TaskForm
 from .tasks import send_daily_task_reminder
 
 
@@ -17,6 +18,15 @@ class SubTaskModelTests(TestCase):
         )
         self.project = Project.objects.create(user=self.user, name='Site vitrine')
         self.task = Task.objects.create(project=self.project, title='Préparer les maquettes')
+
+    def test_task_status_is_disabled_when_subtasks_control_it(self):
+        SubTask.objects.create(task=self.task, title='Créer la maquette')
+        form = TaskForm(instance=self.task)
+        self.assertTrue(form.fields['status'].disabled)
+
+    def test_task_status_remains_editable_without_subtasks(self):
+        form = TaskForm(instance=self.task)
+        self.assertFalse(form.fields['status'].disabled)
 
     def test_task_without_subtasks_keeps_existing_status_behavior(self):
         self.task.status = Task.Status.DONE
