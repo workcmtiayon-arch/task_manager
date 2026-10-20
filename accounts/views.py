@@ -16,7 +16,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
-from core.security import get_client_ip
+from core.security import get_client_ip, increment_rate_limit
 import time
 import hashlib
 
@@ -113,9 +113,10 @@ def forgot_password(request):
             rate_key = "password-reset:" + hashlib.sha256(
                 f"{get_client_ip(request)}:{email}".encode()
             ).hexdigest()
-            attempts = cache.get(rate_key, 0)
             max_attempts = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_ATTEMPTS", 3)
-            if attempts >= max_attempts:
+            window = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", 900)
+            attempts = increment_rate_limit(rate_key, window)
+            if attempts > max_attempts:
                 return redirect('verify-reset-otp')
 
             user = User.objects.filter(email__iexact=email, is_active=True).first()
@@ -124,11 +125,6 @@ def forgot_password(request):
                 send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.PASSWORD_RESET)
                 request.session['reset_user_id'] = user.id
                 messages.info(request, _("If this address is associated with an account, a code has been sent."))
-            cache.set(
-                rate_key,
-                attempts + 1,
-                getattr(settings, "PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", 900),
-            )
             return redirect('verify-reset-otp')
     else:
         form = ForgotPasswordEmailForm()
