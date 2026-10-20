@@ -216,9 +216,8 @@ def connection(request):
             if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
                 return redirect(next_url)
             return redirect("dashboard")
-        cache.set(
+        increment_rate_limit(
             rate_key,
-            failure_count + 1,
             getattr(settings, "LOGIN_RATE_LIMIT_WINDOW_SECONDS", 900),
         )
     else:
