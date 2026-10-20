@@ -80,6 +80,25 @@ class ChatConsumerTests(TransactionTestCase):
         await malik_comm.disconnect()
         await honore_comm.disconnect()
 
+    async def test_http_fallback_message_reaches_connected_socket_group(self):
+        """Vérifie que la diffusion de secours HTTP utilise le groupe partagé."""
+        from django.test import Client
+        from django.urls import reverse
+
+        honore_comm, connected = await self._connect(self.honore)
+        self.assertTrue(connected)
+        client = Client()
+        await database_sync_to_async(client.force_login)(self.malik)
+        response = await database_sync_to_async(client.post)(
+            reverse("chat:conversation_message_send", args=[self.conversation.pk]),
+            {"content": "Message via HTTP"},
+        )
+        self.assertEqual(response.status_code, 201)
+        message = await honore_comm.receive_json_from()
+        self.assertEqual(message["type"], "message.new")
+        self.assertEqual(message["content"], "Message via HTTP")
+        await honore_comm.disconnect()
+
     async def test_only_author_can_edit_message(self):
         """Vérifie que seul l'auteur peut modifier un message."""
         malik_comm, _ = await self._connect(self.malik)
