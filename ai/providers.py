@@ -41,8 +41,12 @@ class GeminiProvider(BaseProvider):
 
     def complete(self, messages):
         contents = [{"role": "user" if item["role"] == "user" else "model", "parts": [{"text": item["content"]}]} for item in messages]
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
-        data = self._post(url, {"contents": contents, "generationConfig": {"maxOutputTokens": 1024}}, {})
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        data = self._post(
+            url,
+            {"contents": contents, "generationConfig": {"maxOutputTokens": 1024}},
+            {"x-goog-api-key": self.api_key},
+        )
         try:
             return data["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError, TypeError) as exc:
