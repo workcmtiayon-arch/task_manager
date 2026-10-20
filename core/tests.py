@@ -1,4 +1,27 @@
 from django.test import TestCase
+from django.test import override_settings
+from django.test.client import RequestFactory
+
+from .security import get_client_ip
+
+
+class ClientAddressTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_uses_remote_address_without_a_trusted_proxy_setting(self):
+        request = self.factory.get("/", REMOTE_ADDR="192.0.2.10", HTTP_X_REAL_IP="203.0.113.20")
+        self.assertEqual(get_client_ip(request), "192.0.2.10")
+
+    @override_settings(RATE_LIMIT_CLIENT_IP_HEADER="HTTP_X_REAL_IP")
+    def test_uses_and_normalizes_the_configured_proxy_address(self):
+        request = self.factory.get("/", REMOTE_ADDR="172.18.0.2", HTTP_X_REAL_IP="203.0.113.20")
+        self.assertEqual(get_client_ip(request), "203.0.113.20")
+
+    @override_settings(RATE_LIMIT_CLIENT_IP_HEADER="HTTP_X_REAL_IP")
+    def test_rejects_a_malformed_proxy_address(self):
+        request = self.factory.get("/", REMOTE_ADDR="172.18.0.2", HTTP_X_REAL_IP="attacker")
+        self.assertEqual(get_client_ip(request), "172.18.0.2")
 from django.urls import reverse
 
 from accounts.models import User
