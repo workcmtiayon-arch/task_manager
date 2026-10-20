@@ -211,3 +211,26 @@ class ProviderOutputLimitTests(TestCase):
         provider = GeminiProvider("key", "model")
         provider.complete([])
         self.assertEqual(post.call_args.args[1]["generationConfig"]["maxOutputTokens"], 1024)
+
+    @patch("ai.providers.BaseProvider._post")
+    def test_gemini_sends_api_key_in_header_not_url(self, post):
+        post.return_value = {"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}
+        GeminiProvider("secret-key", "model").complete([])
+        url, _, headers = post.call_args.args
+        self.assertNotIn("secret-key", url)
+        self.assertEqual(headers["x-goog-api-key"], "secret-key")
+
+    @patch("ai.providers.BaseProvider._post")
+    def test_gemini_sends_system_context_separately_from_chat_turns(self, post):
+        post.return_value = {"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}
+        GeminiProvider("key", "model").complete([
+            {"role": "system", "content": "Use only this user's task data."},
+            {"role": "user", "content": "Summarize"},
+            {"role": "assistant", "content": "Earlier answer"},
+        ])
+        payload = post.call_args.args[1]
+        self.assertEqual(
+            payload["system_instruction"]["parts"][0]["text"],
+            "Use only this user's task data.",
+        )
+        self.assertEqual([turn["role"] for turn in payload["contents"]], ["user", "model"])
