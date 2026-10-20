@@ -40,11 +40,27 @@ class GeminiProvider(BaseProvider):
     name = "gemini"
 
     def complete(self, messages):
-        contents = [{"role": "user" if item["role"] == "user" else "model", "parts": [{"text": item["content"]}]} for item in messages]
+        system_messages = [item["content"] for item in messages if item["role"] == "system"]
+        contents = [
+            {
+                "role": "user" if item["role"] == "user" else "model",
+                "parts": [{"text": item["content"]}],
+            }
+            for item in messages
+            if item["role"] != "system"
+        ]
+        payload = {
+            "contents": contents,
+            "generationConfig": {"maxOutputTokens": 1024},
+        }
+        if system_messages:
+            payload["system_instruction"] = {
+                "parts": [{"text": "\n\n".join(system_messages)}],
+            }
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         data = self._post(
             url,
-            {"contents": contents, "generationConfig": {"maxOutputTokens": 1024}},
+            payload,
             {"x-goog-api-key": self.api_key},
         )
         try:
