@@ -197,7 +197,7 @@ def reset_password(request):
 def connection(request):
     if request.method == 'POST':
         username = request.POST.get("username", "").strip().lower()
-        client_ip = request.META.get("REMOTE_ADDR", "")
+        client_ip = get_client_ip(request)
         rate_key = "login-failures:" + hashlib.sha256(
             f"{client_ip}:{username}".encode()
         ).hexdigest()
