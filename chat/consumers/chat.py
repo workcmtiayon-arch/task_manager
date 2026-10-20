@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .. import permissions as chat_permissions
 from ..models import Conversation, Message, MessageReaction, MessageReceipt
-from ..realtime import register_channel, send_to_conversation, unregister_channel
+from ..realtime import conversation_group_name, send_to_conversation
 from ..utils import serialize_message, serialize_reactions
 
 
@@ -24,7 +24,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close(code=4003)
             return
         await self.accept()
-        register_channel(self.conversation_id, self.channel_name)
+        self.conversation_group = conversation_group_name(self.conversation_id)
+        await self.channel_layer.group_add(self.conversation_group, self.channel_name)
         await self.send_json({"type": "connection.ready", "conversation_id": int(self.conversation_id)})
         delivered_ids = await database_sync_to_async(self._mark_pending_as_delivered)()
         if delivered_ids:
@@ -32,8 +33,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         """Retire le socket fermé du registre direct de la conversation."""
-        if hasattr(self, "conversation_id"):
-            unregister_channel(self.conversation_id, self.channel_name)
+        if hasattr(self, "conversation_group"):
+            await self.channel_layer.group_discard(self.conversation_group, self.channel_name)
 
     async def _send_to_conversation(self, event):
         """Envoie un événement à tous les sockets actifs de cette conversation individuelle."""
