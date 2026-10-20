@@ -197,9 +197,12 @@ def connection(request):
         rate_key = "login-failures:" + hashlib.sha256(
             f"{client_ip}:{username}".encode()
         ).hexdigest()
-        failure_count = cache.get(rate_key, 0)
         max_attempts = getattr(settings, "LOGIN_RATE_LIMIT_ATTEMPTS", 5)
-        if failure_count >= max_attempts:
+        attempts = increment_rate_limit(
+            rate_key,
+            getattr(settings, "LOGIN_RATE_LIMIT_WINDOW_SECONDS", 900),
+        )
+        if attempts > max_attempts:
             form = CustomAuthenticationForm(request, data=request.POST)
             return render(
                 request,
@@ -216,10 +219,6 @@ def connection(request):
             if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
                 return redirect(next_url)
             return redirect("dashboard")
-        increment_rate_limit(
-            rate_key,
-            getattr(settings, "LOGIN_RATE_LIMIT_WINDOW_SECONDS", 900),
-        )
     else:
         form = CustomAuthenticationForm()
 
