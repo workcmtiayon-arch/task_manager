@@ -8,18 +8,18 @@ from .models import SubTask, Task
 
 class TaskForm(forms.ModelForm):
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk and self.instance.subtasks.exists():
-            self.fields['status'].disabled = True
-            self.fields['status'].help_text = _('The status is managed automatically by subtasks.')
     Formulaire permettant de créer ou modifier une tâche.
 
     Le projet n'est volontairement PAS présent dans ce formulaire.
     Le projet est déterminé par la vue à partir du projet
     dans lequel l'utilisateur se trouve.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk and self.instance.subtasks.exists():
+            self.fields['status'].disabled = True
+            self.fields['status'].help_text = _('The status is managed automatically by subtasks.')
 
     class Meta:
         # Le formulaire est basé sur le modèle Task
