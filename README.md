@@ -92,7 +92,7 @@ docker compose exec worker celery -A config inspect ping
 python manage.py test
 ```
 
-Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack and must be terminated by external infrastructure before enabling production HTTPS redirects.
+Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure that trusted proxy to overwrite `X-Forwarded-Proto`; Nginx preserves its `http` or `https` value so Django's HTTPS redirect and secure request checks see the browser-facing scheme. Do not expose this Nginx service directly alongside a trusted edge proxy that does not overwrite forwarded headers.
 
 
 ## Project Objectives
