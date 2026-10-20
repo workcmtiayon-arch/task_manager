@@ -16,6 +16,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from .models import EmailOTP
 from .tasks import send_otp_email_task, send_registration_alert_email_task
+from core.security import get_client_ip
 import time
 import hashlib
 
@@ -110,7 +111,7 @@ def forgot_password(request):
         if form.is_valid():
             email = form.cleaned_data['email'].lower()
             rate_key = "password-reset:" + hashlib.sha256(
-                f"{request.META.get('REMOTE_ADDR', '')}:{email}".encode()
+                f"{get_client_ip(request)}:{email}".encode()
             ).hexdigest()
             attempts = cache.get(rate_key, 0)
             max_attempts = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_ATTEMPTS", 3)
