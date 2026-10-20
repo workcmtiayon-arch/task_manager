@@ -4,7 +4,6 @@ import hashlib
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.core.cache import cache
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -13,6 +12,7 @@ from .exceptions import AIError
 from .models import Conversation
 from .services import chat
 from projects.models import Project
+from core.security import increment_rate_limit
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +32,7 @@ def chat_view(request):
         rate_key = "ai-chat:" + hashlib.sha256(
             str(request.user.pk).encode()
         ).hexdigest()
-        attempts = cache.get(rate_key, 0)
-        if attempts >= getattr(settings, "AI_RATE_LIMIT_ATTEMPTS", 10):
-            return JsonResponse({"detail": "Limite de requêtes atteinte. Réessaie plus tard."}, status=429)
         window = getattr(settings, "AI_RATE_LIMIT_WINDOW_SECONDS", 3600)
-        if not cache.add(rate_key, 1, window):
-            try:
-                attempts = cache.incr(rate_key)
-            except ValueError:
-                cache.add(rate_key, 1, window)
-                attempts = 1
-            if attempts > getattr(settings, "AI_RATE_LIMIT_ATTEMPTS", 10):
-                return JsonResponse({"detail": "Limite de requêtes atteinte. Réessaie plus tard."}, status=429)
         content = payload.get("content", "")
         if not isinstance(content, str) or len(content) > 4000:
             return JsonResponse({"detail": "La demande est invalide ou trop longue."}, status=400)
@@ -65,6 +54,9 @@ def chat_view(request):
             pk=project_id, user=request.user
         ).exists():
             return JsonResponse({"detail": "Projet introuvable."}, status=404)
+        attempts = increment_rate_limit(rate_key, window)
+        if attempts > getattr(settings, "AI_RATE_LIMIT_ATTEMPTS", 10):
+            return JsonResponse({"detail": "Limite de requêtes atteinte. Réessaie plus tard."}, status=429)
         conversation, answer = chat(request.user, content, conversation, project_id)
     except (json.JSONDecodeError, ValueError):
         return JsonResponse({"detail": "Demande invalide."}, status=400)
