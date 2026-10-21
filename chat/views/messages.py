@@ -6,6 +6,7 @@ from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
+from django.contrib.auth import get_user_model
 from django.utils.text import get_valid_filename
 from django.utils.http import content_disposition_header
 from django.core.exceptions import ValidationError
@@ -76,7 +77,7 @@ def conversation_attachment_upload(request, pk):
     with transaction.atomic():
         # Serialize uploads for this account so concurrent requests cannot
         # all pass the storage quota using the same previous total.
-        type(request.user).objects.select_for_update().get(pk=request.user.pk)
+        get_user_model().objects.select_for_update().get(pk=request.user.pk)
         stored_bytes = MessageAttachment.objects.filter(
             message__sender_id=request.user.pk
         ).aggregate(total=Sum("file_size"))["total"] or 0
