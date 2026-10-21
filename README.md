@@ -92,7 +92,7 @@ docker compose exec worker celery -A config inspect ping
 python manage.py test
 ```
 
-Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure that trusted proxy to overwrite `X-Forwarded-Proto`; Nginx preserves its `http` or `https` value so Django's HTTPS redirect and secure request checks see the browser-facing scheme. Do not expose this Nginx service directly alongside a trusted edge proxy that does not overwrite forwarded headers.
+Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure Nginx's `docker/nginx/trusted-proxies.conf` with `set_real_ip_from <CIDR>;` entries and `docker/nginx/trusted-proxies.geo` with matching `<CIDR> 1;` entries for that proxy. The edge must overwrite `X-Forwarded-For` and `X-Forwarded-Proto`. Nginx now honors those headers only when the direct peer is in the configured trusted ranges; without entries, requests use the connection's actual address and scheme.
 
 
 ## Project Objectives
