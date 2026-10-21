@@ -95,7 +95,9 @@ def conversation_attachment_upload(request, pk):
         maybe_accept_conversation(conversation, request.user)
         conversation.touch()
     payload = serialize_message(message)
-    broadcast_event(conversation, {"type": "chat.message", "message": payload}, ignore_errors=False)
+    # The upload is already committed; a transient channel-layer outage must
+    # not turn a successful persisted upload into an apparent HTTP failure.
+    broadcast_event(conversation, {"type": "chat.message", "message": payload})
     return JsonResponse(payload, status=201)
 
 
