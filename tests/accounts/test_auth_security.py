@@ -98,11 +98,15 @@ class OtpSecurityTests(TestCase):
 
 class PasswordResetSecurityTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user(
             username="reset-user",
             email="reset@example.com",
             password="OldSecurePass123!",
         )
+
+    def tearDown(self):
+        cache.clear()
 
     @patch("accounts.views.send_otp_email_task.delay")
     def test_reset_request_does_not_enumerate_accounts(self, send_email):
@@ -124,6 +128,17 @@ class PasswordResetSecurityTests(TestCase):
             self.client.post(
                 reverse("forgot-password"),
                 {"email": self.user.email},
+            )
+
+        self.assertEqual(send_email.call_count, 3)
+
+    @patch("accounts.views.send_otp_email_task.delay")
+    def test_reset_email_volume_is_limited_across_client_addresses(self, send_email):
+        for index in range(1, 5):
+            self.client.post(
+                reverse("forgot-password"),
+                {"email": self.user.email},
+                REMOTE_ADDR=f"203.0.113.{index}",
             )
 
         self.assertEqual(send_email.call_count, 3)
