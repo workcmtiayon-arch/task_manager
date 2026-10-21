@@ -4,6 +4,7 @@ import hashlib
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.exceptions import RequestDataTooBig
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -26,7 +27,20 @@ def csrf_failure(request, reason=""):
 @never_cache
 def chat_view(request):
     try:
-        payload = json.loads(request.body or "{}")
+        max_request_bytes = getattr(settings, "AI_MAX_REQUEST_BYTES", 65536)
+        try:
+            content_length = int(request.META.get("CONTENT_LENGTH") or 0)
+        except (TypeError, ValueError):
+            return JsonResponse({"detail": "Demande invalide."}, status=400)
+        if content_length > max_request_bytes:
+            return JsonResponse({"detail": "La demande est trop volumineuse."}, status=413)
+        try:
+            raw_body = request.body
+        except RequestDataTooBig:
+            return JsonResponse({"detail": "La demande est trop volumineuse."}, status=413)
+        if len(raw_body) > max_request_bytes:
+            return JsonResponse({"detail": "La demande est trop volumineuse."}, status=413)
+        payload = json.loads(raw_body or "{}")
         if not isinstance(payload, dict):
             return JsonResponse({"detail": "Demande invalide."}, status=400)
         rate_key = "ai-chat:" + hashlib.sha256(
