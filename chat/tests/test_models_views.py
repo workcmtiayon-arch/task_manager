@@ -153,6 +153,25 @@ class MessageSendingTests(TestCase):
         self.assertEqual(response.status_code, 405)
         self.assertFalse(Conversation.objects.exists())
 
+    @override_settings(CHAT_ATTACHMENT_MAX_BYTES_PER_USER=12)
+    def test_attachment_upload_stops_at_the_per_user_storage_limit(self):
+        sender = User.objects.create_user(username="quota", email="quota@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="quota-target", email="quota-target@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(sender, recipient)
+        self.client.force_login(sender)
+
+        first = self.client.post(
+            f"/chat/{conversation.pk}/attachments/",
+            {"file": SimpleUploadedFile("first.txt", b"12345678", content_type="text/plain")},
+        )
+        self.assertEqual(first.status_code, 201)
+        second = self.client.post(
+            f"/chat/{conversation.pk}/attachments/",
+            {"file": SimpleUploadedFile("second.txt", b"12345", content_type="text/plain")},
+        )
+        self.assertEqual(second.status_code, 413)
+        self.assertEqual(MessageAttachment.objects.filter(message__sender=sender).count(), 1)
+
     def test_inactive_account_cannot_be_contacted(self):
         sender = User.objects.create_user(username="start", email="start@example.com", password="pass1234")
         recipient = User.objects.create_user(username="target", email="target@example.com", password="pass1234", is_active=False)
