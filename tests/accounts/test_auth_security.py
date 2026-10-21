@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -177,3 +177,36 @@ class LoginAbuseProtectionTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 429)
+
+
+class RegistrationAbuseProtectionTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def tearDown(self):
+        cache.clear()
+
+    @override_settings(
+        REGISTRATION_RATE_LIMIT_ATTEMPTS=10,
+        REGISTRATION_EMAIL_RATE_LIMIT_ATTEMPTS=1,
+    )
+    @patch("accounts.views.send_otp_email_task.delay")
+    def test_registration_is_limited_per_email_before_creating_more_users(self, send_email):
+        url = reverse("registration")
+        first = self.client.post(url, {
+            "username": "first-pending",
+            "email": "target@example.com",
+            "password1": "SecurePass123!",
+            "password2": "SecurePass123!",
+        })
+        second = self.client.post(url, {
+            "username": "second-pending",
+            "email": "target@example.com",
+            "password1": "SecurePass123!",
+            "password2": "SecurePass123!",
+        })
+
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(second.status_code, 429)
+        self.assertEqual(User.objects.filter(email="target@example.com").count(), 1)
+        self.assertEqual(send_email.call_count, 1)
