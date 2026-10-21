@@ -29,6 +29,17 @@ def registration(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email'].lower()
+            window = getattr(settings, "REGISTRATION_RATE_LIMIT_WINDOW_SECONDS", 900)
+            ip_key = "registration-ip:" + hashlib.sha256(get_client_ip(request).encode()).hexdigest()
+            email_key = "registration-email:" + hashlib.sha256(email.encode()).hexdigest()
+            ip_attempts = increment_rate_limit(ip_key, window)
+            email_attempts = increment_rate_limit(email_key, window)
+            if (
+                ip_attempts > getattr(settings, "REGISTRATION_RATE_LIMIT_ATTEMPTS", 5)
+                or email_attempts > getattr(settings, "REGISTRATION_EMAIL_RATE_LIMIT_ATTEMPTS", 3)
+            ):
+                form.add_error(None, _("Too many registration attempts. Try again later."))
+                return render(request, 'accounts/register.html', {'form': form}, status=429)
             existing = User.objects.filter(email__iexact=email).first()
 
             if existing:
