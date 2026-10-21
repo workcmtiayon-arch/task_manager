@@ -6,6 +6,7 @@ import { startPresenceCheck } from "./helpers.js";
 // Crée le contrôleur WebSocket isolé du rendu et du composeur.
 export function createSocketController(handleServerEvent, stopTyping) {
   let socket = null;
+  let presenceHeartbeat = null;
 
   // Envoie une commande JSON lorsque le socket est ouvert.
   function sendEvent(payload) { if (socket && socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(payload)); }
@@ -14,9 +15,9 @@ export function createSocketController(handleServerEvent, stopTyping) {
   function connect() {
     const url = `${config.wsScheme}://${config.wsHost}/ws/chat/${config.conversationId}/`;
     socket = new WebSocket(url);
-    socket.addEventListener("open", () => { state.reconnectDelay = 1000; if (elements.connectionStatus) elements.connectionStatus.textContent = window.taskManagerI18n.checkingStatus; startPresenceCheck(); sendEvent({ type: "presence.announce" }); sendEvent({ type: "presence.request" }); });
+    socket.addEventListener("open", () => { state.reconnectDelay = 1000; if (elements.connectionStatus) elements.connectionStatus.textContent = window.taskManagerI18n.checkingStatus; startPresenceCheck(); sendEvent({ type: "presence.announce" }); sendEvent({ type: "presence.request" }); presenceHeartbeat = window.setInterval(() => sendEvent({ type: "presence.request" }), 10000); });
     socket.addEventListener("message", (event) => handleServerEvent(JSON.parse(event.data)));
-    socket.addEventListener("close", (event) => { stopTyping(); window.clearTimeout(state.presenceCheckTimer); app.classList.remove("is-other-online"); if (elements.connectionStatus) elements.connectionStatus.textContent = window.taskManagerI18n.statusUnavailable; if (event.code === 4001) { window.location.href = config.loginUrl; return; } if (event.code === 4003) { window.location.href = config.conversationListUrl; return; } if (!state.intentionalClose) { window.setTimeout(connect, state.reconnectDelay); state.reconnectDelay = Math.min(state.reconnectDelay * 2, 15000); } });
+    socket.addEventListener("close", (event) => { stopTyping(); window.clearInterval(presenceHeartbeat); presenceHeartbeat = null; window.clearTimeout(state.presenceCheckTimer); app.classList.remove("is-other-online"); if (elements.connectionStatus) elements.connectionStatus.textContent = window.taskManagerI18n.statusUnavailable; if (event.code === 4001) { window.location.href = config.loginUrl; return; } if (event.code === 4003) { window.location.href = config.conversationListUrl; return; } if (!state.intentionalClose) { window.setTimeout(connect, state.reconnectDelay); state.reconnectDelay = Math.min(state.reconnectDelay * 2, 15000); } });
     socket.addEventListener("error", () => socket.close());
   }
 
