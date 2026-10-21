@@ -57,6 +57,17 @@ class AIChatViewTests(TestCase):
         response = self.client.post(reverse("ai:chat"), "not-json", content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(AI_MAX_REQUEST_BYTES=32)
+    @patch("ai.services.get_provider")
+    def test_oversized_request_is_rejected_before_provider_call(self, get_provider):
+        response = self.client.post(
+            reverse("ai:chat"),
+            '{"content":"' + ("x" * 64) + '"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 413)
+        get_provider.assert_not_called()
+
     def test_non_object_json_is_rejected(self):
         response = self.client.post(reverse("ai:chat"), "[]", content_type="application/json")
         self.assertEqual(response.status_code, 400)
