@@ -23,9 +23,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if not is_member:
             await self.close(code=4003)
             return
-        await self.accept()
         self.conversation_group = conversation_group_name(self.conversation_id)
         await self.channel_layer.group_add(self.conversation_group, self.channel_name)
+        await self.accept()
         await self.send_json({"type": "connection.ready", "conversation_id": int(self.conversation_id)})
         delivered_ids = await database_sync_to_async(self._mark_pending_as_delivered)()
         if delivered_ids:
