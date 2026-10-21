@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, TransactionTestCase, override_settings
+from unittest.mock import patch
 
 from ..models import Conversation, Message, MessageAttachment, MessageReaction
 from ..permissions import user_can_access_conversation
@@ -170,6 +171,21 @@ class MessageSendingTests(TestCase):
             {"file": SimpleUploadedFile("second.txt", b"12345", content_type="text/plain")},
         )
         self.assertEqual(second.status_code, 413)
+        self.assertEqual(MessageAttachment.objects.filter(message__sender=sender).count(), 1)
+
+    def test_attachment_upload_remains_successful_when_channel_layer_is_unavailable(self):
+        sender = User.objects.create_user(username="offline", email="offline@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="offline-target", email="offline-target@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(sender, recipient)
+        self.client.force_login(sender)
+
+        with patch("channels.layers.get_channel_layer", side_effect=RuntimeError("Redis unavailable")):
+            response = self.client.post(
+                f"/chat/{conversation.pk}/attachments/",
+                {"file": SimpleUploadedFile("stored.txt", b"saved", content_type="text/plain")},
+            )
+
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(MessageAttachment.objects.filter(message__sender=sender).count(), 1)
 
     def test_inactive_account_cannot_be_contacted(self):
