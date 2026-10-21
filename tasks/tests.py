@@ -98,6 +98,29 @@ class SubTaskIntegrationTests(TestCase):
         subtask.refresh_from_db()
         self.assertEqual(subtask.status, SubTask.Status.DONE)
 
+    def test_new_subtask_uses_next_position_after_a_gap(self):
+        SubTask.objects.create(task=self.task, title='Première', position=0)
+        SubTask.objects.create(task=self.task, title='Troisième', position=2)
+        self.client.force_login(self.owner)
+
+        response = self.client.post(reverse('add_subtask', args=[self.task.id]), {'title': 'Quatrième'})
+
+        self.assertRedirects(response, reverse('task_detail', args=[self.task.id]))
+        self.assertEqual(self.task.subtasks.get(title='Quatrième').position, 3)
+
+    def test_subtask_rejects_an_already_used_position(self):
+        SubTask.objects.create(task=self.task, title='Étape existante', position=1)
+        self.client.force_login(self.owner)
+
+        response = self.client.post(
+            reverse('add_subtask', args=[self.task.id]),
+            {'title': 'Collision', 'position': 1},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(self.task.subtasks.filter(title='Collision').exists())
+        self.assertIn('position', response.context['form'].errors)
+
     def test_task_detail_displays_subtasks(self):
         SubTask.objects.create(task=self.task, title='Créer les modèles')
         self.client.force_login(self.owner)
