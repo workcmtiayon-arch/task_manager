@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.db.models import Count, Q
+from django.db import transaction
+from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 
 from projects.models import Project
@@ -115,11 +117,18 @@ def add_subtask(request, task_id):
     form = SubTaskForm(request.POST or None, initial={'position': task.subtasks.count()})
     if form.is_valid():
         subtask = form.save(commit=False)
-        subtask.task = task
-        if 'position' not in form.changed_data:
-            subtask.position = task.subtasks.count()
-        subtask.save()
-        return redirect('task_detail', id=task.id)
+        with transaction.atomic():
+            # Lock the parent so concurrent additions through this endpoint
+            # cannot select the same next position.
+            task = Task.objects.select_for_update().get(pk=task.pk)
+            subtask.task = task
+            if 'position' not in request.POST:
+                subtask.position = (task.subtasks.aggregate(max_position=Max('position'))['max_position'] or -1) + 1
+            elif task.subtasks.filter(position=subtask.position).exists():
+                form.add_error('position', _('This position is already used by another subtask.'))
+            if not form.errors:
+                subtask.save()
+                return redirect('task_detail', id=task.id)
     return render(request, 'tasks/subtask_form.html', {'form': form, 'task': task, 'active_nav': 'tasks'})
 
 
