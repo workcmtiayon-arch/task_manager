@@ -9,6 +9,8 @@ from django.utils.translation import gettext as _
 from django.utils.text import get_valid_filename
 from django.utils.http import content_disposition_header
 from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.db.models import Sum
 
 from ..models import Conversation, ConversationMember, Message, MessageAttachment, MessageReceipt
 from ..utils import serialize_message
@@ -72,6 +74,20 @@ def conversation_attachment_upload(request, pk):
     except ValidationError:
         return HttpResponseBadRequest(_("File content or type is not allowed (images, PDF or TXT only)."))
     with transaction.atomic():
+        # Serialize uploads for this account so concurrent requests cannot
+        # all pass the storage quota using the same previous total.
+        type(request.user).objects.select_for_update().get(pk=request.user.pk)
+        stored_bytes = MessageAttachment.objects.filter(
+            message__sender_id=request.user.pk
+        ).aggregate(total=Sum("file_size"))["total"] or 0
+        storage_limit = getattr(
+            settings, "CHAT_ATTACHMENT_MAX_BYTES_PER_USER", 100 * 1024 * 1024
+        )
+        if stored_bytes + uploaded_file.size > storage_limit:
+            return JsonResponse(
+                {"detail": _("Your attachment storage limit has been reached.")},
+                status=413,
+            )
         message = Message.objects.create(conversation=conversation, sender=request.user, content="", message_type=Message.MessageType.ATTACHMENT)
         MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=uploaded_file.name[:255], file_size=uploaded_file.size, content_type=uploaded_file.content_type)
         other_members = conversation.get_members().exclude(pk=request.user.pk)
