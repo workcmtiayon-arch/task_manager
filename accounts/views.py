@@ -124,10 +124,15 @@ def forgot_password(request):
             rate_key = "password-reset:" + hashlib.sha256(
                 f"{get_client_ip(request)}:{email}".encode()
             ).hexdigest()
+            account_rate_key = "password-reset-account:" + hashlib.sha256(email.encode()).hexdigest()
             max_attempts = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_ATTEMPTS", 3)
             window = getattr(settings, "PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS", 900)
             attempts = increment_rate_limit(rate_key, window)
-            if attempts > max_attempts:
+            account_attempts = increment_rate_limit(account_rate_key, window)
+            if (
+                attempts > max_attempts
+                or account_attempts > getattr(settings, "PASSWORD_RESET_ACCOUNT_RATE_LIMIT_ATTEMPTS", 3)
+            ):
                 return redirect('verify-reset-otp')
 
             user = User.objects.filter(email__iexact=email, is_active=True).first()
