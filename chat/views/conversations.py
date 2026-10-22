@@ -44,10 +44,18 @@ def conversation_list(request):
 @login_required
 def invitations_list(request):
     """Affiche les invitations reçues qui attendent une première réponse."""
-    conversations = Conversation.objects.invitations_for_user(request.user).order_by("-updated_at")
+    conversations = Conversation.objects.invitations_for_user(request.user).order_by("-updated_at").select_related(
+        "initiated_by"
+    ).prefetch_related(
+        Prefetch(
+            "messages",
+            queryset=Message.objects.order_by("created_at", "pk")[:1],
+            to_attr="first_messages",
+        )
+    )
     items = []
     for conversation in conversations:
-        first_message = conversation.messages.order_by("created_at").first()
+        first_message = conversation.first_messages[0] if conversation.first_messages else None
         items.append({"conversation": conversation, "initiator": conversation.initiated_by, "preview": preview_text(first_message)})
     return render(request, "chat/invitations_list.html", {"items": items, "active_nav": "messages"})
 
