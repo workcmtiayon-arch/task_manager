@@ -72,5 +72,12 @@
         </div>
         {% endfor %}
     </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="tasks-pagination" aria-label="Pagination">
+        {% if page_obj.has_previous %}<a class="btn btn--outline" href="?page={{ page_obj.previous_page_number }}">{% translate "Previous" %}</a>{% endif %}
+        <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a class="btn btn--outline" href="?page={{ page_obj.next_page_number }}">{% translate "Next" %}</a>{% endif %}
+    </nav>
+    {% endif %}
 </section>
 {% endblock %}
