@@ -28,6 +28,8 @@ load_dotenv(BASE_DIR / ".env")
 
 DEPLOYMENT_ENV = os.environ.get("DJANGO_ENV", "development").lower()
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
+if DEPLOYMENT_ENV == "production" and DEBUG:
+    raise ImproperlyConfigured("DJANGO_DEBUG must be disabled in production.")
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or os.environ.get("SECRET_KEY")
 INSECURE_SECRET_VALUES = {
     "SECRET_KEY",
