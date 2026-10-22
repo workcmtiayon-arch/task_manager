@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Logout confirmation modal
     var signoutLink = document.querySelector('.signout-link');
+    var signoutForm = document.querySelector('.signout-form');
     var logoutOverlay = document.getElementById('logout-confirm-overlay');
     var confirmBtn = document.getElementById('confirmSignoutBtn');
     var logoutCancelBtns = logoutOverlay ? Array.from(logoutOverlay.querySelectorAll('.logout-cancel, .modal__close')) : [];
@@ -110,18 +111,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (signoutLink && logoutOverlay && confirmBtn) {
         signoutLink.addEventListener('click', function (e) {
             e.preventDefault();
-            var href = signoutLink.getAttribute('href');
             logoutOverlay.hidden = false;
             // allow CSS transition
             requestAnimationFrame(function () { logoutOverlay.classList.add('is-visible'); });
-            confirmBtn.dataset.href = href || '';
+            confirmBtn.dataset.logout = 'true';
             // focus first actionable element
             (logoutCancelBtns[0] || confirmBtn).focus();
         });
 
         function closeLogoutModal() {
             logoutOverlay.classList.remove('is-visible');
-            setTimeout(function () { logoutOverlay.hidden = true; confirmBtn.removeAttribute('data-href'); }, 180);
+            setTimeout(function () { logoutOverlay.hidden = true; confirmBtn.removeAttribute('data-logout'); }, 180);
             signoutLink.focus();
         }
 
@@ -138,10 +138,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         confirmBtn.addEventListener('click', function () {
-            var href = confirmBtn.dataset.href;
-            if (href) {
-                // follow the link to perform logout
-                window.location.href = href;
+            if (signoutForm && confirmBtn.dataset.logout) {
+                signoutForm.submit();
             }
         });
     }
