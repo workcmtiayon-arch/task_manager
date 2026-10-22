@@ -37,6 +37,7 @@ INSECURE_SECRET_VALUES = {
 insecure_secret = (
     not SECRET_KEY
     or SECRET_KEY in INSECURE_SECRET_VALUES
+    or any(marker in SECRET_KEY.lower() for marker in ("replace-me", "replace-with", "change-me", "example-secret"))
     or len(SECRET_KEY) < 50
 )
 if insecure_secret:
