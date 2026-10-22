@@ -1,3 +1,5 @@
+from collections import Counter, deque
+
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
@@ -43,28 +45,61 @@ def _prepare_project(project):
     return project
 
 
-def _project_page_context(all_projects, displayed_projects, view_mode, request):
-    total_task_count = sum(project.task_count for project in displayed_projects)
-    completed_task_count = sum(project.done_count for project in displayed_projects)
-    page_obj = Paginator(displayed_projects, 24).get_page(request.GET.get('page'))
+def _project_page_context(project_queryset, view_mode, request):
+    try:
+        requested_page = max(1, int(request.GET.get('page', '1')))
+    except (TypeError, ValueError):
+        requested_page = 1
+
+    page_size = 24
+    page_start = (requested_page - 1) * page_size
+    selected_count = 0
+    total_task_count = 0
+    completed_task_count = 0
+    status_counts = Counter()
+    requested_projects = []
+    last_projects = deque(maxlen=page_size)
+
+    for project in project_queryset.iterator(chunk_size=200):
+        _prepare_project(project)
+        status_counts[project.display_status] += 1
+        if view_mode == 'active':
+            is_displayed = project.display_status in ACTIVE_STATUSES
+        elif view_mode == 'completed':
+            is_displayed = project.display_status == Project.TemporalStatus.COMPLETED
+        else:
+            is_displayed = project.display_status == Project.TemporalStatus.UPCOMING
+        if not is_displayed:
+            continue
+
+        total_task_count += project.task_count
+        completed_task_count += project.done_count
+        if page_start <= selected_count < page_start + page_size:
+            requested_projects.append(project)
+        last_projects.append(project)
+        selected_count += 1
+
+    paginator = Paginator(range(selected_count), page_size)
+    page_obj = paginator.get_page(requested_page)
+    if page_obj.number != requested_page:
+        requested_projects = list(last_projects)
+    page_obj.object_list = requested_projects
+
     return {
         'projects': page_obj,
         'page_obj': page_obj,
         'active_nav': 'projects',
         'view_mode': view_mode,
-        'project_count': len(displayed_projects),
+        'project_count': selected_count,
         'total_task_count': total_task_count,
         'completed_task_count': completed_task_count,
-        'completed_project_count': sum(
-            project.display_status == Project.TemporalStatus.COMPLETED
-            for project in all_projects
-        ),
+        'completed_project_count': status_counts[Project.TemporalStatus.COMPLETED],
         'project_completion_percentage': (
             round(completed_task_count * 100 / total_task_count)
             if total_task_count else 0
         ),
         'status_counts': {
-            status: sum(project.display_status == status for project in all_projects)
+            status: status_counts[status]
             for status in Project.TemporalStatus.values
         },
     }
@@ -72,42 +107,28 @@ def _project_page_context(all_projects, displayed_projects, view_mode, request):
 
 @login_required
 def project_list(request):
-    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
-    displayed_projects = [
-        project for project in all_projects if project.display_status in ACTIVE_STATUSES
-    ]
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'active', request),
+        _project_page_context(_project_queryset(request.user), 'active', request),
     )
 
 
 @login_required
 def completed_project_list(request):
-    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
-    displayed_projects = [
-        project for project in all_projects
-        if project.display_status == Project.TemporalStatus.COMPLETED
-    ]
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'completed', request),
+        _project_page_context(_project_queryset(request.user), 'completed', request),
     )
 
 
 @login_required
 def upcoming_project_list(request):
-    all_projects = [_prepare_project(project) for project in _project_queryset(request.user)]
-    displayed_projects = [
-        project for project in all_projects
-        if project.display_status == Project.TemporalStatus.UPCOMING
-    ]
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'upcoming', request),
+        _project_page_context(_project_queryset(request.user), 'upcoming', request),
     )
 
 
