@@ -212,16 +212,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Use WhiteNoise to serve static files in production (and in environments where no separate static server is configured)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = DEPLOYMENT_ENV == "production"
+CSRF_COOKIE_SECURE = DEPLOYMENT_ENV == "production"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
-# Local development commonly runs over plain HTTP; secure cookies are enabled
-# only when the application is deployed behind HTTPS.
-if DEPLOYMENT_ENV != "production" and DEBUG:
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
+# Production is expected to terminate TLS at the trusted proxy. Development
+# Compose exposes plain HTTP, so its browser cookies must work without TLS.
 
 CACHES = {
     "default": {
