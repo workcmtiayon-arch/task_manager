@@ -60,6 +60,13 @@ Nginx is published on port `8000` by default. If that port is already in use, ch
 NGINX_PORT=18080 docker compose up -d
 ```
 
+The development Compose defaults use plain HTTP and non-secure session/CSRF
+cookies. Set `DJANGO_ENV=production` only behind HTTPS: production startup
+rejects debug mode, missing or example secret keys, and wildcard/empty host
+allowlists, and marks both cookies `Secure`. Set `DJANGO_SECRET_KEY` to a
+private random value and `DJANGO_ALLOWED_HOSTS` to the explicit public hosts
+before deploying.
+
 The `migrate` service waits for healthy PostgreSQL and Redis, runs migrations, and collects staticfiles before Daphne, the worker, Beat, and Nginx start. A failure stops the dependent services. To repeat this explicitly:
 
 ```bash
@@ -92,7 +99,7 @@ docker compose exec worker celery -A config inspect ping
 python manage.py test
 ```
 
-Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure Nginx's `docker/nginx/trusted-proxies.conf` with `set_real_ip_from <CIDR>;` entries and `docker/nginx/trusted-proxies.geo` with matching `<CIDR> 1;` entries for that proxy. The edge must overwrite `X-Forwarded-For` and `X-Forwarded-Proto`. Nginx now honors those headers only when the direct peer is in the configured trusted ranges; without entries, requests use the connection's actual address and scheme.
+Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. Profile photos and chat images are decoded and checked against MIME type and a pixel limit before storage. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure Nginx's `docker/nginx/trusted-proxies.conf` with `set_real_ip_from <CIDR>;` entries and `docker/nginx/trusted-proxies.geo` with matching `<CIDR> 1;` entries for that proxy. The edge must overwrite `X-Forwarded-For` and `X-Forwarded-Proto`. Nginx now honors those headers only when the direct peer is in the configured trusted ranges; without entries, requests use the connection's actual address and scheme.
 
 
 ## Project Objectives
@@ -684,8 +691,8 @@ Future security work will include:
 
 ### Database
 
-* SQLite during development
-* PostgreSQL planned/available for production-oriented development
+* SQLite for local non-Compose development
+* PostgreSQL in the Docker Compose stack and production-oriented deployments
 
 ### Frontend
 
