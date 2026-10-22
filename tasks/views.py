@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.db.models import Count, Q
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
@@ -34,11 +35,21 @@ def _prepare_task(task):
 
 @login_required
 def task_list(request):
-    tasks = [_prepare_task(task) for task in _task_queryset(request.user).order_by('due_date', '-created_at')]
-    total_tasks = len(tasks)
-    done_tasks = sum(task.status == Task.Status.DONE for task in tasks)
-    in_progress_tasks = sum(task.status == Task.Status.IN_PROGRESS for task in tasks)
-    todo_tasks = sum(task.status == Task.Status.TODO for task in tasks)
+    owned_tasks = Task.objects.filter(project__user=request.user)
+    counts = owned_tasks.aggregate(
+        total=Count('pk'),
+        done=Count('pk', filter=Q(status=Task.Status.DONE)),
+        in_progress=Count('pk', filter=Q(status=Task.Status.IN_PROGRESS)),
+        todo=Count('pk', filter=Q(status=Task.Status.TODO)),
+    )
+    page_obj = Paginator(
+        _task_queryset(request.user).order_by('due_date', '-created_at'), 50
+    ).get_page(request.GET.get('page'))
+    tasks = [_prepare_task(task) for task in page_obj.object_list]
+    total_tasks = counts['total']
+    done_tasks = counts['done']
+    in_progress_tasks = counts['in_progress']
+    todo_tasks = counts['todo']
     return render(request, 'tasks/task_list.html', {
         'tasks': tasks,
         'active_nav': 'tasks',
@@ -47,6 +58,7 @@ def task_list(request):
         'in_progress_tasks': in_progress_tasks,
         'todo_tasks': todo_tasks,
         'completion_percentage': round(done_tasks * 100 / total_tasks) if total_tasks else 0,
+        'page_obj': page_obj,
     })
 
 
