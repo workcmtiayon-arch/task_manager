@@ -242,10 +242,9 @@ def connection(request):
 
 
 # Je passe a la deconection maintenant
+@require_POST
 def deconnexion(request):
-    if request.method == 'POST':
-        logout(request)
-        return redirect('home')
+    logout(request)
     return redirect('home')
 
 
