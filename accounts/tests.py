@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -9,6 +11,14 @@ from projects.models import Project
 from tasks.models import Task
 
 from .models import User
+
+
+def valid_png_upload(name="avatar.png"):
+    image_data = BytesIO()
+    from PIL import Image
+
+    Image.new("RGB", (2, 2), color="blue").save(image_data, format="PNG")
+    return SimpleUploadedFile(name, image_data.getvalue(), content_type="image/png")
 
 
 class DashboardAndAdministrationTests(TestCase):
@@ -93,11 +103,7 @@ class DashboardAndAdministrationTests(TestCase):
 
     def test_profile_photo_can_be_uploaded_and_served_to_authenticated_users(self):
         self.client.force_login(self.member)
-        photo = SimpleUploadedFile(
-            "avatar.png",
-            b"\x89PNG\r\n\x1a\n" + b"profile-image",
-            content_type="image/png",
-        )
+        photo = valid_png_upload()
         response = self.client.post(
             reverse("profile"),
             {
