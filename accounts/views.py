@@ -43,8 +43,9 @@ def registration(request):
             existing = User.objects.filter(email__iexact=email).first()
 
             if existing:
+                client_ip = get_client_ip(request)
                 alert_key = "registration-alert:" + hashlib.sha256(
-                    f"{request.META.get('REMOTE_ADDR', '')}:{email}".encode()
+                    f"{client_ip}:{email}".encode()
                 ).hexdigest()
                 if cache.add(alert_key, True, 900):
                     send_registration_alert_email_task.delay(existing.email)
