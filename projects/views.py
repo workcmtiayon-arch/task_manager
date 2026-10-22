@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -42,11 +43,13 @@ def _prepare_project(project):
     return project
 
 
-def _project_page_context(all_projects, displayed_projects, view_mode):
+def _project_page_context(all_projects, displayed_projects, view_mode, request):
     total_task_count = sum(project.task_count for project in displayed_projects)
     completed_task_count = sum(project.done_count for project in displayed_projects)
+    page_obj = Paginator(displayed_projects, 24).get_page(request.GET.get('page'))
     return {
-        'projects': displayed_projects,
+        'projects': page_obj,
+        'page_obj': page_obj,
         'active_nav': 'projects',
         'view_mode': view_mode,
         'project_count': len(displayed_projects),
@@ -76,7 +79,7 @@ def project_list(request):
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'active'),
+        _project_page_context(all_projects, displayed_projects, 'active', request),
     )
 
 
@@ -90,7 +93,7 @@ def completed_project_list(request):
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'completed'),
+        _project_page_context(all_projects, displayed_projects, 'completed', request),
     )
 
 
@@ -104,7 +107,7 @@ def upcoming_project_list(request):
     return render(
         request,
         'projects/project_list.html',
-        _project_page_context(all_projects, displayed_projects, 'upcoming'),
+        _project_page_context(all_projects, displayed_projects, 'upcoming', request),
     )
 
 
