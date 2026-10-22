@@ -48,7 +48,16 @@ if insecure_secret:
             "DJANGO_SECRET_KEY must be set to a strong value before starting Django."
         )
     SECRET_KEY = f"django-insecure-{secrets.token_urlsafe(50)}"
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")).split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost"),
+    ).split(",")
+    if host.strip()
+]
+if DEPLOYMENT_ENV == "production" and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS):
+    raise ImproperlyConfigured("DJANGO_ALLOWED_HOSTS must list explicit production hosts.")
 RATE_LIMIT_CLIENT_IP_HEADER = os.environ.get("RATE_LIMIT_CLIENT_IP_HEADER", "")
 
 
