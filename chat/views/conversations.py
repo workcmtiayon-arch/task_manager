@@ -2,13 +2,13 @@
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from ..models import Conversation
+from ..models import Conversation, ConversationMember, Message
 from .common import preview_text
 
 User = get_user_model()
@@ -17,11 +17,26 @@ User = get_user_model()
 @login_required
 def conversation_list(request):
     """Affiche les conversations visibles dans la boîte de réception de l'utilisateur."""
-    conversations = Conversation.objects.for_user_inbox(request.user).order_by("-updated_at")
+    conversations = Conversation.objects.for_user_inbox(request.user).order_by("-updated_at").prefetch_related(
+        Prefetch(
+            "memberships",
+            queryset=ConversationMember.objects.filter(left_at__isnull=True).select_related("user"),
+            to_attr="active_memberships",
+        ),
+        Prefetch(
+            "messages",
+            queryset=Message.objects.order_by("-created_at", "-pk")[:1],
+            to_attr="latest_messages",
+        ),
+    )
     items = []
     for conversation in conversations:
-        other_user = conversation.get_members().exclude(pk=request.user.pk).first()
-        items.append({"conversation": conversation, "other_user": other_user, "preview": preview_text(conversation.get_last_message())})
+        other_user = next(
+            (membership.user for membership in conversation.active_memberships if membership.user_id != request.user.pk),
+            None,
+        )
+        last_message = conversation.latest_messages[0] if conversation.latest_messages else None
+        items.append({"conversation": conversation, "other_user": other_user, "preview": preview_text(last_message)})
     invitations_count = Conversation.objects.invitations_for_user(request.user).count()
     return render(request, "chat/conversation_list.html", {"items": items, "invitations_count": invitations_count, "active_nav": "messages"})
 
