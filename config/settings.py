@@ -29,9 +29,14 @@ load_dotenv(BASE_DIR / ".env")
 DEPLOYMENT_ENV = os.environ.get("DJANGO_ENV", "development").lower()
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or os.environ.get("SECRET_KEY")
+INSECURE_SECRET_VALUES = {
+    "SECRET_KEY",
+    "your-secret-key-here",
+    "replace-with-a-random-secret-of-at-least-50-characters-12345",
+}
 insecure_secret = (
     not SECRET_KEY
-    or SECRET_KEY in {"SECRET_KEY", "your-secret-key-here"}
+    or SECRET_KEY in INSECURE_SECRET_VALUES
     or len(SECRET_KEY) < 50
 )
 if insecure_secret:
