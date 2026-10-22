@@ -587,9 +587,9 @@ celery -A config beat -l info
 - [x] Verification email sending (async via Celery)
 - [x] Verification code validation
 - [x] Code/token expiration
-- [ ] Prevent access to protected features before verification
-- [ ] Resend verification email
-- [ ] Handle invalid or expired verification links
+- [x] Prevent access to protected features before verification
+- [x] Resend verification email
+- [x] Handle invalid or expired verification codes
 
 ### Scheduled Tasks
 
@@ -629,21 +629,20 @@ celery -A config beat -l info
 
 ### User Management
 
-* [ ] User profile
-* [ ] `ADMIN / MEMBER` permissions
-* [ ] Administrative user management
-* [ ] Account activation/deactivation
-* [ ] Permission-based access control
+* [x] User profile
+* [x] `ADMIN / MEMBER` permissions
+* [x] Administrative user management
+* [x] Account activation/deactivation
+* [x] Permission-based access control
 
 ### Testing
 
-* [ ] Model tests
-* [ ] Form tests
-* [ ] View tests
-* [ ] Authentication tests
-* [ ] Authorization tests
-* [ ] User data isolation tests
-* [ ] CRUD integration tests
+* [x] Model tests
+* [x] Form tests
+* [x] View tests
+* [x] Authentication tests
+* [x] Authorization and user data isolation tests
+* [ ] Full CRUD integration coverage
 
 
 ## Security Principles
@@ -663,12 +662,11 @@ The current implementation already considers:
 * Restricted project selection
 * Object-level access checks
 * Hashed, time-limited, attempt-limited OTP codes
+* Role-based authorization and administrative user controls
+* Account activation/deactivation
 
 Future security work will include:
 
-* Role-based authorization
-* Administrative permissions
-* Account activation/deactivation
 * More comprehensive authorization tests
 * Authentication hardening
 
