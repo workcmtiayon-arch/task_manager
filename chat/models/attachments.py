@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
+from core.uploads import validate_raster_image
 from .messages import Message
 
 
@@ -31,17 +32,23 @@ class MessageAttachment(models.Model):
         if uploaded_file.size > cls.MAX_FILE_SIZE:
             raise ValidationError(_("File too large (10 MB maximum)."))
 
+        if uploaded_file.content_type.startswith("image/"):
+            validate_raster_image(uploaded_file, uploaded_file.content_type)
+            return
+
         header = uploaded_file.read(16)
         uploaded_file.seek(0)
-        signatures = {
-            "image/png": header.startswith(b"\x89PNG\r\n\x1a\n"),
-            "image/jpeg": header.startswith(b"\xff\xd8\xff"),
-            "image/gif": header.startswith((b"GIF87a", b"GIF89a")),
-            "image/webp": header.startswith(b"RIFF") and header[8:12] == b"WEBP",
-            "application/pdf": header.startswith(b"%PDF-"),
-            "text/plain": b"\x00" not in header,
-        }
-        if not signatures.get(uploaded_file.content_type, False):
+        if uploaded_file.content_type == "application/pdf":
+            valid = header.startswith(b"%PDF-")
+        else:
+            try:
+                content = uploaded_file.read()
+                uploaded_file.seek(0)
+                content.decode("utf-8")
+                valid = b"\x00" not in content
+            except UnicodeDecodeError:
+                valid = False
+        if not valid:
             raise ValidationError(_("The file content does not match its type."))
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
