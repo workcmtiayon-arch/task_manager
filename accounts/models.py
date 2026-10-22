@@ -11,6 +11,7 @@ from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from core.uploads import validate_raster_image
 
 
 def profile_photo_upload_path(instance, filename):
@@ -31,16 +32,7 @@ def validate_profile_photo(uploaded_file):
     if uploaded_file.size > 5 * 1024 * 1024:
         raise ValidationError(_("Profile photos must not exceed 5 MB."))
 
-    header = uploaded_file.read(16)
-    uploaded_file.seek(0)
-    signatures = {
-        "image/jpeg": header.startswith(b"\xff\xd8\xff"),
-        "image/png": header.startswith(b"\x89PNG\r\n\x1a\n"),
-        "image/gif": header.startswith((b"GIF87a", b"GIF89a")),
-        "image/webp": header.startswith(b"RIFF") and header[8:12] == b"WEBP",
-    }
-    if not signatures.get(uploaded_file.content_type, False):
-        raise ValidationError(_("The profile photo content does not match its type."))
+    validate_raster_image(uploaded_file, uploaded_file.content_type)
 
 
 # Create your models here.
