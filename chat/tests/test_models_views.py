@@ -146,6 +146,16 @@ class MessageSendingTests(TestCase):
         self.assertTrue(Message.objects.filter(conversation=conversation, content="Bonjour Malik").exists())
         self.assertEqual(Conversation.objects.invitations_for_user(recipient).count(), 1)
 
+    def test_message_history_rejects_a_malformed_cursor(self):
+        sender = User.objects.create_user(username="cursor", email="cursor@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="cursor-target", email="cursor-target@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(sender, recipient)
+        self.client.force_login(sender)
+
+        response = self.client.get(f"/chat/{conversation.pk}/messages/?before=not-an-id")
+
+        self.assertEqual(response.status_code, 400)
+
     def test_conversation_creation_requires_post(self):
         sender = User.objects.create_user(username="start", email="start@example.com", password="pass1234")
         recipient = User.objects.create_user(username="target", email="target@example.com", password="pass1234")

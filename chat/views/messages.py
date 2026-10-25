@@ -31,6 +31,12 @@ def conversation_messages_json(request, pk):
     queryset = conversation.messages.select_related("sender").prefetch_related("attachments", "reactions", "receipts")
     before_id = request.GET.get("before")
     if before_id:
+        try:
+            before_id = int(before_id)
+        except (TypeError, ValueError):
+            return JsonResponse({"detail": _("The message cursor must be an integer.")}, status=400)
+        if before_id < 1:
+            return JsonResponse({"detail": _("The message cursor must be positive.")}, status=400)
         queryset = queryset.filter(pk__lt=before_id)
     messages = list(queryset.order_by("-pk")[:limit])
     messages.reverse()
