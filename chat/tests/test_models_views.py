@@ -291,6 +291,8 @@ class MessageSendingTests(TestCase):
         self.client.force_login(recipient)
         response = self.client.get(f"/chat/attachments/{attachment.pk}/download/")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Cache-Control"], "private, no-store")
+        self.assertEqual(response["X-Content-Type-Options"], "nosniff")
         self.assertNotIn("\r", response["Content-Disposition"])
         self.assertNotIn("\n", response["Content-Disposition"])
 

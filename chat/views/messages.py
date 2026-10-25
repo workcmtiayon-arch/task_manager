@@ -122,6 +122,8 @@ def attachment_download(request, attachment_id):
     response = FileResponse(attachment.file.open("rb"), content_type=attachment.content_type)
     safe_filename = get_valid_filename(attachment.file_name)[:255] or "attachment"
     response["Content-Disposition"] = content_disposition_header(False, safe_filename)
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
     return response
 
 
