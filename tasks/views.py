@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods, require_POST
 
 from projects.models import Project
 
@@ -63,6 +64,7 @@ def task_list(request):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def add_task(request, project_id):
     project = get_object_or_404(Project.objects.filter(user=request.user), id=project_id)
     form = TaskForm(request.POST or None)
@@ -75,6 +77,7 @@ def add_task(request, project_id):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def update_task(request, id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     form = TaskForm(request.POST or None, instance=task)
@@ -85,6 +88,7 @@ def update_task(request, id):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def delete_task(request, id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     project = task.project
@@ -105,6 +109,7 @@ def task_detail(request, id):
 
 
 @login_required
+@require_POST
 def task_update_status(request, id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=id)
     if request.method == 'POST':
@@ -124,6 +129,7 @@ def task_update_status(request, id):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def add_subtask(request, task_id):
     task = get_object_or_404(Task.objects.filter(project__user=request.user), id=task_id)
     form = SubTaskForm(request.POST or None, initial={'position': task.subtasks.count()})
@@ -145,6 +151,7 @@ def add_subtask(request, task_id):
 
 
 @login_required
+@require_POST
 def toggle_subtask(request, id):
     subtask = get_object_or_404(SubTask.objects.filter(task__project__user=request.user), id=id)
     if request.method == 'POST':
@@ -158,6 +165,7 @@ def toggle_subtask(request, id):
 
 
 @login_required
+@require_POST
 def delete_subtask(request, id):
     subtask = get_object_or_404(SubTask.objects.filter(task__project__user=request.user), id=id)
     task_id = subtask.task.id

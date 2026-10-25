@@ -135,6 +135,26 @@ class SubTaskIntegrationTests(TestCase):
         self.assertEqual(self.client.get(reverse('task_detail', args=[self.task.id])).status_code, 404)
         self.assertEqual(self.client.post(reverse('toggle_subtask', args=[subtask.id])).status_code, 404)
 
+    def test_task_mutations_reject_unsupported_http_methods(self):
+        subtask = SubTask.objects.create(task=self.task, title="Keep me")
+        self.client.force_login(self.owner)
+
+        urls = (
+            reverse('add_task', args=[self.task.project_id]),
+            reverse('update_task', args=[self.task.pk]),
+            reverse('delete_task', args=[self.task.pk]),
+            reverse('task_update_status', args=[self.task.pk]),
+            reverse('add_subtask', args=[self.task.pk]),
+            reverse('toggle_subtask', args=[subtask.pk]),
+            reverse('delete_subtask', args=[subtask.pk]),
+        )
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(self.client.put(url).status_code, 405)
+
+        self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
+        self.assertTrue(SubTask.objects.filter(pk=subtask.pk).exists())
+
     def test_task_status_endpoint_rejects_done_with_open_subtasks(self):
         SubTask.objects.create(task=self.task, title='Étape ouverte')
         self.client.force_login(self.owner)
