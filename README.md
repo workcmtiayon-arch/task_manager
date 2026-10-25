@@ -63,10 +63,13 @@ NGINX_PORT=18080 docker compose up -d
 
 The development Compose defaults use plain HTTP and non-secure session/CSRF
 cookies. Set `DJANGO_ENV=production` only behind HTTPS: production startup
-rejects debug mode, missing or example secret keys, and wildcard/empty host
-allowlists, and marks both cookies `Secure`. Set `DJANGO_SECRET_KEY` to a
-private random value and `DJANGO_ALLOWED_HOSTS` to the explicit public hosts
-before deploying.
+rejects debug mode, missing or example Django secrets, weak or missing
+PostgreSQL credentials, SQLite, and wildcard/empty host allowlists, and marks
+both cookies `Secure`. Before deploying, replace the local-only
+`POSTGRES_PASSWORD` from `.env.example` with a private value of at least 32
+characters, set `DJANGO_SECRET_KEY` to a separate private random value, and set
+`DJANGO_ALLOWED_HOSTS` to the explicit public hosts. Keep the production `.env`
+outside version control.
 
 The `migrate` service waits for healthy PostgreSQL and Redis, runs migrations, and collects staticfiles before Daphne, the worker, Beat, and Nginx start. A failure stops the dependent services. To repeat this explicitly:
 
