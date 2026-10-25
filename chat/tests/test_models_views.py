@@ -1,5 +1,8 @@
 """Tests des modèles et endpoints HTTP du chat."""
 
+import os
+import tempfile
+
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -275,6 +278,32 @@ class MessageSendingTests(TestCase):
 
         self.client.force_login(outsider)
         self.assertEqual(self.client.get(f"/chat/attachments/{attachment.pk}/download/").status_code, 403)
+
+    def test_attachment_file_is_removed_when_conversation_is_deleted(self):
+        owner = User.objects.create_user(username="cleanup", email="cleanup@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="cleanup-target", email="cleanup-target@example.com", password="pass1234")
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            conversation = Conversation.objects.get_or_create_private(owner, recipient)
+            message = Message.objects.create(
+                conversation=conversation,
+                sender=owner,
+                content="",
+                message_type=Message.MessageType.ATTACHMENT,
+            )
+            attachment = MessageAttachment.objects.create(
+                message=message,
+                file=SimpleUploadedFile("cleanup.txt", b"private", content_type="text/plain"),
+                file_name="cleanup.txt",
+                file_size=7,
+                content_type="text/plain",
+            )
+            stored_path = attachment.file.path
+            self.assertTrue(os.path.exists(stored_path))
+
+            with self.captureOnCommitCallbacks(execute=True):
+                conversation.delete()
+
+            self.assertFalse(os.path.exists(stored_path))
 
     def test_attachment_download_sanitizes_control_characters_in_filename(self):
         owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")

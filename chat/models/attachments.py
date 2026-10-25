@@ -6,6 +6,9 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.db import transaction
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from core.uploads import validate_raster_image
 from .messages import Message
@@ -93,3 +96,12 @@ class MessageAttachment(models.Model):
     def __str__(self):
         """Retourne le nom original affiché à l'utilisateur."""
         return self.file_name
+
+
+@receiver(post_delete, sender=MessageAttachment)
+def delete_attachment_file_after_commit(sender, instance, **kwargs):
+    """Remove stored bytes after the database deletion has committed."""
+    file_name = instance.file.name
+    storage = instance.file.storage
+    if file_name:
+        transaction.on_commit(lambda: storage.delete(file_name))
