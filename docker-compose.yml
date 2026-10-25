@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-task_manager}
       POSTGRES_USER: ${POSTGRES_USER:-task_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -37,7 +37,7 @@ services:
       DJANGO_ENV: ${DJANGO_ENV:-development}
       POSTGRES_DB: ${POSTGRES_DB:-task_manager}
       POSTGRES_USER: ${POSTGRES_USER:-task_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
@@ -64,7 +64,7 @@ services:
       DJANGO_ENV: ${DJANGO_ENV:-development}
       POSTGRES_DB: ${POSTGRES_DB:-task_manager}
       POSTGRES_USER: ${POSTGRES_USER:-task_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
@@ -123,7 +123,7 @@ services:
       DJANGO_ENV: ${DJANGO_ENV:-development}
       POSTGRES_DB: ${POSTGRES_DB:-task_manager}
       POSTGRES_USER: ${POSTGRES_USER:-task_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
@@ -149,7 +149,7 @@ services:
       DJANGO_ENV: ${DJANGO_ENV:-development}
       POSTGRES_DB: ${POSTGRES_DB:-task_manager}
       POSTGRES_USER: ${POSTGRES_USER:-task_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-task_manager_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0

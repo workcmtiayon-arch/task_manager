@@ -48,7 +48,8 @@ Install Docker Engine with the Compose plugin, then create the local environment
 
 ```bash
 cp .env.example .env
-# Set DJANGO_SECRET_KEY and any provider/email credentials needed locally.
+# Replace the local-only POSTGRES_PASSWORD and set DJANGO_SECRET_KEY.
+# Add any provider/email credentials needed locally.
 docker compose config
 docker compose up -d --build
 docker compose ps
