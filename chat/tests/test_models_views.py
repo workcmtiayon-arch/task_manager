@@ -270,3 +270,19 @@ class MessageSendingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("\r", response["Content-Disposition"])
         self.assertNotIn("\n", response["Content-Disposition"])
+
+    def test_attachment_storage_path_uses_an_opaque_filename(self):
+        sender = User.objects.create_user(username="opaque", email="opaque@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="opaque-target", email="opaque-target@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(sender, recipient)
+        self.client.force_login(sender)
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/attachments/",
+            {"file": SimpleUploadedFile('" onerror="alert(1).txt', b"plain text", content_type="text/plain")},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        attachment = MessageAttachment.objects.get(message__sender=sender)
+        self.assertNotIn('"', attachment.file_name)
+        self.assertNotIn("onerror", attachment.file.name)

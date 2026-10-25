@@ -1,6 +1,7 @@
 """Modèle et règles de validation des pièces jointes du chat."""
 
 import os
+import uuid
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -11,8 +12,16 @@ from .messages import Message
 
 
 def attachment_upload_path(instance, filename):
-    """Construit le chemin de stockage regroupé par conversation."""
-    return f"chat_attachments/conversation_{instance.message.conversation_id}/{os.path.basename(filename)}"
+    """Store uploads under opaque names so user filenames never form paths."""
+    extension = {
+        "image/png": ".png",
+        "image/jpeg": ".jpg",
+        "image/gif": ".gif",
+        "image/webp": ".webp",
+        "application/pdf": ".pdf",
+        "text/plain": ".txt",
+    }.get(instance.content_type, "")
+    return f"chat_attachments/conversation_{instance.message.conversation_id}/{uuid.uuid4().hex}{extension}"
 
 
 class MessageAttachment(models.Model):

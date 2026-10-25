@@ -90,7 +90,8 @@ def conversation_attachment_upload(request, pk):
                 status=413,
             )
         message = Message.objects.create(conversation=conversation, sender=request.user, content="", message_type=Message.MessageType.ATTACHMENT)
-        MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=uploaded_file.name[:255], file_size=uploaded_file.size, content_type=uploaded_file.content_type)
+        safe_filename = get_valid_filename(uploaded_file.name).strip(".")[:255] or "attachment"
+        MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=safe_filename, file_size=uploaded_file.size, content_type=uploaded_file.content_type)
         other_members = conversation.get_members().exclude(pk=request.user.pk)
         MessageReceipt.objects.bulk_create([MessageReceipt(message=message, user=member) for member in other_members])
         maybe_accept_conversation(conversation, request.user)
