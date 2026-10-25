@@ -54,7 +54,7 @@ def registration(request):
                 user.is_active = False
                 user.email = email
                 user.save()
-                _, code = EmailOTP.generate_for(user, EmailOTP.Purpose.REGISTER)
+                otp, code = EmailOTP.generate_for(user, EmailOTP.Purpose.REGISTER)
                 send_otp_email_task.delay(user.id, code, EmailOTP.Purpose.REGISTER)
                 request.session['pending_user_id'] = user.id
             return redirect('verify-otp')

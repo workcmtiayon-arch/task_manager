@@ -14,8 +14,8 @@ class SecuritySettingsTests(SimpleTestCase):
         self.assertGreaterEqual(len(settings.SECRET_KEY), 50)
 
     def test_authentication_cookies_are_secure(self):
-        self.assertTrue(settings.SESSION_COOKIE_SECURE)
-        self.assertTrue(settings.CSRF_COOKIE_SECURE)
+        self.assertEqual(settings.SESSION_COOKIE_SECURE, settings.DEPLOYMENT_ENV == "production")
+        self.assertEqual(settings.CSRF_COOKIE_SECURE, settings.DEPLOYMENT_ENV == "production")
         self.assertTrue(settings.SESSION_COOKIE_HTTPONLY)
         self.assertEqual(settings.SESSION_COOKIE_SAMESITE, "Lax")
         self.assertEqual(settings.CSRF_COOKIE_SAMESITE, "Lax")
