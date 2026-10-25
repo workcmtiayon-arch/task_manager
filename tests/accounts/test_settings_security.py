@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.test import SimpleTestCase
+from django.core.exceptions import ImproperlyConfigured
+
+from config.settings import validate_production_database_settings
 
 
 class SecuritySettingsTests(SimpleTestCase):
@@ -19,3 +22,14 @@ class SecuritySettingsTests(SimpleTestCase):
 
     def test_content_type_sniffing_is_disabled(self):
         self.assertTrue(settings.SECURE_CONTENT_TYPE_NOSNIFF)
+
+    def test_production_database_rejects_a_missing_postgres_host(self):
+        with self.assertRaises(ImproperlyConfigured):
+            validate_production_database_settings("", "s" * 40)
+
+    def test_production_database_rejects_development_passwords(self):
+        with self.assertRaises(ImproperlyConfigured):
+            validate_production_database_settings("postgres", "task_manager_dev_password")
+
+    def test_production_database_accepts_a_long_private_password(self):
+        validate_production_database_settings("postgres", "p" * 40)

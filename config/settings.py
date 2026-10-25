@@ -61,6 +61,18 @@ if DEPLOYMENT_ENV == "production" and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS
 RATE_LIMIT_CLIENT_IP_HEADER = os.environ.get("RATE_LIMIT_CLIENT_IP_HEADER", "")
 
 
+def validate_production_database_settings(host, password):
+    """Reject SQLite and obvious development credentials in production."""
+    if not host:
+        raise ImproperlyConfigured("POSTGRES_HOST must be configured in production.")
+    lowered_password = (password or "").lower()
+    if (
+        len(password or "") < 32
+        or any(marker in lowered_password for marker in ("change-me", "example", "dev-only", "task_manager_dev"))
+    ):
+        raise ImproperlyConfigured("POSTGRES_PASSWORD must be a strong production secret.")
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -117,6 +129,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
+if DEPLOYMENT_ENV == "production":
+    validate_production_database_settings(
+        POSTGRES_HOST,
+        os.environ.get("POSTGRES_PASSWORD", ""),
+    )
 if POSTGRES_HOST:
     DATABASES = {
         'default': {
