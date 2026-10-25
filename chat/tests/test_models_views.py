@@ -305,6 +305,29 @@ class MessageSendingTests(TestCase):
 
             self.assertFalse(os.path.exists(stored_path))
 
+    def test_attachment_file_is_removed_when_database_transaction_rolls_back(self):
+        owner = User.objects.create_user(username="rollback", email="rollback@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="rollback-target", email="rollback-target@example.com", password="pass1234")
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            conversation = Conversation.objects.get_or_create_private(owner, recipient)
+            self.client.force_login(owner)
+
+            with patch(
+                "chat.views.messages.MessageReceipt.objects.bulk_create",
+                side_effect=RuntimeError("database write failed"),
+            ):
+                with self.assertRaises(RuntimeError):
+                    self.client.post(
+                        f"/chat/{conversation.pk}/attachments/",
+                        {"file": SimpleUploadedFile("rollback.txt", b"private", content_type="text/plain")},
+                    )
+
+            self.assertEqual(Message.objects.filter(conversation=conversation).count(), 0)
+            self.assertEqual(
+                [name for _, _, names in os.walk(media_root) for name in names],
+                [],
+            )
+
     def test_attachment_download_sanitizes_control_characters_in_filename(self):
         owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")
         recipient = User.objects.create_user(username="recipient", email="recipient@example.com", password="pass1234")

@@ -80,28 +80,43 @@ def conversation_attachment_upload(request, pk):
         MessageAttachment.validate_upload(uploaded_file)
     except ValidationError:
         return HttpResponseBadRequest(_("File content or type is not allowed (images, PDF or TXT only)."))
-    with transaction.atomic():
-        # Serialize uploads for this account so concurrent requests cannot
-        # all pass the storage quota using the same previous total.
-        get_user_model().objects.select_for_update().get(pk=request.user.pk)
-        stored_bytes = MessageAttachment.objects.filter(
-            message__sender_id=request.user.pk
-        ).aggregate(total=Sum("file_size"))["total"] or 0
-        storage_limit = getattr(
-            settings, "CHAT_ATTACHMENT_MAX_BYTES_PER_USER", 100 * 1024 * 1024
-        )
-        if stored_bytes + uploaded_file.size > storage_limit:
-            return JsonResponse(
-                {"detail": _("Your attachment storage limit has been reached.")},
-                status=413,
+    stored_file_name = None
+    try:
+        with transaction.atomic():
+            # Serialize uploads for this account so concurrent requests cannot
+            # all pass the storage quota using the same previous total.
+            get_user_model().objects.select_for_update().get(pk=request.user.pk)
+            stored_bytes = MessageAttachment.objects.filter(
+                message__sender_id=request.user.pk
+            ).aggregate(total=Sum("file_size"))["total"] or 0
+            storage_limit = getattr(
+                settings, "CHAT_ATTACHMENT_MAX_BYTES_PER_USER", 100 * 1024 * 1024
             )
-        message = Message.objects.create(conversation=conversation, sender=request.user, content="", message_type=Message.MessageType.ATTACHMENT)
-        safe_filename = get_valid_filename(uploaded_file.name).strip(".")[:255] or "attachment"
-        MessageAttachment.objects.create(message=message, file=uploaded_file, file_name=safe_filename, file_size=uploaded_file.size, content_type=uploaded_file.content_type)
-        other_members = conversation.get_members().exclude(pk=request.user.pk)
-        MessageReceipt.objects.bulk_create([MessageReceipt(message=message, user=member) for member in other_members])
-        maybe_accept_conversation(conversation, request.user)
-        conversation.touch()
+            if stored_bytes + uploaded_file.size > storage_limit:
+                return JsonResponse(
+                    {"detail": _("Your attachment storage limit has been reached.")},
+                    status=413,
+                )
+            message = Message.objects.create(conversation=conversation, sender=request.user, content="", message_type=Message.MessageType.ATTACHMENT)
+            safe_filename = get_valid_filename(uploaded_file.name).strip(".")[:255] or "attachment"
+            attachment = MessageAttachment(
+                message=message,
+                file=None,
+                file_name=safe_filename,
+                file_size=uploaded_file.size,
+                content_type=uploaded_file.content_type,
+            )
+            attachment.file.save(uploaded_file.name, uploaded_file, save=False)
+            stored_file_name = attachment.file.name
+            attachment.save()
+            other_members = conversation.get_members().exclude(pk=request.user.pk)
+            MessageReceipt.objects.bulk_create([MessageReceipt(message=message, user=member) for member in other_members])
+            maybe_accept_conversation(conversation, request.user)
+            conversation.touch()
+    except Exception:
+        if stored_file_name:
+            attachment.file.storage.delete(stored_file_name)
+        raise
     payload = serialize_message(message)
     # The upload is already committed; a transient channel-layer outage must
     # not turn a successful persisted upload into an apparent HTTP failure.
