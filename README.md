@@ -101,6 +101,8 @@ python manage.py test
 
 Nginx serves collected staticfiles and proxies HTTP plus `/ws/` WebSocket connections to Daphne. Media is deliberately not mounted into Nginx; in development Django may serve it when `DJANGO_DEBUG=True`, while production should use an explicit protected media strategy. Profile photos and chat images are decoded and checked against MIME type and a pixel limit before storage. TLS is not configured in this Compose stack. When TLS terminates at an external edge proxy, configure Nginx's `docker/nginx/trusted-proxies.conf` with `set_real_ip_from <CIDR>;` entries and `docker/nginx/trusted-proxies.geo` with matching `<CIDR> 1;` entries for that proxy. The edge must overwrite `X-Forwarded-For` and `X-Forwarded-Proto`. Nginx now honors those headers only when the direct peer is in the configured trusted ranges; without entries, requests use the connection's actual address and scheme.
 
+Chat attachments are limited to 10 MiB each. Nginx allows 12 MiB per request so multipart form framing does not make a valid maximum-sized file fail at the proxy. Any additional edge proxy should use a compatible request-body limit.
+
 
 ## Project Objectives
 
