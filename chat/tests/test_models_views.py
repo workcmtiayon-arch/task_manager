@@ -230,6 +230,19 @@ class MessageSendingTests(TestCase):
         response = self.client.post(f"/chat/{conversation.pk}/reactions/set/", {"message_id": message.pk, "reaction": "INVALID"})
         self.assertEqual(response.status_code, 400)
 
+    def test_reaction_endpoint_rejects_a_malformed_message_id(self):
+        current_user = User.objects.create_user(username="react-id", email="react-id@example.com", password="pass1234")
+        recipient = User.objects.create_user(username="react-id-target", email="react-id-target@example.com", password="pass1234")
+        conversation = Conversation.objects.get_or_create_private(current_user, recipient)
+        self.client.force_login(current_user)
+
+        response = self.client.post(
+            f"/chat/{conversation.pk}/reactions/set/",
+            {"message_id": "not-an-id", "reaction": MessageReaction.Reaction.LIKE},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
     def test_reaction_endpoint_rejects_non_members(self):
         """Vérifie qu'un utilisateur externe ne peut pas réagir."""
         owner = User.objects.create_user(username="owner", email="owner@example.com", password="pass1234")

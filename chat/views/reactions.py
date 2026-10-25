@@ -16,7 +16,13 @@ def reaction_message(request, pk, remove=False):
     conversation = get_object_or_404(Conversation, pk=pk)
     if not conversation.is_member(request.user):
         return HttpResponseForbidden(_("You are not a member of this conversation."))
-    message = get_object_or_404(Message, pk=request.POST.get("message_id"), conversation=conversation)
+    try:
+        message_id = int(request.POST.get("message_id", ""))
+    except (TypeError, ValueError):
+        return JsonResponse({"detail": _("Invalid message id.")}, status=400)
+    if message_id < 1:
+        return JsonResponse({"detail": _("Invalid message id.")}, status=400)
+    message = get_object_or_404(Message, pk=message_id, conversation=conversation)
     if remove:
         MessageReaction.objects.filter(message=message, user=request.user).delete()
     else:
