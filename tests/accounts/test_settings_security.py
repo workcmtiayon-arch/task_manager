@@ -16,3 +16,6 @@ class SecuritySettingsTests(SimpleTestCase):
         self.assertTrue(settings.SESSION_COOKIE_HTTPONLY)
         self.assertEqual(settings.SESSION_COOKIE_SAMESITE, "Lax")
         self.assertEqual(settings.CSRF_COOKIE_SAMESITE, "Lax")
+
+    def test_content_type_sniffing_is_disabled(self):
+        self.assertTrue(settings.SECURE_CONTENT_TYPE_NOSNIFF)

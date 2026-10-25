@@ -217,6 +217,7 @@ CSRF_COOKIE_SECURE = DEPLOYMENT_ENV == "production"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+SECURE_CONTENT_TYPE_NOSNIFF = True
 # Production is expected to terminate TLS at the trusted proxy. Development
 # Compose exposes plain HTTP, so its browser cookies must work without TLS.
 
