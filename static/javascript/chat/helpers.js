@@ -3,7 +3,13 @@
 import { app, elements, state } from "./context.js";
 
 // Protège une valeur externe avant son insertion dans le DOM.
-export function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value == null ? "" : String(value); return div.innerHTML; }
+export function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = value == null ? "" : String(value);
+  // This helper is also used in HTML attributes. Escape quotes as well as
+  // markup delimiters so a user supplied filename cannot break out of them.
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
 
 // Formate les horodatages ISO renvoyés par le backend.
 export function formatTime(value) { return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
