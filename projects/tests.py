@@ -1,6 +1,7 @@
 from datetime import date
 from unittest.mock import patch
 
+from django.contrib.staticfiles import finders
 from django.test import TestCase
 from django.urls import reverse
 
@@ -137,7 +138,7 @@ class ProjectListDisplayTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse('project_list'))
         self.assertContains(response, '/static/css/projects.css')
-        self.assertEqual(self.client.get('/static/css/projects.css').status_code, 200)
+        self.assertIsNotNone(finders.find('css/projects.css'))
 
     def test_completed_projects_view_only_lists_completed_projects(self):
         user = User.objects.create_user(
