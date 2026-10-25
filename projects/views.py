@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 
 from .forms import ProjectForm
@@ -133,6 +134,7 @@ def upcoming_project_list(request):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def add_project(request):
     form = ProjectForm(request.POST or None)
     if form.is_valid():
@@ -144,6 +146,7 @@ def add_project(request):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def update_project(request, id):
     project = get_object_or_404(Project.objects.filter(user=request.user), id=id)
     form = ProjectForm(request.POST or None, instance=project)
@@ -154,6 +157,7 @@ def update_project(request, id):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def delete_project(request, id):
     project = get_object_or_404(Project.objects.filter(user=request.user), id=id)
     if request.method == 'POST':

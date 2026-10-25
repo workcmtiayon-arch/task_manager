@@ -100,6 +100,20 @@ class ProjectAccessTests(TestCase):
         response = self.client.get(reverse('project_list'))
         self.assertEqual(response.status_code, 302)
 
+    def test_project_mutations_reject_unsupported_http_methods(self):
+        project = Project.objects.create(user=self.owner, name="Method check")
+        self.client.force_login(self.owner)
+
+        for url in (
+            reverse('project_add'),
+            reverse('project_update', args=[project.pk]),
+            reverse('project_delete', args=[project.pk]),
+        ):
+            with self.subTest(url=url):
+                self.assertEqual(self.client.put(url).status_code, 405)
+
+        self.assertTrue(Project.objects.filter(pk=project.pk).exists())
+
 
 class ProjectListDisplayTests(TestCase):
     def test_project_list_uses_the_project_overview(self):
